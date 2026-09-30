@@ -1671,36 +1671,28 @@ function getAIRecommendations(options) {
 
   firebase.aiModel.generateContent(prompt).then(function(result) {
     return result.response.text();
-  })// Hàm retry khi model quá tải
-function callAIWithRetry(prompt, maxRetries) {
-  maxRetries = maxRetries || 3;
-  var attempt = 0;
-  
-  function tryOnce() {
-    attempt++;
-    return firebase.aiModel.generateContent(prompt)
-      .then(function (result) {
-        return result.response.text();
-      })
-      .catch(function (err) {
-        // Nếu lỗi 500/503 và còn lượt retry
-        if (attempt < maxRetries && (err.message && (err.message.includes('500') || err.message.includes('503') || err.message.includes('high demand')))) {
-          var delay = attempt * 2000; // 2s, 4s, 6s
-          console.log('⏳ AI quá tải, thử lại sau ' + (delay/1000) + 's (lần ' + attempt + '/' + maxRetries + ')');
-          return new Promise(function(resolve) {
-            setTimeout(resolve, delay);
-          }).then(tryOnce);
-        }
-        throw err;
-      });
-  }
-  
-  return tryOnce();
+  }).then(function(text) {
+    var safeText = escapeHtml(text).replace(/\n/g, '<br>');
+    card.innerHTML = '<div class="flex items-start gap-3">' +
+      '<div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-lightbulb"></i></div>' +
+      '<div class="min-w-0 text-xs text-gray-300 leading-6">' + safeText + '</div>' +
+    '</div>';
+    if (ctx.tasks.length) {
+      var f = ctx.tasks[0];
+      showAIToast(f.overdue ? '⏰ AI Coach — Task đang trễ' : '🤖 AI Coach', ctx.tasks.length + ' việc. Gợi ý: ' + f.task, { silent: silent });
+    } else if (ctx.totalPending === 0) {
+      showAIToast('🎉 AI Coach', 'Bạn đã hoàn thành toàn bộ công việc!', { silent: silent });
+    } else {
+      showAIToast('📅 AI Coach', 'Hôm nay chưa có task. Còn ' + ctx.totalPending + ' task.', { silent: silent });
+    }
+  }).catch(function(error) {
+    console.error('AI error:', error);
+    card.innerHTML = '<div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs">⚠️ AI tạm lỗi: ' + escapeHtml(error.message || 'Không xác định') + '<br><br>Nếu lỗi 403: bật <b>Gemini Developer API</b> trong Firebase Console → AI Logic.</div>';
+  }).then(function() {
+    btn.disabled = false; btn.classList.remove('opacity-60');
+    if (btnSpan) btnSpan.innerText = 'AI gợi ý cho tôi';
+  });
 }
-
-// Sử dụng retry
-callAIWithRetry(prompt, 3).then(function (text) {
-  // ... phần xử lý kết quả giữ nguyên
 
 // ========== AI REMINDERS ==========
 function sendAIProactiveReminder(force) {
