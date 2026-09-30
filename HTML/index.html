@@ -1669,29 +1669,88 @@ function getAIRecommendations(options) {
     'QUAN TRỌNG: Nếu có task, phải nói còn công việc chưa hoàn thành. Nếu task overdue, ưu tiên nhắc. ' +
     'Trả lời ngắn gọn, tiếng Việt, tối đa 3 gợi ý, không tạo task mới.';
 
- firebase.aiModel.generateContent(prompt) .then(function(result) {
-    return result.response.text();
-  }).then(function (text) {
-    var safeText = escapeHtml(text).replace(/\n/g, '<br>');
-    card.innerHTML = '<div class="flex items-start gap-3">' +
-      '<div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-lightbulb"></i></div>' +
-      '<div class="min-w-0 text-xs text-gray-300 leading-6">' + safeText + '</div>' +
-    '</div>';
-    if (ctx.tasks.length) {
-      var f = ctx.tasks[0];
-      showAIToast(f.overdue ? '⏰ AI Coach — Task đang trễ' : '🤖 AI Coach', ctx.tasks.length + ' việc. Gợi ý: ' + f.task, { silent: silent });
-    } else if (ctx.totalPending === 0) {
-      showAIToast('🎉 AI Coach', 'Bạn đã hoàn thành toàn bộ công việc!', { silent: silent });
-    } else {
-      showAIToast('📅 AI Coach', 'Hôm nay chưa có task. Còn ' + ctx.totalPending + ' task.', { silent: silent });
-    }
-  }).catch(function(error) {
-    console.error('AI error:', error);
-    card.innerHTML = '<div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs">⚠️ AI tạm lỗi: ' + escapeHtml(error.message || 'Không xác định') + '<br><br>Nếu lỗi 403: bật <b>Gemini Developer API</b> trong Firebase Console → AI Logic.</div>';
-  }).then(function() {
-    btn.disabled = false; btn.classList.remove('opacity-60');
-    if (btnSpan) btnSpan.innerText = 'AI gợi ý cho tôi';
-  });
+ // ═══ GỌI GEMINI API TRỰC TIẾP ═══
+var GEMINI_API_KEY = 'AQ.Ab8RN6IhfcN3eSiT8GfRCtdpjEWssgkY4kjyqwGxMd8_R2sY4g';
+
+var apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY;
+
+var systemPrompt = 'Bạn là AI Productivity Coach cho ứng dụng quản lý công việc. Chỉ đưa ra gợi ý thực tế, ngắn gọn, không phán xét. Ưu tiên: task đang trễ, task quan trọng, task có thể hoàn thành nhanh để tạo đà. Trả lời bằng tiếng Việt, tối đa 5 gợi ý.';
+
+var requestBody = {
+  contents: [{
+    parts: [{
+      text: systemPrompt + '\n\n' + prompt
+    }]
+  }],
+  generationConfig: {
+    temperature: 0.7,
+    maxOutputTokens: 1024
+  }
+};
+
+fetch(apiUrl, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(requestBody)
+})
+.then(function(response) {
+  if (!response.ok) {
+    return response.json().then(function(err) {
+      throw new Error(err.error ? err.error.message : 'HTTP ' + response.status);
+    });
+  }
+  return response.json();
+})
+.then(function(data) {
+  // Lấy text từ response
+  var text = '';
+  try {
+    text = data.candidates[0].content.parts[0].text;
+  } catch(e) {
+    throw new Error('Không parse được response từ Gemini');
+  }
+
+  var safeText = escapeHtml(text).replace(/\n/g, '<br>');
+  card.innerHTML = '<div class="flex items-start gap-3">' +
+    '<div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-lightbulb"></i></div>' +
+    '<div class="min-w-0 text-xs text-gray-300 leading-6">' + safeText + '</div>' +
+  '</div>';
+
+  // Toast
+  if (ctx.tasks.length) {
+    var first = ctx.tasks[0];
+    showAIToast(
+      first.overdue ? '⏰ AI Coach — Task đang trễ' : '🤖 AI Coach có gợi ý',
+      ctx.tasks.length + ' việc cần xử lý. Gợi ý: ' + first.task,
+      { silent: silent }
+    );
+  } else if (ctx.totalPending === 0) {
+    showAIToast('🎉 AI Coach', 'Bạn đã hoàn thành toàn bộ công việc!', { silent: silent });
+  } else {
+    showAIToast('📅 AI Coach', 'Hôm nay chưa có task. Còn ' + ctx.totalPending + ' task.', { silent: silent });
+  }
+})
+.catch(function(error) {
+  console.error('❌ Gemini API error:', error);
+  var msg = error.message || 'Lỗi không xác định';
+  var hint = '';
+  if (msg.includes('quota') || msg.includes('429')) {
+    hint = '<br><br><b>Gợi ý:</b> Đã hết quota. Đợi 1 phút rồi thử lại.';
+  } else if (msg.includes('API_KEY_INVALID') || msg.includes('400')) {
+    hint = '<br><br><b>Gợi ý:</b> API key sai. Kiểm tra lại.';
+  } else if (msg.includes('SAFETY')) {
+    hint = '<br><br><b>Gợi ý:</b> Nội dung bị chặn. Thử lại.';
+  }
+  card.innerHTML = '<div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs leading-relaxed">' +
+    '<b>⚠️ Lỗi:</b> ' + escapeHtml(msg) + hint + '</div>';
+})
+.then(function() {
+  // Reset button
+  btn.disabled = false;
+  btn.classList.remove('opacity-60');
+  var btnSpan = btn.querySelector('span');
+  if (btnSpan) btnSpan.innerText = 'AI gợi ý cho tôi';
+});
 }
 
 // ========== AI REMINDERS ==========
