@@ -1684,30 +1684,84 @@ function handleGuestLogin() {
   if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
 
   if (!firebase.auth || !firebase.signInAnonymously) {
-    Swal.fire({ icon: 'error', title: 'Firebase chưa sẵn sàng', text: 'Đợi 3 giây rồi thử lại.', background: '#1a1b2e', color: '#fff' });
+    Swal.fire({
+      icon: 'error',
+      title: 'Firebase chưa sẵn sàng',
+      text: 'Đợi 3 giây rồi thử lại.',
+      background: '#1a1b2e',
+      color: '#fff'
+    });
     return;
   }
 
-  if (spin) spin.classList.remove('hidden');
-  if (txt) txt.innerText = 'Đang tạo phiên Khách...';
+  // ═══ HIỆN DIALOG XÁC NHẬN ═══
+  Swal.fire({
+    title: 'Chế độ Khách',
+    html: '<div class="text-xs text-gray-300 text-left leading-relaxed">' +
+          'Bạn sẽ dùng app với tư cách <b class="text-emerald-300">Khách ẩn danh</b>.<br><br>' +
+          '<b class="text-white">Ưu điểm:</b><br>' +
+          '• Dùng ngay, không cần đăng ký<br>' +
+          '• Dữ liệu lưu trên cloud<br><br>' +
+          '<b class="text-amber-300">Lưu ý:</b><br>' +
+          '• Nếu xóa cache trình duyệt, có thể mất quyền truy cập<br>' +
+          '• Nên tạo tài khoản chính thức sau khi đã thử xong' +
+          '</div>',
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonText: 'Tiếp tục',
+    cancelButtonText: 'Hủy',
+    confirmButtonColor: '#10b981',
+    cancelButtonColor: '#374151',
+    background: '#1a1b2e',
+    color: '#fff',
+    allowOutsideClick: false,
+    allowEscapeKey: true,
+    reverseButtons: true
+  }).then(function (result) {
+    if (!result.isConfirmed) {
+      console.log('User hủy chế độ Khách');
+      return;
+    }
 
-  var timeoutId = setTimeout(function () {
-    if (spin) spin.classList.add('hidden');
-    if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-    Swal.fire({ icon: 'error', title: 'Không phản hồi', text: 'Firebase không phản hồi sau 15s.', background: '#1a1b2e', color: '#fff' });
-  }, 15000);
+    // ═══ ĐĂNG NHẬP ANONYMOUS ═══
+    if (spin) spin.classList.remove('hidden');
+    if (txt) txt.innerText = 'Đang tạo phiên Khách...';
 
-  firebase.signInAnonymously(firebase.auth).then(function (cred) {
-    clearTimeout(timeoutId);
-    console.log('Guest OK - uid:', cred.user.uid);
-  }).catch(function (err) {
-    clearTimeout(timeoutId);
-    console.error('Guest err:', err);
-    if (spin) spin.classList.add('hidden');
-    if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-    var msg = err.message || 'Không xác định';
-    if (err.code === 'auth/operation-not-allowed') msg = 'Anonymous Auth chưa bật trong Firebase Console.';
-    Swal.fire({ icon: 'error', title: 'Lỗi: ' + (err.code || 'unknown'), text: msg, background: '#1a1b2e', color: '#fff' });
+    var timeoutId = setTimeout(function () {
+      if (spin) spin.classList.add('hidden');
+      if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
+      Swal.fire({
+        icon: 'error',
+        title: 'Không phản hồi',
+        text: 'Firebase không phản hồi sau 15 giây. Kiểm tra kết nối mạng.',
+        background: '#1a1b2e',
+        color: '#fff'
+      });
+    }, 15000);
+
+    firebase.signInAnonymously(firebase.auth).then(function (cred) {
+      clearTimeout(timeoutId);
+      console.log('Guest OK - uid:', cred.user.uid);
+      if (spin) spin.classList.add('hidden');
+      if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
+      // onAuthStateChanged sẽ tự chuyển màn hình
+    }).catch(function (err) {
+      clearTimeout(timeoutId);
+      console.error('Guest err:', err);
+      if (spin) spin.classList.add('hidden');
+      if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
+      var msg = err.message || 'Không xác định';
+      if (err.code === 'auth/operation-not-allowed') {
+        msg = 'Anonymous Auth chưa bật trong Firebase Console → Authentication → Sign-in method.';
+      }
+      Swal.fire({
+        icon: 'error',
+        title: 'Lỗi: ' + (err.code || 'unknown'),
+        text: msg,
+        background: '#1a1b2e',
+        color: '#fff'
+      });
+    });
   });
 }
 
