@@ -2433,11 +2433,11 @@ try {
     try {
       var firebaseAI = aiMod.getAI(app, { backend: new aiMod.GoogleAIBackend() });
       firebase.aiModel = aiMod.getGenerativeModel(firebaseAI, {
-        model: "gemini-3.8-flash",
+        model: "gemini-2.5-flash",
         systemInstruction: 'Bạn là AI Productivity Coach. Chỉ đưa ra gợi ý thực tế, ngắn gọn. Ưu tiên: task trễ, task quan trọng. Trả lời bằng tiếng Việt, tối đa 5 gợi ý.'
       });
       firebase.aiReady = true;
-      console.log('✅ AI Coach sẵn sàng (gemini-3.8-flash)');
+      console.log('✅ AI Coach sẵn sàng (gemini-2.5-flash)');
     } catch (aiError) {
       console.warn('⚠️ AI chưa sẵn sàng:', aiError);
       console.warn('👉 Bật Gemini Developer API: Firebase Console → AI Logic → Get started');
