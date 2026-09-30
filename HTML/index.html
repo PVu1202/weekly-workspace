@@ -1669,9 +1669,10 @@ function getAIRecommendations(options) {
     'QUAN TRỌNG: Nếu có task, phải nói còn công việc chưa hoàn thành. Nếu task overdue, ưu tiên nhắc. ' +
     'Trả lời ngắn gọn, tiếng Việt, tối đa 3 gợi ý, không tạo task mới.';
 
-  firebase.aiModel.generateContent(prompt).then(function(result) {
+ firebase.aiModel.generateContent(prompt) .then(function(result) {
     return result.response.text();
-  }).then(function(text) {
+  })
+    callAIWithRetry(prompt, 3).then(function (text) {
     var safeText = escapeHtml(text).replace(/\n/g, '<br>');
     card.innerHTML = '<div class="flex items-start gap-3">' +
       '<div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-lightbulb"></i></div>' +
@@ -2433,7 +2434,7 @@ try {
     try {
       var firebaseAI = aiMod.getAI(app, { backend: new aiMod.GoogleAIBackend() });
       firebase.aiModel = aiMod.getGenerativeModel(firebaseAI, {
-        model: "gemini-2.5-flash",
+        model: "gemini-3.8-flash",
         systemInstruction: 'Bạn là AI Productivity Coach. Chỉ đưa ra gợi ý thực tế, ngắn gọn. Ưu tiên: task trễ, task quan trọng. Trả lời bằng tiếng Việt, tối đa 5 gợi ý.'
       });
       firebase.aiReady = true;
