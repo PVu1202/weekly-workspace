@@ -573,7 +573,7 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
         <div class="flex items-center space-x-3"><i class="fa-solid fa-stopwatch text-cyan-400 w-4"></i><span class="sidebar-text">Thời Gian & Pomodoro</span></div>
       </button>
       <button onclick="ww.switchTab('aiCoachTab')" id="nav-aiCoachTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
-        <div class="flex items-center space-x-3"><i class="fa-solid fa-sparkles text-fuchsia-400 w-4"></i><span class="sidebar-text">AI Coach</span></div>
+        <div class="flex items-center space-x-3"><i class="fa-solid fa-robot text-fuchsia-400 w-4"></i><span class="sidebar-text">AI Coach</span></div>
         <span id="aiReminderBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300">!</span>
       </button>
       <button onclick="ww.switchTab('reviewTab')" id="nav-reviewTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
@@ -639,7 +639,7 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
       <section id="breakoutTab" class="tab-content space-y-6">
         <div class="glass-panel rounded-2xl p-5 border border-gemini-accent/30 relative overflow-hidden">
           <div class="flex items-center justify-between mb-3">
-            <label class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-gemini-accent"></i> Thêm Mục Tiêu Lớn & Chia Nhỏ</label>
+            <label class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa-solid fa-robot text-gemini-accent"></i> Thêm Mục Tiêu Lớn & Chia Nhỏ</label>
             <span class="text-xs text-purple-300 bg-gemini-accent/10 px-2.5 py-0.5 rounded-full border border-gemini-accent/20">Micro-step</span>
           </div>
           <div class="flex flex-col md:flex-row gap-3">
@@ -743,14 +743,14 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
               <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div>
                   <div class="flex items-center gap-2 mb-2">
-                    <span class="w-9 h-9 rounded-xl bg-fuchsia-500/15 text-fuchsia-300 flex items-center justify-center ai-pulse-dot"><i class="fa-solid fa-sparkles"></i></span>
+                    <span class="w-9 h-9 rounded-xl bg-fuchsia-500/15 text-fuchsia-300 flex items-center justify-center ai-pulse-dot"><i class="fa-solid fa-robot"></i></span>
                     <span class="text-[11px] font-bold uppercase tracking-[.18em] text-fuchsia-300">AI Productivity Coach</span>
                   </div>
                   <h2 class="text-2xl md:text-3xl font-extrabold text-white">Chào bạn! 👋</h2>
                   <p class="text-xs md:text-sm text-gray-400 mt-2 max-w-2xl">Mình xem những việc chưa xong và giúp bạn biết <b class="text-gray-200">bắt đầu từ đâu</b>.</p>
                 </div>
                 <button onclick="ww.getAIRecommendations()" id="aiRecommendBtn" class="shrink-0 px-4 py-3 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold transition shadow-lg flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI gợi ý cho tôi</span>
+                  <i class="fa-solid fa-robot"></i><span>AI gợi ý cho tôi</span>
                 </button>
               </div>
               <div class="rounded-2xl bg-white/5 border border-white/10 px-4 py-3">
@@ -789,7 +789,7 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
           </div>
           <div class="glass-panel rounded-3xl p-5 border border-white/5">
             <div class="flex items-center justify-between mb-4">
-              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-fuchsia-400"></i> Gợi ý AI</h3></div>
+              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-robot text-fuchsia-400"></i> Gợi ý AI</h3></div>
               <span class="text-[10px] text-gray-500">AI</span>
             </div>
             <div id="aiRecommendationCard" class="rounded-2xl bg-black/15 border border-white/5 p-4 min-h-[170px]">
@@ -1760,7 +1760,7 @@ function switchTab(tabId) {
     if (hi) hi.innerHTML = '<i class="fa-solid fa-stopwatch text-gemini-cyan"></i>';
   } else if (tabId === 'aiCoachTab') {
     if (ht) ht.innerText = 'AI Coach & Nhắc Nhở';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-sparkles text-fuchsia-400"></i>';
+    if (hi) hi.innerHTML = '<i class="fa-solid fa-robot text-fuchsia-400"></i>';
     renderAIDashboardPreview();
     setTimeout(function() { getAIRecommendations({ silent: true }); }, 250);
   } else if (tabId === 'reviewTab') {
