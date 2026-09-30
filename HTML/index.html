@@ -132,6 +132,26 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
 #authScreen button,#authScreen input,#authScreen textarea { pointer-events:auto !important; position:relative; z-index:2; }
 #authScreen .glass-panel { position:relative; z-index:1; }
 #firebaseConfigModal { z-index:100000 !important; }
+/* Swal phải nằm TRÊN authScreen */
+.swal2-container {
+  z-index: 9999999 !important;
+}
+
+/* Cho phép click vào Swal khi authScreen đang hiện */
+.swal2-container.swal2-shown,
+.swal2-container .swal2-popup,
+.swal2-container .swal2-actions button {
+  pointer-events: auto !important;
+}
+/* Fix Swal bị che bởi authScreen */
+.swal2-container {
+  z-index: 999999 !important;
+}
+
+/* Cho phép tương tác khi authScreen đang hiện */
+.swal2-container.swal2-shown {
+  pointer-events: auto !important;
+}
 .loading-overlay { position:fixed; inset:0; background:rgba(11,11,20,.95); backdrop-filter:blur(12px); z-index:999999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
 .loading-overlay.hidden { display:none; }
 /* Subtask custom - thêm/xóa/sửa */
@@ -228,6 +248,7 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
   color: #fff;
   outline: none;
 }
+
 </style>
 <!-- Google reCAPTCHA v3 -->
 <script src="https://www.google.com/recaptcha/api.js?render=6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d"></script>
@@ -360,6 +381,22 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
 <aside id="appSidebar" class="w-72 bg-gemini-sidebar border-r border-gemini-cardBorder flex flex-col justify-between z-20 shrink-0 hidden">
   <div>
     <div class="p-5 flex items-center justify-between border-b border-gemini-cardBorder">
+  <div class="flex items-center space-x-3 sidebar-full-content">
+    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gemini-accent via-gemini-blue to-gemini-pink p-1.5 flex items-center justify-center shadow-lg text-white shrink-0">
+      <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+        <path d="M50 8V24M30 14L41 29M70 14L59 29M14 28L30 38M86 28L70 38M8 46L26 48M92 46L74 48" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M10 82L18 72H82L90 82H10Z" fill="currentColor" stroke-width="2"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="font-bold text-sm tracking-wide text-white">Weekly Workspace</h1>
+      <p class="text-[10px] text-purple-300 font-medium">Quản lý công việc</p>
+    </div>
+  </div>
+  <button onclick="ww.toggleSidebar()" id="sidebarToggleBtn" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" title="Thu gọn / Mở rộng">
+    <i class="fa-solid fa-bars text-sm"></i>
+  </button>
+</div>
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gemini-accent via-gemini-blue to-gemini-pink p-1.5 flex items-center justify-center shadow-lg text-white shrink-0">
           <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -980,6 +1017,21 @@ function toggleSubtask(goalId, subtaskId) {
 
 function deleteGoal(goalId) {
   Swal.fire({
+    didOpen: function() {
+      var auth = document.getElementById('authScreen');
+      if (auth) {
+        auth.removeAttribute('aria-hidden');
+        auth.style.pointerEvents = 'none';
+      }
+    },
+    didClose: function() {
+      var auth = document.getElementById('authScreen');
+      if (auth) {
+        auth.style.pointerEvents = '';
+      }
+    },
+    title: 'Chế độ Khách',
+    // ... phần còn lại giữ nguyên
     title:'Xóa mục tiêu?', text:'Bạn có chắc chắn muốn xóa mục tiêu này?', icon:'warning',
     showCancelButton:true, confirmButtonColor:'#ef4444', cancelButtonColor:'#374151',
     confirmButtonText:'Xóa', cancelButtonText:'Hủy',
@@ -1694,46 +1746,64 @@ function handleGuestLogin() {
     return;
   }
 
-  // ═══ HIỆN DIALOG XÁC NHẬN ═══
+  // ═══ ẨN authScreen TẠM THỜI ĐỂ DIALOG HIỆN RÕ ═══
+  var authScreen = document.getElementById('authScreen');
+  var wasHidden = authScreen && authScreen.classList.contains('hidden');
+  
+  if (authScreen && !wasHidden) {
+    authScreen.classList.add('hidden');
+  }
+
   Swal.fire({
     title: 'Chế độ Khách',
-    html: '<div class="text-xs text-gray-300 text-left leading-relaxed">' +
-          'Bạn sẽ dùng app với tư cách <b class="text-emerald-300">Khách ẩn danh</b>.<br><br>' +
-          '<b class="text-white">Ưu điểm:</b><br>' +
+    html: '<div style="text-align:left;color:#c4b5fd;font-size:13px;line-height:1.6">' +
+          'Bạn sẽ dùng app với tư cách <b style="color:#10b981">Khách ẩn danh</b>.<br><br>' +
+          '<b style="color:#fff">Ưu điểm:</b><br>' +
           '• Dùng ngay, không cần đăng ký<br>' +
           '• Dữ liệu lưu trên cloud<br><br>' +
-          '<b class="text-amber-300">Lưu ý:</b><br>' +
-          '• Nếu xóa cache trình duyệt, có thể mất quyền truy cập<br>' +
-          '• Nên tạo tài khoản chính thức sau khi đã thử xong' +
+          '<b style="color:#f59e0b">Lưu ý:</b><br>' +
+          '• Nếu xóa cache, có thể mất quyền truy cập<br>' +
+          '• Nên tạo tài khoản chính thức sau' +
           '</div>',
-    icon: 'info',
+    icon: 'question',
     showCancelButton: true,
-    confirmButtonText: 'Tiếp tục',
-    cancelButtonText: 'Hủy',
+    confirmButtonText: '✅ Tiếp tục',
+    cancelButtonText: '❌ Hủy',
     confirmButtonColor: '#10b981',
-    cancelButtonColor: '#374151',
+    cancelButtonColor: '#6b7280',
     background: '#1a1b2e',
     color: '#fff',
     allowOutsideClick: false,
-    allowEscapeKey: true,
-    reverseButtons: true
+    allowEscapeKey: false,
+    reverseButtons: true,
+    focusConfirm: true
   }).then(function (result) {
+    // ─── USER BẤM HỦY ───
     if (!result.isConfirmed) {
-      console.log('User hủy chế độ Khách');
+      // Hiện lại authScreen
+      if (authScreen && !wasHidden) {
+        authScreen.classList.remove('hidden');
+      }
       return;
     }
 
-    // ═══ ĐĂNG NHẬP ANONYMOUS ═══
+    // ─── USER BẤM TIẾP TỤC ───
+    // Không cần hiện lại authScreen — sẽ vào app luôn
+
     if (spin) spin.classList.remove('hidden');
     if (txt) txt.innerText = 'Đang tạo phiên Khách...';
 
     var timeoutId = setTimeout(function () {
       if (spin) spin.classList.add('hidden');
       if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
+      // Hiện lại authScreen nếu timeout
+      if (authScreen && !wasHidden) {
+        authScreen.classList.remove('hidden');
+      }
       Swal.fire({
         icon: 'error',
         title: 'Không phản hồi',
-        text: 'Firebase không phản hồi sau 15 giây. Kiểm tra kết nối mạng.',
+        text: 'Firebase không phản hồi sau 15 giây.',
         background: '#1a1b2e',
         color: '#fff'
       });
@@ -1741,18 +1811,22 @@ function handleGuestLogin() {
 
     firebase.signInAnonymously(firebase.auth).then(function (cred) {
       clearTimeout(timeoutId);
-      console.log('Guest OK - uid:', cred.user.uid);
-      if (spin) spin.classList.add('hidden');
-      if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-      // onAuthStateChanged sẽ tự chuyển màn hình
+      console.log('✅ Guest OK:', cred.user.uid);
+      // onAuthStateChanged sẽ ẩn authScreen và hiện app
     }).catch(function (err) {
       clearTimeout(timeoutId);
-      console.error('Guest err:', err);
+      console.error('❌ Guest err:', err);
       if (spin) spin.classList.add('hidden');
       if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-      var msg = err.message || 'Không xác định';
+      
+      // Hiện lại authScreen nếu lỗi
+      if (authScreen && !wasHidden) {
+        authScreen.classList.remove('hidden');
+      }
+      
+      var msg = err.message || 'Lỗi không xác định';
       if (err.code === 'auth/operation-not-allowed') {
-        msg = 'Anonymous Auth chưa bật trong Firebase Console → Authentication → Sign-in method.';
+        msg = 'Anonymous Auth chưa bật trong Firebase Console.';
       }
       Swal.fire({
         icon: 'error',
