@@ -1678,131 +1678,36 @@ function handleAuthSubmit(e) {
   });
 }
 function handleGuestLogin() {
-  console.log('🔵 handleGuestLogin được gọi');
-
   var spin = document.getElementById('spinGuestBtn');
   var txt = document.getElementById('txtGuestBtn');
-
-  // ═══ RESET SPINNER TRƯỚC (fix bug kẹt) ═══
   if (spin) spin.classList.add('hidden');
   if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
 
-  // ═══ KIỂM TRA FIREBASE ═══
-  if (!firebase.auth) {
-    Swal.fire({ icon:'error', title:'Firebase chưa sẵn sàng', text:'Đợi 3 giây rồi thử lại.', background:'#1a1b2e', color:'#fff' });
-    return;
-  }
-  if (!firebase.signInAnonymously) {
-    Swal.fire({ icon:'error', title:'Chưa sẵn sàng', text:'Firebase SDK đang load, thử lại sau 3 giây.', background:'#1a1b2e', color:'#fff' });
+  if (!firebase.auth || !firebase.signInAnonymously) {
+    Swal.fire({ icon: 'error', title: 'Firebase chưa sẵn sàng', text: 'Đợi 3 giây rồi thử lại.', background: '#1a1b2e', color: '#fff' });
     return;
   }
 
-  // ═══ HIỆN DIALOG XÁC NHẬN ═══
-  Swal.fire({
-    title: 'Chế độ Khách',
-    html: '<div class="text-xs text-gray-400 text-left leading-relaxed">' +
-          'Bạn sẽ dùng app với tư cách <b class="text-emerald-300">Khách ẩn danh</b>.<br><br>' +
-          '<b class="text-white">Ưu điểm:</b><br>• Dùng ngay, không cần đăng ký<br>• Dữ liệu lưu trên Firestore<br><br>' +
-          '<b class="text-amber-300">Lưu ý:</b><br>• Nếu xóa cache trình duyệt, có thể mất quyền truy cập<br>• Nên tạo tài khoản chính thức sau khi đã thử xong' +
-          '</div>',
-    icon: 'info',
-    showCancelButton: true,
-    confirmButtonText: 'Tiếp tục',
-    cancelButtonText: 'Hủy',
-    confirmButtonColor: '#10b981',
-    cancelButtonColor: '#374151',
-    background: '#1a1b2e',
-    color: '#fff',
-    allowOutsideClick: false
-  }).then(function(result) {
-    console.log('🔵 User chọn:', result.isConfirmed ? 'TIẾP TỤC' : 'HỦY');
+  if (spin) spin.classList.remove('hidden');
+  if (txt) txt.innerText = 'Đang tạo phiên Khách...';
 
-    if (!result.isConfirmed) {
-      // Reset button khi hủy
-      if (spin) spin.classList.add('hidden');
-      if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-      return;
-    }
+  var timeoutId = setTimeout(function () {
+    if (spin) spin.classList.add('hidden');
+    if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
+    Swal.fire({ icon: 'error', title: 'Không phản hồi', text: 'Firebase không phản hồi sau 15s.', background: '#1a1b2e', color: '#fff' });
+  }, 15000);
 
-    // ═══ BẮT ĐẦU ĐĂNG NHẬP ═══
-    if (spin) spin.classList.remove('hidden');
-    if (txt) txt.innerText = 'Đang tạo phiên Khách...';
-
-    // Timeout 15s
-    var timeoutId = setTimeout(function() {
-      if (spin) spin.classList.add('hidden');
-      if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-      Swal.fire({
-        icon: 'error',
-        title: 'Không phản hồi',
-        text: 'Firebase không phản hồi sau 15 giây. Kiểm tra kết nối mạng.',
-        background: '#1a1b2e', color: '#fff'
-      });
-    }, 15000);
-
-    // Nếu đang login tài khoản khác → đăng xuất trước
-    var proceed = function() {
-      firebase.signInAnonymously(firebase.auth)
-        .then(function(cred) {
-          clearTimeout(timeoutId);
-          console.log('✅ Login Khách OK:', cred.user.uid);
-          if (spin) spin.classList.add('hidden');
-          if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-          // onAuthStateChanged xử lý chuyển màn hình
-        })
-        .catch(function(err) {
-          clearTimeout(timeoutId);
-          console.error('❌ Login ERR:', err);
-          if (spin) spin.classList.add('hidden');
-          if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
-
-          var msg = err.message || 'Không xác định';
-          if (err.code === 'auth/operation-not-allowed') {
-            msg = 'Anonymous Auth chưa được bật trong Firebase Console.';
-          } else if (err.code === 'auth/network-request-failed') {
-            msg = 'Lỗi mạng. Kiểm tra kết nối internet.';
-          }
-
-          Swal.fire({
-            icon: 'error',
-            title: 'Lỗi: ' + (err.code || 'unknown'),
-            html: '<div class="text-xs text-left">' + msg + '</div>',
-            background: '#1a1b2e', color: '#fff'
-          });
-        });
-    };
-
-    if (firebase.user && !firebase.user.isAnonymous) {
-      // Đăng xuất tài khoản cũ trước
-      firebase.signOut(firebase.auth).then(function() {
-        firebase.user = null;
-        if (firebase.unsub) { firebase.unsub(); firebase.unsub = null; }
-        state.goals = [];
-        state.reviews = {};
-        proceed();
-      }).catch(function() {
-        proceed();
-      });
-    } else {
-      proceed();
-    }
-  });
-}
-
-function handleLogout() {
-  Swal.fire({
-    title:'Đăng xuất?', icon:'question', showCancelButton:true,
-    confirmButtonColor:'#7c5dfa', cancelButtonColor:'#374151',
-    confirmButtonText:'Đăng xuất', cancelButtonText:'Hủy',
-    background:'#1a1b2e', color:'#fff'
-  }).then(function(res) {
-    if (res.isConfirmed) {
-      if (firebase.unsub) firebase.unsub();
-      firebase.user = null;
-      if (firebase.auth && firebase.signOut) {
-        firebase.signOut(firebase.auth).catch(function(e) { console.warn(e); });
-      }
-    }
+  firebase.signInAnonymously(firebase.auth).then(function (cred) {
+    clearTimeout(timeoutId);
+    console.log('Guest OK - uid:', cred.user.uid);
+  }).catch(function (err) {
+    clearTimeout(timeoutId);
+    console.error('Guest err:', err);
+    if (spin) spin.classList.add('hidden');
+    if (txt) txt.innerText = 'Dùng thử với tư cách Khách';
+    var msg = err.message || 'Không xác định';
+    if (err.code === 'auth/operation-not-allowed') msg = 'Anonymous Auth chưa bật trong Firebase Console.';
+    Swal.fire({ icon: 'error', title: 'Lỗi: ' + (err.code || 'unknown'), text: msg, background: '#1a1b2e', color: '#fff' });
   });
 }
 
@@ -2081,6 +1986,26 @@ setTimeout(function() {
     firestoreSdk.onSnapshot = fsMod.onSnapshot;
 
     var app = appMod.initializeApp(firebaseConfig);
+    
+// ========== APP CHECK với reCAPTCHA Enterprise ==========
+if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  console.log('🔧 App Check: chế độ DEBUG cho localhost');
+}
+
+try {
+  var appCheckMod = await import("https://www.gstatic.com/firebasejs/11.8.0/firebase-app-check.js");
+  var appCheckProvider = new appCheckMod.ReCaptchaEnterpriseProvider('6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d');
+  var appCheck = appCheckMod.initializeAppCheck(app, {
+    provider: appCheckProvider,
+    isTokenAutoRefreshEnabled: true
+  });
+  console.log('✅ App Check đã khởi tạo');
+} catch (e) {
+  console.warn('⚠️ App Check lỗi (app vẫn chạy):', e.message);
+}
+// ========== KẾT THÚC APP CHECK ==========
+
     var auth = authMod.getAuth(app);
     var db = fsMod.getFirestore(app);
 
