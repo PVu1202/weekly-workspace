@@ -1671,8 +1671,7 @@ function getAIRecommendations(options) {
 
  firebase.aiModel.generateContent(prompt) .then(function(result) {
     return result.response.text();
-  })
-    callAIWithRetry(prompt, 3).then(function (text) {
+  }).then(function (text) {
     var safeText = escapeHtml(text).replace(/\n/g, '<br>');
     card.innerHTML = '<div class="flex items-start gap-3">' +
       '<div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-lightbulb"></i></div>' +
