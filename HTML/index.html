@@ -430,45 +430,129 @@ body.light-mode .priority-low { background: rgba(34,197,94,.1); color: #16a34a; 
 .daily-goal-title { font-size:12px; font-weight:700; color:#f3f4f6; line-height:1.35; }
 .daily-goal-meta { font-size:10px; color:#6b7280; margin-top:5px; }
 .daily-empty { padding:22px 8px; text-align:center; color:#555b70; font-size:10px; border:1px dashed rgba(255,255,255,.06); border-radius:12px; }
-/* ═══════════════ LIGHT MODE ═══════════════ */
+/* ═══════════════ LIGHT MODE (IMPROVED) ═══════════════ */
 body.light-mode {
-  background-color: #f5f7fb !important;
+  background-color: #f0f2f7 !important;
   color: #1f2937 !important;
   background-image:
-    radial-gradient(circle at 15% 15%, rgba(124,93,250,.08) 0%, transparent 35%),
-    radial-gradient(circle at 85% 85%, rgba(59,130,246,.06) 0%, transparent 40%) !important;
+    radial-gradient(circle at 15% 15%, rgba(124,93,250,.06) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(59,130,246,.05) 0%, transparent 40%) !important;
 }
 
-/* Panels & Cards */
+/* ═══ SIDEBAR ═══ */
+body.light-mode #appSidebar {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.08) !important;
+  box-shadow: 2px 0 12px rgba(0,0,0,.03);
+}
+body.light-mode #appSidebar .bg-black\/20 {
+  background: rgba(0,0,0,.015) !important;
+}
+body.light-mode #appSidebar .border-gemini-cardBorder,
+body.light-mode #appSidebar .border-b {
+  border-color: rgba(0,0,0,.07) !important;
+}
+body.light-mode #appSidebar h1 {
+  color: #111827 !important;
+}
+body.light-mode #appSidebar p {
+  color: #6b7280 !important;
+}
+
+/* Nav buttons */
+body.light-mode #appSidebar nav button {
+  color: #4b5563 !important;
+  border-color: transparent !important;
+}
+body.light-mode #appSidebar nav button:hover {
+  background: rgba(124,93,250,.06) !important;
+  color: #1f2937 !important;
+}
+body.light-mode #appSidebar nav button.tab-btn.active {
+  background: linear-gradient(135deg, rgba(124,93,250,.12), rgba(59,130,246,.06)) !important;
+  border-color: rgba(124,93,250,.3) !important;
+  color: #7c3aed !important;
+}
+body.light-mode #appSidebar nav button i {
+  opacity: 0.85;
+}
+body.light-mode #appSidebar nav button.tab-btn.active i {
+  opacity: 1;
+}
+
+/* Week picker */
+body.light-mode #appSidebar input[type="week"] {
+  background: #f9fafb !important;
+  border-color: rgba(0,0,0,.1) !important;
+  color: #1f2937 !important;
+  color-scheme: light;
+}
+body.light-mode #appSidebar .bg-gemini-card {
+  background: #f9fafb !important;
+}
+
+/* Progress box */
+body.light-mode #appSidebar .glass-card {
+  background: rgba(0,0,0,.02) !important;
+  border-color: rgba(0,0,0,.06) !important;
+}
+body.light-mode #appSidebar #sidebarProgressPct {
+  color: #059669 !important;
+}
+
+/* User info */
+body.light-mode #appSidebar .bg-white\/5 {
+  background: rgba(0,0,0,.03) !important;
+  border-color: rgba(0,0,0,.06) !important;
+}
+body.light-mode #appSidebar #userName {
+  color: #111827 !important;
+}
+body.light-mode #appSidebar #userEmail {
+  color: #6b7280 !important;
+}
+
+/* ═══ HEADER ═══ */
+body.light-mode header.glass-panel,
+body.light-mode header {
+  background: rgba(255,255,255,.95) !important;
+  border-color: rgba(0,0,0,.07) !important;
+  backdrop-filter: blur(20px);
+}
+body.light-mode #tabTitleHeader {
+  color: #111827 !important;
+}
+body.light-mode #liveDateTime {
+  color: #6b7280 !important;
+}
+
+/* Search input */
+body.light-mode #globalSearchInput {
+  background: #f9fafb !important;
+  border-color: rgba(0,0,0,.1) !important;
+  color: #1f2937 !important;
+}
+body.light-mode #globalSearchInput::placeholder {
+  color: #9ca3af !important;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+body.light-mode main {
+  background: #f0f2f7 !important;
+}
+
 body.light-mode .glass-panel {
   background: rgba(255,255,255,.9) !important;
   border-color: rgba(0,0,0,.06) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.03);
 }
 body.light-mode .glass-card {
   background: rgba(255,255,255,.75) !important;
   border-color: rgba(0,0,0,.06) !important;
 }
 body.light-mode .glass-card:hover {
-  border-color: rgba(124,93,250,.35) !important;
-  box-shadow: 0 10px 30px -5px rgba(0,0,0,.08) !important;
-}
-
-/* Sidebar */
-body.light-mode #appSidebar {
-  background: #ffffff !important;
-  border-color: rgba(0,0,0,.06) !important;
-}
-body.light-mode #appSidebar header,
-body.light-mode #appSidebar .bg-black\/20,
-body.light-mode #appSidebar .bg-black\/30 {
-  background: rgba(0,0,0,.02) !important;
-  border-color: rgba(0,0,0,.05) !important;
-}
-
-/* Main header */
-body.light-mode header {
-  background: rgba(255,255,255,.9) !important;
-  border-color: rgba(0,0,0,.06) !important;
+  border-color: rgba(124,93,250,.3) !important;
+  box-shadow: 0 8px 24px -5px rgba(0,0,0,.06) !important;
 }
 
 /* Text colors */
@@ -477,6 +561,7 @@ body.light-mode .text-gray-200 { color: #1f2937 !important; }
 body.light-mode .text-gray-300 { color: #374151 !important; }
 body.light-mode .text-gray-400 { color: #4b5563 !important; }
 body.light-mode .text-gray-500 { color: #6b7280 !important; }
+body.light-mode .text-gray-600 { color: #4b5563 !important; }
 body.light-mode .text-purple-300 { color: #7c3aed !important; }
 body.light-mode .text-purple-400 { color: #7c3aed !important; }
 body.light-mode .text-cyan-300 { color: #0891b2 !important; }
@@ -484,21 +569,22 @@ body.light-mode .text-emerald-300 { color: #059669 !important; }
 body.light-mode .text-emerald-400 { color: #059669 !important; }
 body.light-mode .text-fuchsia-300 { color: #a21caf !important; }
 body.light-mode .text-fuchsia-400 { color: #a21caf !important; }
+body.light-mode .text-red-400 { color: #dc2626 !important; }
+body.light-mode .text-amber-400 { color: #d97706 !important; }
+body.light-mode .text-green-400 { color: #16a34a !important; }
 
 /* Backgrounds */
-body.light-mode .bg-gemini-bg { background-color: #f5f7fb !important; }
+body.light-mode .bg-gemini-bg { background-color: #f0f2f7 !important; }
 body.light-mode .bg-gemini-card { background-color: #ffffff !important; }
 body.light-mode .bg-gemini-sidebar { background-color: #ffffff !important; }
 body.light-mode .bg-black\/20,
 body.light-mode .bg-black\/30,
 body.light-mode .bg-black\/40,
 body.light-mode .bg-black\/50 {
-  background-color: rgba(0,0,0,.03) !important;
+  background-color: rgba(0,0,0,.02) !important;
 }
-body.light-mode .bg-white\/5,
-body.light-mode .bg-white\/10 {
-  background-color: rgba(0,0,0,.04) !important;
-}
+body.light-mode .bg-white\/5 { background-color: rgba(0,0,0,.03) !important; }
+body.light-mode .bg-white\/10 { background-color: rgba(0,0,0,.05) !important; }
 
 /* Borders */
 body.light-mode .border-white\/5,
@@ -513,7 +599,7 @@ body.light-mode .border-gemini-cardBorder {
 body.light-mode input:not([type="checkbox"]):not([type="range"]),
 body.light-mode textarea,
 body.light-mode select {
-  background-color: rgba(0,0,0,.02) !important;
+  background-color: #f9fafb !important;
   color: #1f2937 !important;
   border-color: rgba(0,0,0,.1) !important;
 }
@@ -522,7 +608,22 @@ body.light-mode textarea::placeholder {
   color: #9ca3af !important;
 }
 
-/* Daily columns */
+/* Priority filter buttons */
+body.light-mode .priority-filter-btn {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.08) !important;
+  color: #4b5563 !important;
+}
+body.light-mode .priority-filter-btn:hover {
+  background: rgba(124,93,250,.06) !important;
+}
+body.light-mode .priority-filter-btn.active {
+  background: rgba(124,93,250,.1) !important;
+  border-color: rgba(124,93,250,.3) !important;
+  color: #7c3aed !important;
+}
+
+/* Daily board */
 body.light-mode .daily-column {
   background: linear-gradient(145deg, #ffffff, #f9fafb) !important;
   border-color: rgba(0,0,0,.06) !important;
@@ -535,6 +636,11 @@ body.light-mode .daily-goal {
   background: rgba(0,0,0,.02) !important;
   border-color: rgba(0,0,0,.05) !important;
 }
+body.light-mode .daily-day-pill {
+  background: rgba(124,93,250,.1) !important;
+  color: #7c3aed !important;
+  border-color: rgba(124,93,250,.2) !important;
+}
 
 /* Weekly progress */
 body.light-mode .week-progress-card {
@@ -542,7 +648,7 @@ body.light-mode .week-progress-card {
   border-color: rgba(0,0,0,.06) !important;
 }
 body.light-mode .week-progress-card:hover {
-  background: rgba(124,93,250,.04) !important;
+  background: rgba(124,93,250,.03) !important;
 }
 body.light-mode .week-progress-card.current {
   border-color: rgba(34,211,238,.4) !important;
@@ -557,7 +663,7 @@ body.light-mode .week-day-tab:hover {
 }
 body.light-mode .week-selected-viewer {
   background: #ffffff !important;
-  border-color: rgba(124,93,250,.15) !important;
+  border-color: rgba(124,93,250,.12) !important;
 }
 body.light-mode .week-day-schedule {
   background: #f9fafb !important;
@@ -568,10 +674,10 @@ body.light-mode .week-day-task-card {
   border-color: rgba(0,0,0,.05) !important;
 }
 body.light-mode .week-selected-day-pill,
-body.light-mode .week-day-tab-pill,
-body.light-mode .daily-day-pill {
+body.light-mode .week-day-tab-pill {
   background: rgba(124,93,250,.1) !important;
   color: #7c3aed !important;
+  border-color: rgba(124,93,250,.2) !important;
 }
 
 /* AI section */
@@ -591,23 +697,12 @@ body.light-mode .ai-reminder-panel {
   border-color: rgba(168,85,247,.15) !important;
 }
 body.light-mode .ai-hero {
-  background: radial-gradient(circle at 14% 55%, rgba(124,93,250,.15), transparent 28%),
+  background: radial-gradient(circle at 14% 55%, rgba(124,93,250,.12), transparent 28%),
               linear-gradient(135deg, #f8f7ff, #f0f4ff) !important;
+  border-color: rgba(139,92,246,.2) !important;
 }
 body.light-mode .ai-number {
   box-shadow: 0 6px 18px rgba(124,93,250,.15) !important;
-}
-
-/* Nav buttons */
-body.light-mode nav button:hover {
-  background: rgba(124,93,250,.08) !important;
-}
-
-/* Tab active */
-body.light-mode .tab-btn.active {
-  color: #7c3aed !important;
-  background: linear-gradient(135deg, rgba(124,93,250,.15), rgba(59,130,246,.08)) !important;
-  border-color: rgba(124,93,250,.3) !important;
 }
 
 /* Table */
@@ -626,19 +721,45 @@ body.light-mode .divide-gemini-cardBorder > * + * {
 body.light-mode .task-toast {
   background: rgba(255,255,255,.98) !important;
   border-color: rgba(16,185,129,.3) !important;
+  box-shadow: 0 18px 45px rgba(0,0,0,.12) !important;
 }
 body.light-mode .task-toast-title { color: #111827 !important; }
 body.light-mode .task-toast-message { color: #4b5563 !important; }
 
-/* Week picker input */
-body.light-mode input[type="week"] {
-  color-scheme: light;
+/* Calendar day cards */
+body.light-mode .calendar-day-card {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.06) !important;
 }
+body.light-mode .calendar-day-card.today {
+  border-color: rgba(34,211,238,.4) !important;
+  background: linear-gradient(145deg, #f0feff, #f8faff) !important;
+}
+body.light-mode .calendar-day-card.weekend {
+  background: linear-gradient(145deg, #faf9ff, #f5f3ff) !important;
+}
+body.light-mode .calendar-task-item {
+  background: rgba(0,0,0,.02) !important;
+  border-color: rgba(0,0,0,.06) !important;
+}
+body.light-mode .calendar-task-item:hover {
+  background: rgba(124,93,250,.05) !important;
+}
+body.light-mode .calendar-task-title { color: #1f2937 !important; }
+body.light-mode .calendar-day-name { color: #111827 !important; }
+body.light-mode .calendar-empty-state { color: #9ca3af !important; }
 
 /* Scrollbar */
-body.light-mode ::-webkit-scrollbar-track { background: rgba(0,0,0,.03); }
+body.light-mode ::-webkit-scrollbar-track { background: rgba(0,0,0,.02); }
 body.light-mode ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); }
 body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4); }
+
+/* Theme toggle icon */
+body.light-mode #themeToggleBtn { color: #6b7280 !important; }
+body.light-mode #themeToggleBtn:hover { color: #7c3aed !important; background: rgba(124,93,250,.06) !important; }
+
+/* Sync badge */
+body.light-mode #syncBadgeText { color: #059669 !important; }
 /* ═══════════════ END LIGHT MODE ═══════════════ */
 /* ═══════════ RESPONSIVE SIDEBAR ═══════════ */
 #appSidebar {
@@ -1378,6 +1499,12 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4
             </div>
             <div class="flex gap-2">
               <button onclick="ww.saveWeeklyReview()" class="px-4 py-2 bg-gemini-emerald hover:bg-emerald-600 text-black font-bold rounded-xl text-xs transition flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu</button>
+              <button onclick="ww.exportAllData()" class="px-4 py-2 bg-gemini-blue/20 hover:bg-gemini-blue/30 text-blue-300 rounded-xl text-xs transition border border-blue-500/30 flex items-center gap-1.5" title="Xuất toàn bộ dữ liệu ra file JSON">
+                <i class="fa-solid fa-download"></i> Xuất dữ liệu
+              </button>
+              <button onclick="ww.importAllData()" class="px-4 py-2 bg-gemini-accent/20 hover:bg-gemini-accent/30 text-purple-300 rounded-xl text-xs transition border border-purple-500/30 flex items-center gap-1.5" title="Nhập dữ liệu từ file JSON">
+                <i class="fa-solid fa-upload"></i> Nhập dữ liệu
+              </button>
               <button onclick="ww.exportReviewReport()" class="px-4 py-2 bg-gemini-card hover:bg-white/10 text-white rounded-xl text-xs transition border border-gemini-cardBorder flex items-center gap-1.5"><i class="fa-solid fa-file-arrow-down"></i> Tải</button>
             </div>
           </div>
@@ -1614,6 +1741,7 @@ function showAIToast(title, message, options) {
 function saveStateToFirestore() {
   if (!firebase.user || !firebase.db) return;
   var uid = firebase.user.uid;
+   autoBackupLocal(); 
   try {
     var ref = firestoreSdk.doc(firebase.db, 'artifacts', appId, 'users', uid, 'userData', 'plannerState');
     firestoreSdk.setDoc(ref, {
@@ -2829,7 +2957,155 @@ function loadWeeklyReviewData() {
   var rv = document.getElementById('ratingVal');
   if (rv) rv.innerText = (data.rating || 8) + '/10';
 }
+// ========== EXPORT / IMPORT DATA ==========
+function exportAllData() {
+    try {
+        var exportData = {
+            version: '1.0',
+            exportedAt: new Date().toISOString(),
+            user: {
+                displayName: (firebase.user && firebase.user.displayName) || 'Unknown',
+                email: (firebase.user && firebase.user.email) || '',
+                uid: (firebase.user && firebase.user.uid) || ''
+            },
+            goals: state.goals,
+            reviews: state.reviews,
+            meta: {
+                totalGoals: state.goals.length,
+                totalReviews: Object.keys(state.reviews || {}).length,
+                currentWeek: state.currentWeekKey
+            }
+        };
+        
+        var jsonStr = JSON.stringify(exportData, null, 2);
+        var blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        var timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        a.href = url;
+        a.download = 'weekly-workspace-backup-' + timestamp + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Đã xuất dữ liệu!',
+            html: '<div class="text-xs text-left text-gray-300">' +
+                  '<b>File:</b> weekly-workspace-backup-' + timestamp + '.json<br>' +
+                  '<b>Số mục tiêu:</b> ' + state.goals.length + '<br>' +
+                  '<b>Số đánh giá:</b> ' + Object.keys(state.reviews || {}).length + '<br><br>' +
+                  '<span class="text-gray-400">File đã được tải về máy bạn. Hãy cất giữ ở nơi an toàn.</span>' +
+                  '</div>',
+            background: '#1a1b2e',
+            color: '#fff'
+        });
+    } catch (err) {
+        console.error('Export error:', err);
+        Swal.fire({ icon: 'error', title: 'Lỗi xuất dữ liệu', text: err.message, background: '#1a1b2e', color: '#fff' });
+    }
+}
 
+function importAllData() {
+    // Tạo input file ẩn
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    
+    input.onchange = function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                var data = JSON.parse(evt.target.result);
+                
+                if (!data.goals || !Array.isArray(data.goals)) {
+                    throw new Error('File không đúng định dạng — thiếu mảng "goals"');
+                }
+                
+                // Hiện dialog xác nhận
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Xác nhận nhập dữ liệu?',
+                    html: '<div class="text-xs text-left text-gray-300">' +
+                          '<b>File:</b> ' + file.name + '<br>' +
+                          '<b>Xuất lúc:</b> ' + (data.exportedAt || 'Không rõ') + '<br>' +
+                          '<b>Chủ sở hữu:</b> ' + ((data.user && data.user.email) || 'Không rõ') + '<br>' +
+                          '<b>Số mục tiêu:</b> ' + data.goals.length + '<br>' +
+                          '<b>Số đánh giá:</b> ' + Object.keys(data.reviews || {}).length + '<br><br>' +
+                          '<span style="color:#ef4444;font-weight:700">⚠️ CẢNH BÁO: Dữ liệu hiện tại sẽ bị THAY THẾ!</span><br>' +
+                          '<span class="text-gray-400">Hãy chắc chắn bạn đã backup dữ liệu hiện tại trước.</span>' +
+                          '</div>',
+                    showCancelButton: true,
+                    confirmButtonText: 'Nhập & Thay thế',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    background: '#1a1b2e',
+                    color: '#fff'
+                }).then(function(result) {
+                    if (!result.isConfirmed) return;
+                    
+                    // Áp dụng dữ liệu
+                    state.goals = data.goals;
+                    state.reviews = data.reviews || {};
+                    
+                    saveStateToFirestore();
+                    renderAll();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Nhập thành công!',
+                        text: 'Đã khôi phục ' + data.goals.length + ' mục tiêu',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        background: '#1a1b2e',
+                        color: '#fff'
+                    });
+                });
+            } catch (err) {
+                console.error('Import error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File không hợp lệ',
+                    text: err.message || 'Không đọc được file JSON',
+                    background: '#1a1b2e',
+                    color: '#fff'
+                });
+            }
+        };
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// Auto backup mỗi ngày vào localStorage
+function autoBackupLocal() {
+    try {
+        var lastBackup = localStorage.getItem('weekly_ws_last_backup');
+        var now = Date.now();
+        var oneDay = 24 * 60 * 60 * 1000;
+        
+        if (!lastBackup || (now - Number(lastBackup)) > oneDay) {
+            var backup = {
+                version: '1.0',
+                backedUpAt: new Date().toISOString(),
+                goals: state.goals,
+                reviews: state.reviews
+            };
+            localStorage.setItem('weekly_ws_auto_backup', JSON.stringify(backup));
+            localStorage.setItem('weekly_ws_last_backup', String(now));
+            console.log('💾 Auto backup: đã lưu', state.goals.length, 'mục tiêu');
+        }
+    } catch (e) {
+        // Có thể vượt localStorage limit
+        console.warn('Auto backup failed:', e.message);
+    }
+}
 function exportReviewReport() {
   var data = state.reviews[state.currentWeekKey] || {};
   var u = firebase.user || {};
@@ -3126,6 +3402,9 @@ window.ww = {
   closeFirebaseConfigModal: closeFirebaseConfigModal,
   saveCustomFirebaseConfig: saveCustomFirebaseConfig,
   resetFirebaseConfig: resetFirebaseConfig,
+  exportReviewReport: exportReviewReport,
+  exportAllData: exportAllData,              
+  importAllData: importAllData,              
   switchTab: switchTab,
   toggleSidebar: toggleSidebar,
   setPriorityFilter: setPriorityFilter,
@@ -3397,6 +3676,8 @@ window.editSubtask = window.ww.editSubtask;
 window.enableTaskNotifications = enableTaskNotifications;
 window.saveWeeklyReview = saveWeeklyReview;
 window.exportReviewReport = exportReviewReport;
+window.exportAllData = exportAllData;
+window.importAllData = importAllData;
 window.selectWeekFromProgress = window.ww.selectWeekFromProgress;
 window.selectWeekDay = window.ww.selectWeekDay;
 window.setCurrentWeek = window.ww.setCurrentWeek;
