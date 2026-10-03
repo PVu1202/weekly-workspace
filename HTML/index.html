@@ -648,6 +648,160 @@ body.light-mode .priority-low { background: rgba(34,197,94,.1); color: #16a34a; 
   33% { opacity: 1; transform: translate(20px, -20px) scale(1.1); }
   66% { opacity: 0.8; transform: translate(-20px, 20px) scale(0.95); }
 }
+/* ═══ LIVE STATS ROW ═══ */
+.auth-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 40, 0.5) 0%, 
+    rgba(19, 19, 29, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  margin: 0 0 24px;
+  max-width: 520px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+}
+
+.auth-stats-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(139, 92, 246, 0.4) 50%, 
+    transparent 100%);
+  opacity: 0.6;
+  animation: borderScanStat 4s ease-in-out infinite;
+}
+
+@keyframes borderScanStat {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.auth-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.auth-stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.auth-stat:hover .auth-stat-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.auth-stat-violet {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.06));
+  color: #a78bfa;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.15);
+}
+
+.auth-stat-cyan {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(34, 211, 238, 0.06));
+  color: #22d3ee;
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.15);
+}
+
+.auth-stat-emerald {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.06));
+  color: #34d399;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.15);
+}
+
+.auth-stat-amber {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.06));
+  color: #fbbf24;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
+}
+
+.auth-stat-body {
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.auth-stat-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fafafa;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.3s ease;
+}
+
+.auth-stat-unit {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7d7d8a;
+  margin-left: 1px;
+}
+
+.auth-stat-label {
+  font-size: 10px;
+  color: #7d7d8a;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.auth-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.08) 50%, 
+    transparent 100%);
+  flex-shrink: 0;
+}
+
+/* Counter animation */
+.auth-stat-value.counting {
+  color: #a78bfa;
+  text-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+
+/* Light mode */
+body.light-mode .auth-stats-row {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.8) 0%, 
+    rgba(250, 250, 252, 0.9) 100%);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .auth-stat-value {
+  color: #111827;
+}
+
+body.light-mode .auth-stat-label {
+  color: #6b7280;
+}
 /* ═══ MARQUEE ═══ */
 .auth-marquee-wrap {
   width: 100%;
@@ -3605,6 +3759,56 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
       </div>
     </div>
     <!-- ═══ ANIMATED PREVIEW SCENE ═══ -->
+<!-- ═══ LIVE STATS ROW ═══ -->
+<div class="auth-stats-row">
+  
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-violet">
+      <i class="fa-solid fa-bullseye"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="12">0</div>
+      <div class="auth-stat-label">Mục tiêu</div>
+    </div>
+  </div>
+
+  <div class="auth-stat-divider"></div>
+
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-cyan">
+      <i class="fa-solid fa-list-check"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="48">0</div>
+      <div class="auth-stat-label">Bước nhỏ</div>
+    </div>
+  </div>
+
+  <div class="auth-stat-divider"></div>
+
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-emerald">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="24">0</div>
+      <div class="auth-stat-label">Đã xong</div>
+    </div>
+  </div>
+
+  <div class="auth-stat-divider"></div>
+
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-amber">
+      <i class="fa-solid fa-clock"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="42">0<span class="auth-stat-unit">h</span></div>
+      <div class="auth-stat-label">Giờ làm</div>
+    </div>
+  </div>
+
+</div>     
 <div class="auth-preview-scene">
   
   <!-- Sparkles -->
@@ -6668,6 +6872,68 @@ window.openFirebaseConfigModal = openFirebaseConfigModal;
 window.closeFirebaseConfigModal = closeFirebaseConfigModal;
 window.saveCustomFirebaseConfig = saveCustomFirebaseConfig;
 window.resetFirebaseConfig = resetFirebaseConfig;
+// ========== AUTH STATS COUNTER ==========
+function animateAuthStats() {
+  var stats = document.querySelectorAll('.auth-stat-value[data-count]');
+  if (!stats.length) return;
+
+  stats.forEach(function(el, index) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    var hasUnit = el.querySelector('.auth-stat-unit');
+    var unitHtml = hasUnit ? '<span class="auth-stat-unit">h</span>' : '';
+    
+    // Reset
+    el.innerText = '0' + (hasUnit ? 'h' : '');
+    el.classList.add('counting');
+
+    // Delay mỗi số để stagger
+    setTimeout(function() {
+      var duration = 1400;
+      var startTime = performance.now();
+      
+      function update(now) {
+        var elapsed = now - startTime;
+        var progress = Math.min(elapsed / duration, 1);
+        
+        // Easing out cubic
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var current = Math.floor(eased * target);
+        
+        el.innerHTML = current + unitHtml;
+        
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.innerHTML = target + unitHtml;
+          el.classList.remove('counting');
+        }
+      }
+      
+      requestAnimationFrame(update);
+    }, 800 + index * 200);
+  });
+}
+
+// Chạy khi trang load (sau khi animation khác xong)
+function initAuthStats() {
+  if (document.getElementById('authScreen') && !document.getElementById('authScreen').classList.contains('hidden')) {
+    setTimeout(animateAuthStats, 700);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAuthStats);
+} else {
+  initAuthStats();
+}
+
+// Re-run khi user logout (quay lại auth screen)
+window.addEventListener('focus', function() {
+  var authScreen = document.getElementById('authScreen');
+  if (authScreen && !authScreen.classList.contains('hidden')) {
+    setTimeout(animateAuthStats, 300);
+  }
+});
 // ========== AUTH PARTICLES ==========
 function generateAuthParticles() {
   var container = document.getElementById('authParticles');
