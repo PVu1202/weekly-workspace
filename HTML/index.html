@@ -1974,6 +1974,402 @@ body.light-mode #authScreen {
     display: none;
   }
 }
+/* ═══════════════════════════════════════════════════════════════
+   TAB TRANSITION ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tab content wrapper — fade + slide khi chuyển */
+.tab-content {
+  animation: tabFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+.tab-content.hidden {
+  display: none !important;
+}
+
+@keyframes tabFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Nav buttons — active transition */
+.tab-btn {
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  overflow: hidden;
+}
+
+.tab-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(124, 93, 250, 0.15) 0%, 
+    rgba(34, 211, 238, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.tab-btn:hover::before {
+  opacity: 0.5;
+}
+
+.tab-btn.active::before {
+  opacity: 1;
+}
+
+/* Icon rotation on active */
+.tab-btn i {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tab-btn.active i {
+  transform: scale(1.15);
+}
+
+/* Indicator bar — slide */
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #a78bfa, #22d3ee);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.6);
+  animation: tabIndicatorIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes tabIndicatorIn {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: 60%;
+    opacity: 1;
+  }
+}
+
+/* Cards fade-in stagger khi tab load */
+.tab-content > * {
+  animation: cardStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tab-content > *:nth-child(1) { animation-delay: 0.05s; }
+.tab-content > *:nth-child(2) { animation-delay: 0.1s; }
+.tab-content > *:nth-child(3) { animation-delay: 0.15s; }
+.tab-content > *:nth-child(4) { animation-delay: 0.2s; }
+.tab-content > *:nth-child(5) { animation-delay: 0.25s; }
+.tab-content > *:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes cardStagger {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header title — fade on tab change */
+#tabTitleHeader,
+#tabIconHeader {
+  animation: headerFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes headerFade {
+  0% { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Task items — stagger khi render */
+.daily-goal,
+.calendar-task-item,
+.week-day-task-card,
+.ai-task-row {
+  animation: taskItemIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes taskItemIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Stagger cho các task liên tiếp */
+.daily-goal:nth-child(1) { animation-delay: 0.03s; }
+.daily-goal:nth-child(2) { animation-delay: 0.06s; }
+.daily-goal:nth-child(3) { animation-delay: 0.09s; }
+.daily-goal:nth-child(4) { animation-delay: 0.12s; }
+.daily-goal:nth-child(5) { animation-delay: 0.15s; }
+
+/* Toast (góc phải) — slide in mượt hơn */
+.task-toast {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ai-toast {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Firebase config modal */
+#firebaseConfigModal .glass-panel {
+  animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.92);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+/* ═══════════════════════════════════════════════════════════════
+   END TAB TRANSITIONS
+   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   SWEETALERT2 — PREMIUM ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Backdrop — fade + blur mượt */
+.swal2-container {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(8, 8, 12, 0.7) !important;
+  animation: swalBackdropIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.swal2-container.swal2-backdrop-hide {
+  animation: swalBackdropOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes swalBackdropIn {
+  0% { opacity: 0; backdrop-filter: blur(0); }
+  100% { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+@keyframes swalBackdropOut {
+  0% { opacity: 1; backdrop-filter: blur(8px); }
+  100% { opacity: 0; backdrop-filter: blur(0); }
+}
+
+/* Popup — scale + spring + blur entrance */
+.swal2-popup {
+  animation: swalPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  will-change: transform, opacity;
+  border-radius: 24px !important;
+  overflow: hidden;
+  position: relative;
+  transform-origin: center center;
+}
+
+.swal2-popup.swal2-hide {
+  animation: swalPopOut 0.35s cubic-bezier(0.36, 0, 0.66, -0.56) !important;
+}
+
+@keyframes swalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes swalPopOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+    filter: blur(6px);
+  }
+}
+
+/* Shine sweep trên popup */
+.swal2-popup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(167, 139, 250, 0.8), 
+    rgba(34, 211, 238, 0.6),
+    transparent);
+  animation: swalShine 1.2s ease-out 0.3s forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes swalShine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Icon — bounce + glow */
+.swal2-icon {
+  animation: swalIconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both !important;
+  position: relative;
+}
+
+.swal2-icon::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: swalIconRing 1.5s ease-out 0.4s infinite;
+}
+
+@keyframes swalIconPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-45deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes swalIconRing {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+/* Title — slide up */
+.swal2-title {
+  animation: swalTitleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both !important;
+}
+
+@keyframes swalTitleIn {
+  0% { opacity: 0; transform: translateY(15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* HTML container */
+.swal2-html-container {
+  animation: swalContentIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both !important;
+}
+
+@keyframes swalContentIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Buttons — stagger + spring */
+.swal2-actions {
+  animation: swalButtonsIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both !important;
+}
+
+.swal2-actions button {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.swal2-actions button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease, height 0.5s ease;
+}
+
+.swal2-actions button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.swal2-actions button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(124, 93, 250, 0.4) !important;
+}
+
+.swal2-actions button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@keyframes swalButtonsIn {
+  0% { opacity: 0; transform: translateY(15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Success icon — check animation */
+.swal2-success .swal2-success-line-tip,
+.swal2-success .swal2-success-line-long {
+  animation-duration: 0.6s !important;
+}
+
+/* Toast (nếu dùng Swal toast) */
+.swal2-toast {
+  animation: swalToastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+@keyframes swalToastIn {
+  0% { opacity: 0; transform: translateX(100%); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Light mode adjustments */
+body.light-mode .swal2-container {
+  background: rgba(240, 240, 245, 0.7) !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   END SWEETALERT2 ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
 /* ═══ SMOOTH EASING LIBRARY ═══ */
 :root {
   /* Easing tự nhiên — không đều, mượt */
@@ -6351,43 +6747,87 @@ function enableTaskNotifications() {
   });
 }
 
-// ========== TAB SWITCHING ==========
 function switchTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
-  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-  var tab = document.getElementById(tabId);
-  var nav = document.getElementById('nav-' + tabId);
-  if (tab) tab.classList.remove('hidden');
-  if (nav) nav.classList.add('active');
-  var ht = document.getElementById('tabTitleHeader');
-  var hi = document.getElementById('tabIconHeader');
+  // Ẩn tất cả tab
+  document.querySelectorAll('.tab-content').forEach(function(el) {
+    el.classList.add('hidden');
+  });
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  
+  var targetTab = document.getElementById(tabId);
+  var targetNav = document.getElementById('nav-' + tabId);
+  
+  if (!targetTab) return;
+  
+  // Force reflow để animation chạy lại
+  void targetTab.offsetWidth;
+  
+  // Hiện tab mới — animation sẽ tự chạy
+  targetTab.classList.remove('hidden');
+  if (targetNav) targetNav.classList.add('active');
+  
+  // Re-trigger animation cho tab content
+  targetTab.style.animation = 'none';
+  void targetTab.offsetWidth;
+  targetTab.style.animation = '';
+  
+  // Re-trigger stagger animation cho các con trực tiếp
+  var children = targetTab.children;
+  for (var i = 0; i < children.length; i++) {
+    (function(child) {
+      child.style.animation = 'none';
+      void child.offsetWidth;
+      child.style.animation = '';
+    })(children[i]);
+  }
+  
+  // Header animation
+  var headerTitle = document.getElementById('tabTitleHeader');
+  var headerIcon = document.getElementById('tabIconHeader');
+  if (headerTitle) {
+    headerTitle.style.animation = 'none';
+    void headerTitle.offsetWidth;
+    headerTitle.style.animation = '';
+  }
+  if (headerIcon) {
+    headerIcon.style.animation = 'none';
+    void headerIcon.offsetWidth;
+    headerIcon.style.animation = '';
+  }
+  
+  // Cập nhật nội dung theo tab
   if (tabId === 'breakoutTab') {
-    if (ht) ht.innerText = 'Chia Nhỏ Nhiệm Vụ';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-sitemap text-gemini-accent"></i>';
+    if (headerTitle) headerTitle.innerText = 'Chia Nhỏ Nhiệm Vụ';
+    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-sitemap text-gemini-accent"></i>';
   } else if (tabId === 'calendarTab') {
-    if (ht) ht.innerText = 'Lịch Tuần 7 Ngày';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-calendar-week text-gemini-blue"></i>';
+    if (headerTitle) headerTitle.innerText = 'Lịch Tuần 7 Ngày';
+    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-calendar-week text-gemini-blue"></i>';
     var cgCal = state.goals.filter(function(g) { return g.weekKey === state.currentWeekKey; });
-    renderWeeklyCalendar(cgCal);
+    if (typeof renderWeeklyCalendar === 'function') renderWeeklyCalendar(cgCal);
   } else if (tabId === 'timerTab') {
-    if (ht) ht.innerText = 'Thời Gian & Pomodoro';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-stopwatch text-gemini-cyan"></i>';
+    if (headerTitle) headerTitle.innerText = 'Thời Gian & Pomodoro';
+    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-stopwatch text-gemini-cyan"></i>';
   } else if (tabId === 'aiCoachTab') {
-    if (ht) ht.innerText = 'AI Coach & Nhắc Nhở';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-robot text-fuchsia-400"></i>';
-    renderAIDashboardPreview();
-    setTimeout(function() { getAIRecommendations({ silent: true }); }, 250);
-  } else if (tabId === 'statsTab') {
-    if (ht) ht.innerText = 'Thống Kê & Thành Tựu';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-chart-line text-amber-400"></i>';
-    // Delay để canvas render sau khi tab hiện
+    if (headerTitle) headerTitle.innerText = 'AI Coach & Nhắc Nhở';
+    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-fuchsia-400"></i>';
+    if (typeof renderAIDashboardPreview === 'function') renderAIDashboardPreview();
     setTimeout(function() {
-        renderStatsDashboard();
+      if (typeof getAIRecommendations === 'function') {
+        getAIRecommendations({ silent: true });
+      }
+    }, 250);
+  } else if (tabId === 'reviewTab') {
+    if (headerTitle) headerTitle.innerText = 'Nhìn Lại Cuối Tuần';
+    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-clipboard-check text-gemini-emerald"></i>';
+    if (typeof loadWeeklyReviewData === 'function') loadWeeklyReviewData();
+  } else if (tabId === 'statsTab') {
+    if (headerTitle) headerTitle.innerText = 'Thống Kê & Thành Tựu';
+    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-chart-line text-amber-400"></i>';
+    setTimeout(function() {
+      if (typeof renderStatsDashboard === 'function') renderStatsDashboard();
     }, 100);
-  }else if (tabId === 'reviewTab') {
-    if (ht) ht.innerText = 'Nhìn Lại Cuối Tuần';
-    if (hi) hi.innerHTML = '<i class="fa-solid fa-clipboard-check text-gemini-emerald"></i>';
-    loadWeeklyReviewData();
   }
 }
 
