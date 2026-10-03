@@ -2639,47 +2639,9 @@ body.light-mode .swal2-container {
    APPLY CHO MAIN APP
    ═══════════════════════════════════════════════════════════════ */
 
-/* Main app wrapper có waves bg */
+/* ═══ MAIN APP — CHỈ ĐỔI NỀN, KHÔNG WAVES ═══ */
 #appMain {
-  position: relative;
   background: #06060a !important;
-}
-
-#appMain .cyber-waves-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Main app content nằm trên waves */
-#appMain > *:not(.cyber-waves-bg) {
-  position: relative;
-  z-index: 1;
-}
-
-/* Header riêng */
-#appMain header {
-  z-index: 10 !important;
-  background: linear-gradient(180deg, rgba(8, 8, 12, 0.85), rgba(6, 6, 10, 0.85)) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-}
-
-/* Body main — bỏ bg-image cũ, dùng waves */
-#appMain > div.flex-1 {
-  background: transparent !important;
-}
-
-/* Decor grid cũ có thể xóa */
-.main-decor-grid {
-  opacity: 0.15 !important;
-  mix-blend-mode: screen;
-}
-
-/* Sidebar — giữ nguyên dark, không cần waves */
-#appSidebar {
-  position: relative;
-  z-index: 20;
 }
 
 /* ═══════════════════════════════════════════════════════════════
