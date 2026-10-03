@@ -3579,6 +3579,81 @@ body.light-mode #authScreen {
     radial-gradient(ellipse 70% 50% at 80% 70%, rgba(34,211,238,.05), transparent 60%);
 }
 /* ═══════════════ END AUTH SCREEN ═══════════════ */
+/* ═══ DEADLINE BADGE ═══ */
+.deadline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: 6px;
+  animation: deadlineIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes deadlineIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.deadline-normal {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.deadline-today {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.08));
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  animation: deadlineToday 2s ease-in-out infinite;
+}
+
+@keyframes deadlineToday {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(251, 191, 36, 0); }
+}
+
+.deadline-soon {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(249, 115, 22, 0.06));
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.deadline-overdue {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.08));
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  animation: deadlineOverdue 1.5s ease-in-out infinite;
+}
+
+@keyframes deadlineOverdue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+/* Task có deadline overdue — border đỏ nhấp nháy */
+.daily-goal.deadline-overdue-task {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  box-shadow: 
+    0 0 20px rgba(239, 68, 68, 0.15),
+    inset 0 0 0 1px rgba(239, 68, 68, 0.1);
+  animation: taskOverduePulse 3s ease-in-out infinite;
+}
+
+@keyframes taskOverduePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.25); }
+}
+
+/* Light mode */
+body.light-mode .deadline-normal { color: #16a34a; }
+body.light-mode .deadline-today { color: #d97706; }
+body.light-mode .deadline-soon { color: #ea580c; }
+body.light-mode .deadline-overdue { color: #dc2626; }
 /* ═══ INLINE EDIT SUBTASK ═══ */
 .subtask-text-editable {
   cursor: text;
@@ -4871,6 +4946,10 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
                 <option value="medium" selected>🟡 Trung</option>
                 <option value="low">🟢 Thấp</option>
               </select>
+              <input type="datetime-local" id="newGoalDeadline" 
+                class="bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-gemini-accent transition"
+                title="Hạn chót (tùy chọn)"
+                placeholder="Deadline">
               <button onclick="ww.createNewBigGoal()" class="px-5 py-3 bg-gemini-accent hover:bg-gemini-accentHover text-white rounded-xl text-xs font-semibold shadow-lg transition flex items-center gap-2 shrink-0">
                 <i class="fa-solid fa-layer-group"></i><span>Thêm</span>
               </button>
@@ -5504,6 +5583,7 @@ function createNewBigGoal() {
   var estInput = document.getElementById('newGoalEst');
   var dayInput = document.getElementById('newGoalDay');
   var priorityInput = document.getElementById('newGoalPriority');
+  var deadlineInput = document.getElementById('newGoalDeadline');
   var title = titleInput.value.trim();
   if (!title) {
     Swal.fire({ icon:'warning', title:'Thông báo', text:'Vui lòng nhập tên mục tiêu!', background:'#1a1b2e', color:'#fff' });
@@ -5518,6 +5598,7 @@ function createNewBigGoal() {
     estimatedHours: parseFloat(estInput.value) || 2,
     actualHours: 0,
     priority: priorityInput.value || 'medium',
+    deadline: deadlineInput && deadlineInput.value ? deadlineInput.value : null,
     subtasks: [
       { id: 'st_' + ts + '_1', text: 'Chuẩn bị tài liệu & nguồn lực', completed: false },
       { id: 'st_' + ts + '_2', text: 'Thực hiện nội dung cốt lõi', completed: false },
@@ -5528,7 +5609,64 @@ function createNewBigGoal() {
   saveStateToFirestore();
   renderAll();
   titleInput.value = ''; estInput.value = '';
+  if (deadlineInput) deadlineInput.value = '';
   Swal.fire({ icon:'success', title:'Thành công', text:'Đã tạo mục tiêu!', timer:1200, showConfirmButton:false, background:'#1a1b2e', color:'#fff' });
+}
+// ═══ DEADLINE HELPERS ═══
+function getDeadlineInfo(deadlineStr) {
+  if (!deadlineStr) return null;
+  
+  var deadline = new Date(deadlineStr);
+  if (isNaN(deadline.getTime())) return null;
+  
+  var now = new Date();
+  var diffMs = deadline - now;
+  var diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  var diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+  
+  if (diffMs < 0) {
+    var overdueDays = Math.abs(Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    var overdueHours = Math.abs(Math.floor(diffMs / (1000 * 60 * 60)));
+    return {
+      status: 'overdue',
+      text: overdueDays > 0 ? 'Trễ ' + overdueDays + ' ngày' : 'Trễ ' + overdueHours + 'h',
+      class: 'deadline-overdue',
+      icon: 'fa-solid fa-triangle-exclamation'
+    };
+  }
+  
+  if (diffDays === 0) {
+    return {
+      status: 'today',
+      text: 'Hôm nay ' + deadline.getHours() + ':' + String(deadline.getMinutes()).padStart(2, '0'),
+      class: 'deadline-today',
+      icon: 'fa-solid fa-fire'
+    };
+  }
+  
+  if (diffDays <= 2) {
+    return {
+      status: 'soon',
+      text: 'Còn ' + diffDays + ' ngày',
+      class: 'deadline-soon',
+      icon: 'fa-solid fa-hourglass-half'
+    };
+  }
+  
+  return {
+    status: 'normal',
+    text: 'Còn ' + diffDays + ' ngày',
+    class: 'deadline-normal',
+    icon: 'fa-regular fa-calendar'
+  };
+}
+
+function renderDeadlineBadge(goal) {
+  var info = getDeadlineInfo(goal.deadline);
+  if (!info) return '';
+  return '<span class="deadline-badge ' + info.class + '" title="Hạn: ' + new Date(goal.deadline).toLocaleString('vi-VN') + '">' +
+    '<i class="' + info.icon + '"></i> ' + info.text +
+  '</span>';
 }
 // ═══ INLINE EDIT SUBTASK ═══
 function makeSubtaskEditable(el, goalId, subtaskId) {
@@ -5940,7 +6078,7 @@ function renderBreakoutTasks(goals) {
                     return '<div class="daily-goal ' + getPriorityTaskClass(priority) + '">' +
                         '<div class="flex items-start justify-between gap-2">' +
                             '<div class="min-w-0 flex-1">' +
-                                '<div class="mb-1"><span class="priority-badge ' + getPriorityClass(priority) + '">' + getPriorityLabel(priority) + '</span></div>' +
+                                '<div class="mb-1 flex flex-wrap items-center gap-1"><span class="priority-badge ' + getPriorityClass(priority) + '">' + getPriorityLabel(priority) + '</span>' + renderDeadlineBadge(goal) + '</div>' +
                                 '<div class="daily-goal-title">' + escapeHtml(goal.title) + '</div>' +
                                 '<div class="daily-goal-meta">⏱ ' + (goal.estimatedHours || 0) + 'h • ' + completed + '/' + subs.length + ' bước' + (pending ? ' • còn ' + pending : ' • hoàn thành') + '</div>' +
                             '</div>' +
@@ -6072,6 +6210,9 @@ function renderWeeklyCalendar(goals) {
                            'title="' + escapeHtml(goal.title) + '">' +
                         '<div class="calendar-task-title">' + escapeHtml(goal.title) + '</div>' +
                         '<div class="calendar-task-meta">' +
+                          '<div class="calendar-task-meta">' +
+                          renderDeadlineBadge(goal) +
+                          '<span><i class="fa-regular fa-clock"></i> ' + (goal.estimatedHours || 0) + 'h</span>' +
                             '<span><i class="fa-regular fa-clock"></i> ' + (goal.estimatedHours || 0) + 'h</span>' +
                             '<span><i class="fa-solid fa-list-check"></i> ' + done + '/' + subs.length + '</span>' +
                             (goalDone ? '<span style="color:#4ade80"><i class="fa-solid fa-check"></i> Xong</span>' : '') +
@@ -6956,7 +7097,49 @@ fetch(apiUrl, {
   if (btnSpan) btnSpan.innerText = 'AI gợi ý cho tôi';
 });
 }
+// ═══ DEADLINE REMINDER ═══
+function checkDeadlines() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  
+  var now = Date.now();
+  var lastCheck = Number(localStorage.getItem('ws_deadline_last_check') || 0);
+  var oneHour = 60 * 60 * 1000;
+  
+  if (now - lastCheck < oneHour) return;
+  localStorage.setItem('ws_deadline_last_check', String(now));
+  
+  var upcoming = [];
+  var overdue = [];
+  
+  state.goals.forEach(function(g) {
+    if (!g.deadline) return;
+    var subs = g.subtasks || [];
+    var allDone = subs.length > 0 && subs.every(function(s) { return s.completed; });
+    if (allDone) return;
+    
+    var info = getDeadlineInfo(g.deadline);
+    if (!info) return;
+    
+    if (info.status === 'overdue') overdue.push(g);
+    else if (info.status === 'today' || info.status === 'soon') upcoming.push(g);
+  });
+  
+  if (overdue.length > 0) {
+    new Notification('🚨 Có ' + overdue.length + ' task trễ hạn!', {
+      body: overdue.slice(0, 3).map(function(g) { return '• ' + g.title; }).join('\n'),
+      tag: 'deadline-overdue'
+    });
+  } else if (upcoming.length > 0) {
+    new Notification('⏰ Sắp đến hạn', {
+      body: upcoming.slice(0, 3).map(function(g) { return '• ' + g.title; }).join('\n'),
+      tag: 'deadline-upcoming'
+    });
+  }
+}
 
+// Chạy mỗi 30 phút
+setInterval(checkDeadlines, 30 * 60 * 1000);
+setTimeout(checkDeadlines, 5000);  // Lần đầu sau 5s
 // ========== AI REMINDERS ==========
 function sendAIProactiveReminder(force) {
   var ctx = buildAIPlannerContext();
