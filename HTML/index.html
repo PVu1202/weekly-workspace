@@ -125,6 +125,50 @@ body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans',
 .daily-progress-fill.done { background:linear-gradient(90deg,#10b981,#34d399); }
 .daily-goal { padding:10px 11px; border-radius:13px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.06); margin-top:8px; transition:.2s ease; }
 .daily-goal:hover { transform:translateY(-1px); border-color:rgba(124,93,250,.35); background:rgba(124,93,250,.06); }
+/* ═══ PRIORITY BADGES ═══ */
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.priority-high {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.priority-medium {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+.priority-low {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Border highlight cho task priority cao */
+.daily-goal.priority-high-task {
+  border-left: 3px solid #ef4444;
+}
+.daily-goal.priority-medium-task {
+  border-left: 3px solid #fbbf24;
+}
+.daily-goal.priority-low-task {
+  border-left: 3px solid #22c55e;
+}
+
+/* Light mode */
+body.light-mode .priority-high { background: rgba(239,68,68,.1); color: #dc2626; }
+body.light-mode .priority-medium { background: rgba(251,191,36,.1); color: #d97706; }
+body.light-mode .priority-low { background: rgba(34,197,94,.1); color: #16a34a; }
 .daily-goal-title { font-size:12px; font-weight:700; color:#f3f4f6; line-height:1.35; }
 .daily-goal-meta { font-size:10px; color:#6b7280; margin-top:5px; }
 .daily-empty { padding:22px 8px; text-align:center; color:#555b70; font-size:10px; border:1px dashed rgba(255,255,255,.06); border-radius:12px; }
@@ -866,6 +910,11 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4
                 <option value="Mon">Thứ 2</option><option value="Tue">Thứ 3</option><option value="Wed">Thứ 4</option>
                 <option value="Thu">Thứ 5</option><option value="Fri">Thứ 6</option><option value="Sat">Thứ 7</option><option value="Sun">Chủ Nhật</option>
               </select>
+              <select id="newGoalPriority" class="bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-gemini-accent transition" title="Độ ưu tiên">
+                <option value="high">🔴 Cao</option>
+                <option value="medium" selected>🟡 Trung</option>
+                <option value="low">🟢 Thấp</option>
+              </select>
               <button onclick="ww.createNewBigGoal()" class="px-5 py-3 bg-gemini-accent hover:bg-gemini-accentHover text-white rounded-xl text-xs font-semibold shadow-lg transition flex items-center gap-2 shrink-0">
                 <i class="fa-solid fa-layer-group"></i><span>Thêm</span>
               </button>
@@ -891,6 +940,17 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4
         </div>
 
         <div id="selectedWeekDetails" class="glass-panel rounded-2xl p-5 border border-white/5 relative overflow-hidden mt-5"></div>
+        <!-- Filter bar -->
+        <div class="glass-panel rounded-2xl p-3 border border-white/5 mb-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] text-gray-400 font-medium mr-2">Lọc:</span>
+            <button onclick="ww.setPriorityFilter('all')" data-filter="all" class="priority-filter-btn active text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-black/20 text-gray-300 hover:bg-white/5 transition">Tất cả</button>
+            <button onclick="ww.setPriorityFilter('high')" data-filter="high" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">🔴 Cao</button>
+            <button onclick="ww.setPriorityFilter('medium')" data-filter="medium" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition">🟡 Trung bình</button>
+            <button onclick="ww.setPriorityFilter('low')" data-filter="low" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition">🟢 Thấp</button>
+            <span id="filterCount" class="text-[10px] text-gray-500 ml-auto"></span>
+          </div>
+        </div>
         <div id="bigGoalsList" class="space-y-4"></div>
       </section>
 
@@ -1138,6 +1198,23 @@ function formatWeekLabel(w) {
   var m = String(w || '').match(/(\d{4})-W(\d{1,2})/);
   return m ? 'Tuần ' + parseInt(m[2], 10) + ', ' + m[1] : w;
 }
+// Sort theo priority: cao → trung → thấp
+var PRIORITY_ORDER = { high: 1, medium: 2, low: 3 };
+function sortByPriority(a, b) {
+    var pa = PRIORITY_ORDER[a.priority || 'medium'] || 2;
+    var pb = PRIORITY_ORDER[b.priority || 'medium'] || 2;
+    return pa - pb;
+}
+// Helper cho priority
+function getPriorityLabel(p) {
+  return { high: '🔴 Cao', medium: '🟡 Trung', low: '🟢 Thấp' }[p] || '🟡 Trung';
+}
+function getPriorityClass(p) {
+  return { high: 'priority-high', medium: 'priority-medium', low: 'priority-low' }[p] || 'priority-medium';
+}
+function getPriorityTaskClass(p) {
+  return { high: 'priority-high-task', medium: 'priority-medium-task', low: 'priority-low-task' }[p] || '';
+}
 function escapeHtml(s) {
   if (s === null || s === undefined) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -1174,6 +1251,7 @@ var state = {
   currentWeekKey: getCurrentWeekCode(),
   selectedWeekDay: getTodayDayKey(),
   selectedProgressWeek: getCurrentWeekCode(),
+  priorityFilter: 'all',
   goals: [], reviews: {}
 };
 var timer = { interval: null, seconds: 25 * 60, running: false };
@@ -1334,6 +1412,7 @@ function createNewBigGoal() {
   var titleInput = document.getElementById('newGoalInput');
   var estInput = document.getElementById('newGoalEst');
   var dayInput = document.getElementById('newGoalDay');
+  var priorityInput = document.getElementById('newGoalPriority');
   var title = titleInput.value.trim();
   if (!title) {
     Swal.fire({ icon:'warning', title:'Thông báo', text:'Vui lòng nhập tên mục tiêu!', background:'#1a1b2e', color:'#fff' });
@@ -1347,6 +1426,7 @@ function createNewBigGoal() {
     day: dayInput.value || 'Mon',
     estimatedHours: parseFloat(estInput.value) || 2,
     actualHours: 0,
+    priority: priorityInput.value || 'medium',
     subtasks: [
       { id: 'st_' + ts + '_1', text: 'Chuẩn bị tài liệu & nguồn lực', completed: false },
       { id: 'st_' + ts + '_2', text: 'Thực hiện nội dung cốt lõi', completed: false },
@@ -1531,7 +1611,8 @@ function renderSelectedWeekDetails() {
   var remaining = Math.max(total - done, 0);
   var selectedDay = state.selectedWeekDay;
   var sd = days.find(function(d) { return d.key === selectedDay; }) || days[0];
-  var selectedGoals = goals.filter(function(g) { return g.day === selectedDay; });
+  var selectedGoals = goals.filter(function(g) { return g.day === selectedDay; })
+                        .sort(sortByPriority);
   var sSubs = [];
   selectedGoals.forEach(function(g) { sSubs = sSubs.concat(g.subtasks || []); });
   var sDone = sSubs.filter(function(s) { return s.completed; }).length;
@@ -1586,9 +1667,13 @@ function renderSelectedWeekDetails() {
           var gSubs = goal.subtasks || [];
           var gDone = gSubs.filter(function(st) { return st.completed; }).length;
           var gPct = gSubs.length ? Math.round((gDone / gSubs.length) * 100) : 0;
+          var p = goal.priority || 'medium';
           return '<div class="week-day-task-card">' +
             '<div class="flex items-start justify-between gap-3">' +
               '<div class="min-w-0">' +
+                '<div class="flex items-center gap-2 mb-1">' +
+                  '<span class="priority-badge ' + getPriorityClass(p) + '">' + getPriorityLabel(p) + '</span>' +
+                '</div>' +
                 '<div class="week-selected-task-title">' + escapeHtml(goal.title) + '</div>' +
                 '<div class="week-selected-task-meta">⏱ ' + (goal.estimatedHours || 0) + ' giờ • ' + gDone + '/' + gSubs.length + ' bước</div>' +
               '</div>' +
@@ -1621,16 +1706,27 @@ function renderSelectedWeekDetails() {
 function renderBreakoutTasks(goals) {
   var container = document.getElementById('bigGoalsList');
   if (!container) return;
-  var days = [
-    { key:'Mon', label:'Thứ 2', short:'T2' }, { key:'Tue', label:'Thứ 3', short:'T3' },
-    { key:'Wed', label:'Thứ 4', short:'T4' }, { key:'Thu', label:'Thứ 5', short:'T5' },
-    { key:'Fri', label:'Thứ 6', short:'T6' }, { key:'Sat', label:'Thứ 7', short:'T7' },
-    { key:'Sun', label:'Chủ Nhật', short:'CN' }
-  ];
+  if (state.priorityFilter && state.priorityFilter !== 'all') {
+        goals = goals.filter(function(g) {
+            var p = g.priority || 'medium';
+            return p === state.priorityFilter;
+        });
+    }
+    
+    // Update count
+    var countEl = document.getElementById('filterCount');
+    if (countEl) {
+        if (state.priorityFilter === 'all') {
+            countEl.innerText = '';
+        } else {
+            countEl.innerText = 'Hiển thị ' + goals.length + ' mục tiêu';
+        }
+    }
   var todayKey = getTodayDayKey();
   container.className = 'daily-board';
   container.innerHTML = days.map(function(day) {
-    var dayGoals = goals.filter(function(g) { return g.day === day.key; });
+    var dayGoals = goals.filter(function(g) { return g.day === day.key; })
+                    .sort(sortByPriority);
     var total = 0, done = 0;
     dayGoals.forEach(function(g) {
       var subs = g.subtasks || [];
@@ -1657,14 +1753,18 @@ function renderBreakoutTasks(goals) {
         var completed = subs.filter(function(s) { return s.completed; }).length;
         var gpct = subs.length ? Math.round((completed / subs.length) * 100) : 0;
         var pending = subs.filter(function(s) { return !s.completed; }).length;
-        return '<div class="daily-goal">' +
-          '<div class="flex items-start justify-between gap-2">' +
-            '<div class="min-w-0">' +
-              '<div class="daily-goal-title">' + escapeHtml(goal.title) + '</div>' +
-              '<div class="daily-goal-meta">⏱ ' + (goal.estimatedHours || 0) + 'h • ' + completed + '/' + subs.length + ' bước' + (pending ? ' • còn ' + pending : ' • hoàn thành') + '</div>' +
+        var priority = goal.priority || 'medium';
+        return '<div class="daily-goal ' + getPriorityTaskClass(priority) + '">' +
+            '<div class="flex items-start justify-between gap-2">' +
+                '<div class="min-w-0 flex-1">' +
+                    '<div class="flex items-center gap-2 mb-1">' +
+                        '<span class="priority-badge ' + getPriorityClass(priority) + '">' + getPriorityLabel(priority) + '</span>' +
+                    '</div>' +
+                    '<div class="daily-goal-title">' + escapeHtml(goal.title) + '</div>' +
+                    '<div class="daily-goal-meta">⏱ ' + (goal.estimatedHours || 0) + 'h ...</div>' +
+                '</div>' +
+                '<span class="text-[10px] font-bold ...">' + gpct + '%</span>' +
             '</div>' +
-            '<span class="text-[10px] font-bold ' + (gpct === 100 && subs.length ? 'text-emerald-300' : 'text-purple-300') + '">' + gpct + '%</span>' +
-          '</div>' +
           '<div class="mt-2 h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:' + gpct + '%"></div></div>' +
           '<div class="flex items-center justify-between mt-2">' +
             '<span class="text-[9px] ' + (pending ? 'text-gray-500' : 'text-emerald-300') + '">' + (pending ? 'Chưa hoàn tất' : '✓ Đã hoàn tất') + '</span>' +
@@ -1740,7 +1840,22 @@ function renderStatsOnly() {
   if (estEl) estEl.innerText = totalEst.toFixed(1) + ' giờ';
   if (actEl) actEl.innerText = totalAct.toFixed(1) + ' giờ';
 }
-
+function setPriorityFilter(filter) {
+    state.priorityFilter = filter;
+    
+    // Update UI buttons
+    document.querySelectorAll('.priority-filter-btn').forEach(function(btn) {
+        if (btn.dataset.filter === filter) {
+            btn.classList.add('active', 'ring-1', 'ring-cyan-400/30');
+        } else {
+            btn.classList.remove('active', 'ring-1', 'ring-cyan-400/30');
+        }
+    });
+    
+    // Re-render
+    renderAll();
+    console.log('🔍 Filter:', filter);
+}
 function renderAll() {
   try {
     renderWeeklyProgressBoard();
@@ -1763,8 +1878,9 @@ function buildAIPlannerContext() {
     (goal.subtasks || []).forEach(function(sub) {
       if (sub.completed) return;
       var idx = getDayIndex(goal.day);
-      var item = {
+      const item = {
         task: sub.text, goal: goal.title, day: goal.day,
+        priority: goal.priority || 'medium',   // ← THÊM
         dayName: getDayVN(goal.day),
         estimatedHours: goal.estimatedHours || 0,
         overdue: idx < todayIndex, isToday: idx === todayIndex
@@ -1793,7 +1909,12 @@ function renderAIDashboardPreview() {
   if (todayCount) todayCount.innerText = ctx.tasks.length;
   if (weekCount) weekCount.innerText = ctx.totalPending;
   if (badge) badge.innerText = ctx.tasks.length + ' việc';
-  var todayTasks = ctx.tasks.filter(function(t) { return t.isToday; });
+  var todayTasks = ctx.tasks.filter(function(t) { return t.isToday; })
+                          .sort(function(a, b) {
+                              var pa = PRIORITY_ORDER[a.priority || 'medium'] || 2;
+                              var pb = PRIORITY_ORDER[b.priority || 'medium'] || 2;
+                              return pa - pb;
+                          });
   var actionable = ctx.tasks.length ? ctx.tasks : ctx.futureTasks;
   if (priority) priority.innerText = (actionable[0] && actionable[0].task) || 'Chưa có';
   if (hero) {
@@ -2370,6 +2491,7 @@ window.ww = {
   resetFirebaseConfig: resetFirebaseConfig,
   switchTab: switchTab,
   toggleSidebar: toggleSidebar,
+  setPriorityFilter: setPriorityFilter,
   toggleTheme: toggleTheme,
   createNewBigGoal: createNewBigGoal,
   toggleSubtask: toggleSubtask,
@@ -2620,6 +2742,7 @@ document.addEventListener('click', function(e) {
 window.switchTab = switchTab;
 window.toggleSidebar = toggleSidebar;
 window.toggleTheme = toggleTheme;
+window.setPriorityFilter = setPriorityFilter;
 window.createNewBigGoal = createNewBigGoal;
 window.toggleSubtask = toggleSubtask;
 window.deleteGoal = deleteGoal;
@@ -2737,11 +2860,11 @@ try {
     try {
       var firebaseAI = aiMod.getAI(app, { backend: new aiMod.GoogleAIBackend() });
       firebase.aiModel = aiMod.getGenerativeModel(firebaseAI, {
-        model: "gemini-2.5-flash",
+        model: "gemini-3.8-flash",
         systemInstruction: 'Bạn là AI Productivity Coach. Chỉ đưa ra gợi ý thực tế, ngắn gọn. Ưu tiên: task trễ, task quan trọng. Trả lời bằng tiếng Việt, tối đa 5 gợi ý.'
       });
       firebase.aiReady = true;
-      console.log('✅ AI Coach sẵn sàng (gemini-2.5-flash)');
+      console.log('✅ AI Coach sẵn sàng (gemini-3.8-flash)');
     } catch (aiError) {
       console.warn('⚠️ AI chưa sẵn sàng:', aiError);
       console.warn('👉 Bật Gemini Developer API: Firebase Console → AI Logic → Get started');
