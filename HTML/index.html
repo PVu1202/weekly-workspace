@@ -5409,50 +5409,6 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
 <div id="sidebarBackdrop" onclick="ww.toggleSidebar()"></div>
 <main id="appMain" class="flex-1 flex flex-col min-w-0 overflow-hidden bg-gemini-bg relative hidden">
   <main id="appMain" class="flex-1 flex flex-col min-w-0 overflow-hidden bg-gemini-bg relative hidden">
-  
-  <!-- ═══ CYBER WAVES BACKGROUND ═══ -->
-  <div class="cyber-waves-bg">
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="appCyberWave1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#7c5dfa" stop-opacity="0.12"/>
-          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.04"/>
-        </linearGradient>
-        
-        <linearGradient id="appCyberWave2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.08"/>
-          <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.02"/>
-        </linearGradient>
-        
-        <linearGradient id="appCyberWave3" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ec4899" stop-opacity="0.06"/>
-          <stop offset="100%" stop-color="#d946ef" stop-opacity="0.02"/>
-        </linearGradient>
-
-        <filter id="appCyberGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="10" result="blur"/>
-          <feMerge>
-            <feMergeNode in="blur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-
-      <!-- Subtle waves cho app chính -->
-      <path class="cyber-wave-1 cyber-glow-pulse" filter="url(#appCyberGlow)"
-            d="M 900 -50 Q 1100 150 1250 350 T 1500 500 L 1500 -50 Z"
-            fill="url(#appCyberWave1)"/>
-      
-      <path class="cyber-wave-3 cyber-glow-pulse-2" filter="url(#appCyberGlow)"
-            d="M 500 500 Q 800 600 1050 750 T 1500 900 L 1500 500 Z"
-            fill="url(#appCyberWave2)"/>
-      
-      <path class="cyber-wave-5 cyber-glow-pulse-3" filter="url(#appCyberGlow)"
-            d="M -50 -50 Q 150 50 300 150 T 450 220 L -50 220 Z"
-            fill="url(#appCyberWave3)"/>
-    </svg>
-  </div>
-  <!-- ═══ END CYBER WAVES ═══ -->
 
   <header class="h-16 border-b border-gemini-cardBorder glass-panel flex items-center justify-between px-3 sm:px-6 z-10">
 <header class="h-16 border-b border-gemini-cardBorder glass-panel flex items-center justify-between gap-2 px-3 sm:px-6 z-10">
