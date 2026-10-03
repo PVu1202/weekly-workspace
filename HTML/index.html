@@ -2640,8 +2640,51 @@ body.light-mode .swal2-container {
    ═══════════════════════════════════════════════════════════════ */
 
 /* ═══ MAIN APP — CHỈ ĐỔI NỀN, KHÔNG WAVES ═══ */
+/* ═══ MAIN APP — NỀN WAVES QUA BACKGROUND-IMAGE ═══ */
 #appMain {
   background: #06060a !important;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 85% 10%, rgba(124, 93, 250, 0.12), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 15% 90%, rgba(34, 211, 238, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(236, 72, 153, 0.04), transparent 70%);
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* Waves subtle chạy animation qua pseudo-element */
+#appMain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(124, 93, 250, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.05) 0%, transparent 40%);
+  animation: mainWavesDrift 25s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#appMain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.3'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes mainWavesDrift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-30px, -20px, 0); }
+}
+
+/* Content nằm trên */
+#appMain > header,
+#appMain > div.flex-1 {
+  position: relative;
+  z-index: 1;
 }
 
 /* ═══════════════════════════════════════════════════════════════
