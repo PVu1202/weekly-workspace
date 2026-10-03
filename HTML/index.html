@@ -142,6 +142,238 @@ body.light-mode mark {
   background: rgba(251, 191, 36, 0.4) !important;
   color: #92400e !important;
 }
+/* ═══════════ WEEKLY CALENDAR ═══════════ */
+.weekly-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .weekly-calendar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .weekly-calendar-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1600px) {
+  .weekly-calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+.calendar-day-card {
+  background: linear-gradient(145deg, rgba(20,21,39,.96), rgba(12,13,27,.94));
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+.calendar-day-card:hover {
+  border-color: rgba(124,93,250,.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+}
+.calendar-day-card.today {
+  border-color: rgba(34,211,238,.5);
+  box-shadow: 0 0 0 1px rgba(34,211,238,.1), 0 10px 25px rgba(34,211,238,.08);
+  background: linear-gradient(145deg, rgba(30,32,55,.96), rgba(15,18,35,.96));
+}
+.calendar-day-card.weekend {
+  background: linear-gradient(145deg, rgba(28,22,42,.96), rgba(13,13,27,.94));
+}
+
+.calendar-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.calendar-day-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calendar-day-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(124,93,250,.14);
+  border: 1px solid rgba(124,93,250,.26);
+  color: #c4b5fd;
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.calendar-day-card.today .calendar-day-badge {
+  background: linear-gradient(135deg,#7c5dfa,#9f67ff);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(124,93,250,.3);
+}
+.calendar-day-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.calendar-day-today-pill {
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(34,211,238,.15);
+  color: #67e8f9;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.calendar-day-date {
+  font-size: 9px;
+  color: #6b7280;
+  margin-top: 1px;
+}
+.calendar-day-percent {
+  font-size: 14px;
+  font-weight: 900;
+  color: #67e8f9;
+}
+.calendar-day-percent.done {
+  color: #4ade80;
+}
+
+.calendar-progress-track {
+  height: 4px;
+  background: rgba(255,255,255,.06);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.calendar-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7c5dfa, #22d3ee);
+  transition: width 0.4s ease;
+}
+.calendar-progress-fill.done {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.calendar-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.calendar-task-item {
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.06);
+  border-left-width: 3px;
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.calendar-task-item:hover {
+  background: rgba(124,93,250,.08);
+  border-color: rgba(124,93,250,.3);
+}
+.calendar-task-item.priority-high { border-left-color: #ef4444; }
+.calendar-task-item.priority-medium { border-left-color: #fbbf24; }
+.calendar-task-item.priority-low { border-left-color: #22c55e; }
+.calendar-task-item.completed {
+  opacity: 0.55;
+}
+.calendar-task-item.completed .calendar-task-title {
+  text-decoration: line-through;
+}
+
+.calendar-task-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e5e7eb;
+  line-height: 1.35;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.calendar-task-meta {
+  font-size: 9px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.calendar-task-meta i {
+  font-size: 9px;
+}
+
+.calendar-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  gap: 4px;
+  padding: 20px 8px;
+  text-align: center;
+}
+.calendar-empty-state i {
+  font-size: 20px;
+  opacity: 0.5;
+  margin-bottom: 4px;
+}
+.calendar-empty-state span {
+  font-size: 10px;
+}
+
+.calendar-more-badge {
+  font-size: 9px;
+  text-align: center;
+  color: #8b95b0;
+  padding: 4px;
+  background: rgba(124,93,250,.06);
+  border-radius: 8px;
+  margin-top: auto;
+}
+
+/* Light mode */
+body.light-mode .calendar-day-card {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.06);
+}
+body.light-mode .calendar-day-card.today {
+  border-color: rgba(34,211,238,.4);
+  background: linear-gradient(145deg, #f0feff, #f8faff);
+}
+body.light-mode .calendar-day-card.weekend {
+  background: linear-gradient(145deg, #faf9ff, #f5f3ff);
+}
+body.light-mode .calendar-task-item {
+  background: rgba(0,0,0,.02);
+  border-color: rgba(0,0,0,.06);
+}
+body.light-mode .calendar-task-item:hover {
+  background: rgba(124,93,250,.05);
+}
+body.light-mode .calendar-task-title { color: #1f2937; }
+body.light-mode .calendar-day-name { color: #111827; }
+body.light-mode .calendar-empty-state { color: #9ca3af; }
 /* ═══ PRIORITY BADGES ═══ */
 .priority-badge {
 .priority-badge {
@@ -1008,7 +1240,7 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4
           <h3 class="text-base font-bold text-white">Lịch Làm Việc 7 Ngày</h3>
           <p class="text-xs text-gray-400">Công việc phân bổ theo từng ngày</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-3" id="weeklyCalendarGrid"></div>
+        <div class="weekly-calendar-grid" id="weeklyCalendarGrid"></div>
       </section>
 
       <section id="timerTab" class="tab-content hidden space-y-6">
@@ -1870,26 +2102,106 @@ function renderBreakoutTasks(goals) {
 }
 
 function renderWeeklyCalendar(goals) {
-  var days = [
-    { key:'Mon', label:'Thứ 2' }, { key:'Tue', label:'Thứ 3' }, { key:'Wed', label:'Thứ 4' },
-    { key:'Thu', label:'Thứ 5' }, { key:'Fri', label:'Thứ 6' }, { key:'Sat', label:'Thứ 7' }, { key:'Sun', label:'CN' }
-  ];
-  var grid = document.getElementById('weeklyCalendarGrid');
-  if (!grid) return;
-  grid.innerHTML = days.map(function(d) {
-    var dg = goals.filter(function(g) { return g.day === d.key; });
-    return '<div class="glass-card rounded-xl p-3 min-h-[250px] border border-white/5 flex flex-col justify-between">' +
-      '<div class="space-y-2">' +
-        '<div class="flex justify-between items-center border-b border-gemini-cardBorder pb-2">' +
-          '<span class="font-bold text-xs text-purple-300">' + d.label + '</span>' +
-          '<span class="text-[10px] text-gray-400">' + dg.length + ' mục tiêu</span>' +
-        '</div>' +
-        '<div class="space-y-1.5">' +
-          dg.map(function(g) { return '<div class="p-2 rounded bg-black/30 border border-gemini-accent/20 text-[11px] font-medium text-white">' + escapeHtml(g.title) + '</div>'; }).join('') +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
+    var grid = document.getElementById('weeklyCalendarGrid');
+    if (!grid) return;
+
+    grid.className = 'weekly-calendar-grid';
+
+    // Lấy ngày hiện tại
+    var today = new Date();
+    var currentDayNum = today.getDay(); // 0=Sun, 1=Mon...
+    var currentDayKey = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][currentDayNum];
+
+    // Tính ngày đầu tuần (thứ 2)
+    var monday = new Date(today);
+    var daysFromMon = (currentDayNum === 0) ? 6 : currentDayNum - 1;
+    monday.setDate(today.getDate() - daysFromMon);
+
+    var days = [
+        { key:'Mon', label:'Thứ 2', short:'T2' },
+        { key:'Tue', label:'Thứ 3', short:'T3' },
+        { key:'Wed', label:'Thứ 4', short:'T4' },
+        { key:'Thu', label:'Thứ 5', short:'T5' },
+        { key:'Fri', label:'Thứ 6', short:'T6' },
+        { key:'Sat', label:'Thứ 7', short:'T7' },
+        { key:'Sun', label:'Chủ Nhật', short:'CN' }
+    ];
+
+    grid.innerHTML = days.map(function(day, idx) {
+        var dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + idx);
+        var dateStr = dayDate.getDate() + '/' + (dayDate.getMonth() + 1);
+
+        var isToday = day.key === currentDayKey;
+        var isWeekend = day.key === 'Sat' || day.key === 'Sun';
+
+        var dayGoals = goals.filter(function(g) { return g.day === day.key; });
+
+        // Tính progress
+        var totalSubs = 0, doneSubs = 0;
+        dayGoals.forEach(function(g) {
+            (g.subtasks || []).forEach(function(s) {
+                totalSubs++;
+                if (s.completed) doneSubs++;
+            });
+        });
+        var pct = totalSubs ? Math.round((doneSubs / totalSubs) * 100) : 0;
+
+        // Sắp xếp theo priority
+        dayGoals.sort(sortByPriority);
+
+        var tasksHtml = '';
+        if (dayGoals.length === 0) {
+            tasksHtml = '<div class="calendar-empty-state">' +
+                '<i class="fa-regular fa-calendar"></i>' +
+                '<span>Chưa có công việc</span>' +
+            '</div>';
+        } else {
+            var maxShow = 3;
+            var showGoals = dayGoals.slice(0, maxShow);
+            var remaining = dayGoals.length - maxShow;
+
+            tasksHtml = '<div class="calendar-tasks-list">' +
+                showGoals.map(function(goal) {
+                    var pr = goal.priority || 'medium';
+                    var subs = goal.subtasks || [];
+                    var done = subs.filter(function(s) { return s.completed; }).length;
+                    var goalDone = subs.length > 0 && done === subs.length;
+
+                    return '<div class="calendar-task-item priority-' + pr + (goalDone ? ' completed' : '') + '" ' +
+                           'onclick="ww.selectWeekDay(\'' + day.key + '\'); ww.switchTab(\'breakoutTab\');" ' +
+                           'title="' + escapeHtml(goal.title) + '">' +
+                        '<div class="calendar-task-title">' + escapeHtml(goal.title) + '</div>' +
+                        '<div class="calendar-task-meta">' +
+                            '<span><i class="fa-regular fa-clock"></i> ' + (goal.estimatedHours || 0) + 'h</span>' +
+                            '<span><i class="fa-solid fa-list-check"></i> ' + done + '/' + subs.length + '</span>' +
+                            (goalDone ? '<span style="color:#4ade80"><i class="fa-solid fa-check"></i> Xong</span>' : '') +
+                        '</div>' +
+                    '</div>';
+                }).join('') +
+                (remaining > 0 ? '<div class="calendar-more-badge">+' + remaining + ' việc khác</div>' : '') +
+            '</div>';
+        }
+
+        return '<div class="calendar-day-card' + (isToday ? ' today' : '') + (isWeekend ? ' weekend' : '') + '">' +
+            '<div class="calendar-day-header">' +
+                '<div class="calendar-day-info">' +
+                    '<div class="calendar-day-badge">' + day.short + '</div>' +
+                    '<div>' +
+                        '<div class="calendar-day-name">' + day.label +
+                            (isToday ? ' <span class="calendar-day-today-pill">Hôm nay</span>' : '') +
+                        '</div>' +
+                        '<div class="calendar-day-date">' + dateStr + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="calendar-day-percent' + (pct === 100 && totalSubs > 0 ? ' done' : '') + '">' + pct + '%</div>' +
+            '</div>' +
+            '<div class="calendar-progress-track">' +
+                '<div class="calendar-progress-fill' + (pct === 100 && totalSubs > 0 ? ' done' : '') + '" style="width:' + pct + '%"></div>' +
+            '</div>' +
+            tasksHtml +
+        '</div>';
+    }).join('');
 }
 
 function renderTimeTrackerTable(goals) {
