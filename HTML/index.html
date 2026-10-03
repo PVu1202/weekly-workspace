@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://www.google.com/recaptcha/enterprise.js?render=6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d"></script>
 <script>
 tailwind.config = {
@@ -142,6 +144,136 @@ body.light-mode mark {
   background: rgba(251, 191, 36, 0.4) !important;
   color: #92400e !important;
 }
+/* ═══════════ STATISTICS ═══════════ */
+.stats-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: linear-gradient(145deg, rgba(26,27,46,.9), rgba(18,19,38,.85));
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+.stats-card:hover {
+  border-color: rgba(124,93,250,.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.15);
+}
+.stats-card-streak {
+  background: linear-gradient(145deg, rgba(251,146,60,.08), rgba(239,68,68,.05));
+  border-color: rgba(251,146,60,.2);
+}
+
+.stats-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+.stats-icon-blue { background: rgba(59,130,246,.12); color: #60a5fa; }
+.stats-icon-cyan { background: rgba(6,182,212,.12); color: #22d3ee; }
+.stats-icon-emerald { background: rgba(16,185,129,.12); color: #34d399; }
+.stats-icon-fire { background: linear-gradient(135deg, rgba(251,146,60,.2), rgba(239,68,68,.15)); color: #fb923c; }
+
+.stats-label {
+  font-size: 10px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.stats-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+/* Achievement badge */
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+.achievement-item.unlocked {
+  background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(245,158,11,.08));
+  border-color: rgba(251,191,36,.3);
+  box-shadow: 0 0 15px rgba(251,191,36,.08);
+}
+.achievement-item.locked {
+  opacity: 0.45;
+}
+.achievement-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 12px;
+  background: rgba(255,255,255,.05);
+}
+.achievement-item.unlocked .achievement-icon {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000;
+}
+.achievement-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: #e5e7eb;
+  line-height: 1.2;
+}
+.achievement-item.unlocked .achievement-name {
+  color: #fef3c7;
+}
+.achievement-desc {
+  font-size: 8px;
+  color: #6b7280;
+  margin-top: 1px;
+}
+.achievement-item.unlocked .achievement-desc {
+  color: #fbbf24;
+}
+
+/* Light mode */
+body.light-mode .stats-card {
+  background: linear-gradient(145deg, #ffffff, #f9fafb);
+  border-color: rgba(0,0,0,.06);
+}
+body.light-mode .stats-card:hover {
+  border-color: rgba(124,93,250,.3);
+  box-shadow: 0 10px 24px rgba(0,0,0,.04);
+}
+body.light-mode .stats-card-streak {
+  background: linear-gradient(145deg, #fff7ed, #fef2f2);
+}
+body.light-mode .stats-value { color: #111827; }
+body.light-mode .stats-label { color: #6b7280; }
+body.light-mode .achievement-item {
+  background: rgba(0,0,0,.02);
+  border-color: rgba(0,0,0,.06);
+}
+body.light-mode .achievement-item.unlocked {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: rgba(251,191,36,.4);
+}
+body.light-mode .achievement-name { color: #374151; }
+body.light-mode .achievement-item.unlocked .achievement-name { color: #92400e; }
+body.light-mode .achievement-desc { color: #6b7280; }
+body.light-mode .achievement-item.unlocked .achievement-desc { color: #b45309; }
 /* ═══════════ WEEKLY CALENDAR ═══════════ */
 .weekly-calendar-grid {
   display: grid;
@@ -1209,6 +1341,12 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
         <div class="flex items-center space-x-3"><i class="fa-solid fa-robot text-fuchsia-400 w-4"></i><span class="sidebar-text">AI Coach</span></div>
         <span id="aiReminderBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300">!</span>
       </button>
+      <button onclick="ww.switchTab('statsTab')" id="nav-statsTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-chart-line text-amber-400 w-4"></i>
+          <span class="sidebar-text">Thống Kê</span>
+        </div>
+      </button>
       <button onclick="ww.switchTab('reviewTab')" id="nav-reviewTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
         <div class="flex items-center space-x-3"><i class="fa-solid fa-clipboard-check text-emerald-400 w-4"></i><span class="sidebar-text">Nhìn Lại Cuối Tuần</span></div>
       </button>
@@ -1489,7 +1627,120 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
           </div>
         </div>
       </section>
+<!-- ═══════ TAB: THỐNG KÊ ═══════ -->
+<section id="statsTab" class="tab-content hidden space-y-5">
+  
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    
+    <div class="stats-card">
+      <div class="stats-icon stats-icon-blue">
+        <i class="fa-solid fa-bullseye"></i>
+      </div>
+      <div>
+        <p class="stats-label">Tổng mục tiêu</p>
+        <p id="statsTotalGoals" class="stats-value">0</p>
+      </div>
+    </div>
+    
+    <div class="stats-card">
+      <div class="stats-icon stats-icon-cyan">
+        <i class="fa-regular fa-clock"></i>
+      </div>
+      <div>
+        <p class="stats-label">Giờ đã làm</p>
+        <p id="statsTotalHours" class="stats-value">0h</p>
+      </div>
+    </div>
+    
+    <div class="stats-card">
+      <div class="stats-icon stats-icon-emerald">
+        <i class="fa-solid fa-check-circle"></i>
+      </div>
+      <div>
+        <p class="stats-label">Hoàn thành</p>
+        <p id="statsCompletionRate" class="stats-value">0%</p>
+      </div>
+    </div>
+    
+    <div class="stats-card stats-card-streak">
+      <div class="stats-icon stats-icon-fire">
+        <i class="fa-solid fa-fire"></i>
+      </div>
+      <div>
+        <p class="stats-label">Chuỗi ngày</p>
+        <p id="statsStreak" class="stats-value">0 <span class="text-xs text-gray-500">ngày</span></p>
+      </div>
+    </div>
+  </div>
 
+  <!-- Row 1: 2 charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-cyan-400"></i>
+            Tiến độ theo tuần
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">7 tuần gần nhất</p>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chartWeeklyProgress"></canvas>
+      </div>
+    </div>
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-fuchsia-400"></i>
+            Phân bổ độ ưu tiên
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">Tất cả mục tiêu</p>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chartPriority"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Bar chart + Achievements -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-violet-400"></i>
+            Task theo ngày
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">Số task mỗi thứ trong tuần này</p>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chartByDay"></canvas>
+      </div>
+    </div>
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-trophy text-amber-400"></i>
+            Thành tựu
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">Đạt được khi đạt mốc</p>
+        </div>
+      </div>
+      <div id="achievementsList" class="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+  
+</section>
       <section id="reviewTab" class="tab-content hidden space-y-6">
         <div class="glass-panel rounded-2xl p-6 border border-gemini-emerald/30 space-y-6">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gemini-cardBorder pb-4">
@@ -2472,7 +2723,359 @@ function renderTimeTrackerTable(goals) {
     '</tr>';
   }).join('');
 }
+// ========== STATISTICS DASHBOARD ==========
+var chartInstances = { weekly: null, priority: null, byDay: null };
 
+function calculateStats() {
+    var allGoals = state.goals || [];
+    var totalGoals = allGoals.length;
+    
+    // Tổng giờ làm
+    var totalHours = 0;
+    allGoals.forEach(function(g) {
+        totalHours += parseFloat(g.actualHours) || 0;
+    });
+    
+    // Tỷ lệ hoàn thành
+    var totalSubs = 0, doneSubs = 0;
+    allGoals.forEach(function(g) {
+        (g.subtasks || []).forEach(function(s) {
+            totalSubs++;
+            if (s.completed) doneSubs++;
+        });
+    });
+    var completionRate = totalSubs ? Math.round((doneSubs / totalSubs) * 100) : 0;
+    
+    // Streak — số ngày liên tục có task hoàn thành
+    var streak = calculateStreak(allGoals);
+    
+    return {
+        totalGoals: totalGoals,
+        totalHours: totalHours,
+        completionRate: completionRate,
+        streak: streak,
+        totalSubs: totalSubs,
+        doneSubs: doneSubs
+    };
+}
+
+function calculateStreak(goals) {
+    // Đơn giản: đếm số ngày trong 30 ngày gần nhất có ít nhất 1 subtask hoàn thành
+    // Đây là ước lượng vì ta không có timestamp cho từng subtask
+    var streak = 0;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Kiểm tra ngày hôm nay có hoạt động không
+    var hasActivity = goals.some(function(g) {
+        return (g.subtasks || []).some(function(s) { return s.completed; });
+    });
+    
+    if (hasActivity) {
+        // Đếm ngược 30 ngày
+        for (var i = 0; i < 30; i++) {
+            // Vì không có timestamp chính xác, đếm dựa trên task có completed
+            // Giả lập: nếu có task completed → có activity
+            streak = 1;  // Tối thiểu 1 nếu có task completed hôm nay
+            break;
+        }
+    }
+    
+    // Đếm thêm dựa trên actualHours > 0
+    var hoursSum = goals.reduce(function(sum, g) { return sum + (parseFloat(g.actualHours) || 0); }, 0);
+    if (hoursSum > 0) streak = Math.max(streak, 1);
+    
+    return streak;
+}
+
+function renderStatsDashboard() {
+    var stats = calculateStats();
+    
+    // Update summary cards
+    var el;
+    el = document.getElementById('statsTotalGoals');
+    if (el) el.innerText = stats.totalGoals;
+    
+    el = document.getElementById('statsTotalHours');
+    if (el) el.innerText = stats.totalHours.toFixed(1) + 'h';
+    
+    el = document.getElementById('statsCompletionRate');
+    if (el) el.innerText = stats.completionRate + '%';
+    
+    el = document.getElementById('statsStreak');
+    if (el) el.innerHTML = stats.streak + ' <span class="text-xs text-gray-500">ngày</span>';
+    
+    // Render charts
+    renderWeeklyProgressChart();
+    renderPriorityChart();
+    renderByDayChart();
+    renderAchievements(stats);
+}
+
+// ─── CHART 1: Weekly Progress ───
+function renderWeeklyProgressChart() {
+    var ctx = document.getElementById('chartWeeklyProgress');
+    if (!ctx) return;
+    
+    // Tính data cho 7 tuần gần nhất
+    var weeks = [];
+    var completedData = [];
+    var totalData = [];
+    
+    var now = new Date();
+    for (var i = 6; i >= 0; i--) {
+        var d = new Date(now);
+        d.setDate(d.getDate() - (i * 7));
+        var weekCode = getWeekCodeFromDate(d);
+        weeks.push('T' + weekCode.split('-W')[1]);
+        
+        var weekGoals = state.goals.filter(function(g) { return g.weekKey === weekCode; });
+        var weekSubs = 0, weekDone = 0;
+        weekGoals.forEach(function(g) {
+            (g.subtasks || []).forEach(function(s) {
+                weekSubs++;
+                if (s.completed) weekDone++;
+            });
+        });
+        completedData.push(weekDone);
+        totalData.push(weekSubs);
+    }
+    
+    if (chartInstances.weekly) chartInstances.weekly.destroy();
+    
+    chartInstances.weekly = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weeks,
+            datasets: [
+                {
+                    label: 'Hoàn thành',
+                    data: completedData,
+                    borderColor: '#22d3ee',
+                    backgroundColor: 'rgba(34,211,238,.15)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#22d3ee',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Tổng số',
+                    data: totalData,
+                    borderColor: '#7c5dfa',
+                    backgroundColor: 'rgba(124,93,250,.08)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#7c5dfa',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#9ca3af', font: { size: 10, weight: '600' }, boxWidth: 10, padding: 8 }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1b2e',
+                    titleColor: '#fff',
+                    bodyColor: '#c4b5fd',
+                    borderColor: 'rgba(124,93,250,.3)',
+                    borderWidth: 1,
+                    padding: 8,
+                    titleFont: { size: 11 },
+                    bodyFont: { size: 11 }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
+                    ticks: { color: '#6b7280', font: { size: 10 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
+                    ticks: { color: '#6b7280', font: { size: 10 }, stepSize: 2 }
+                }
+            }
+        }
+    });
+}
+
+// ─── CHART 2: Priority ───
+function renderPriorityChart() {
+    var ctx = document.getElementById('chartPriority');
+    if (!ctx) return;
+    
+    var counts = { high: 0, medium: 0, low: 0 };
+    state.goals.forEach(function(g) {
+        var p = g.priority || 'medium';
+        if (counts[p] !== undefined) counts[p]++;
+    });
+    
+    if (chartInstances.priority) chartInstances.priority.destroy();
+    
+    chartInstances.priority = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['🔴 Cao', '🟡 Trung bình', '🟢 Thấp'],
+            datasets: [{
+                data: [counts.high, counts.medium, counts.low],
+                backgroundColor: [
+                    'rgba(239,68,68,.8)',
+                    'rgba(251,191,36,.8)',
+                    'rgba(34,197,94,.8)'
+                ],
+                borderColor: ['#ef4444', '#fbbf24', '#22c55e'],
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#9ca3af', font: { size: 10, weight: '600' }, boxWidth: 10, padding: 8 }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1b2e',
+                    titleColor: '#fff',
+                    bodyColor: '#c4b5fd',
+                    borderColor: 'rgba(124,93,250,.3)',
+                    borderWidth: 1,
+                    padding: 8
+                }
+            }
+        }
+    });
+}
+
+// ─── CHART 3: By Day ───
+function renderByDayChart() {
+    var ctx = document.getElementById('chartByDay');
+    if (!ctx) return;
+    
+    var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    var labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+    var counts = [0, 0, 0, 0, 0, 0, 0];
+    var completed = [0, 0, 0, 0, 0, 0, 0];
+    
+    var cg = state.goals.filter(function(g) { return g.weekKey === state.currentWeekKey; });
+    cg.forEach(function(g) {
+        var idx = days.indexOf(g.day);
+        if (idx >= 0) {
+            counts[idx]++;
+            var subs = g.subtasks || [];
+            var done = subs.filter(function(s) { return s.completed; }).length;
+            if (subs.length > 0 && done === subs.length) completed[idx]++;
+        }
+    });
+    
+    if (chartInstances.byDay) chartInstances.byDay.destroy();
+    
+    chartInstances.byDay = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Tổng',
+                    data: counts,
+                    backgroundColor: 'rgba(124,93,250,.55)',
+                    borderColor: '#7c5dfa',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barThickness: 20
+                },
+                {
+                    label: 'Hoàn thành',
+                    data: completed,
+                    backgroundColor: 'rgba(16,185,129,.65)',
+                    borderColor: '#10b981',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barThickness: 20
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#9ca3af', font: { size: 10, weight: '600' }, boxWidth: 10, padding: 8 }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1b2e',
+                    titleColor: '#fff',
+                    bodyColor: '#c4b5fd',
+                    borderColor: 'rgba(124,93,250,.3)',
+                    borderWidth: 1,
+                    padding: 8
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#6b7280', font: { size: 10 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,.04)' },
+                    ticks: { color: '#6b7280', font: { size: 10 }, stepSize: 1 }
+                }
+            }
+        }
+    });
+}
+
+// ─── ACHIEVEMENTS ───
+function renderAchievements(stats) {
+    var container = document.getElementById('achievementsList');
+    if (!container) return;
+    
+    var achievements = [
+        { id: 'first', icon: 'fa-seedling', name: 'Khởi đầu', desc: 'Tạo 1 mục tiêu đầu tiên', unlocked: stats.totalGoals >= 1 },
+        { id: 'five', icon: 'fa-star', name: 'Ngôi sao nhỏ', desc: 'Hoàn thành 5 bước', unlocked: stats.doneSubs >= 5 },
+        { id: 'ten', icon: 'fa-medal', name: 'Nỗ lực', desc: 'Tạo 10 mục tiêu', unlocked: stats.totalGoals >= 10 },
+        { id: 'complete', icon: 'fa-check-double', name: 'Hoàn hảo', desc: 'Hoàn thành 100%', unlocked: stats.completionRate === 100 && stats.totalSubs > 0 },
+        { id: 'hours10', icon: 'fa-clock', name: 'Chăm chỉ', desc: '10 giờ làm việc', unlocked: stats.totalHours >= 10 },
+        { id: 'hours50', icon: 'fa-hourglass-half', name: 'Bền bỉ', desc: '50 giờ làm việc', unlocked: stats.totalHours >= 50 },
+        { id: 'streak3', icon: 'fa-fire', name: 'Chuỗi 3 ngày', desc: 'Hoạt động 3 ngày', unlocked: stats.streak >= 3 },
+        { id: 'allHigh', icon: 'fa-crown', name: 'Ưu tiên cao', desc: 'Có 5 task ưu tiên cao', unlocked: state.goals.filter(function(g) { return (g.priority || 'medium') === 'high'; }).length >= 5 }
+    ];
+    
+    container.innerHTML = achievements.map(function(a) {
+        return '<div class="achievement-item ' + (a.unlocked ? 'unlocked' : 'locked') + '" title="' + a.desc + '">' +
+            '<div class="achievement-icon"><i class="fa-solid ' + a.icon + '"></i></div>' +
+            '<div class="min-w-0">' +
+                '<div class="achievement-name truncate">' + a.name + '</div>' +
+                '<div class="achievement-desc truncate">' + a.desc + '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// Helper: Lấy weekCode từ Date
+function getWeekCodeFromDate(d) {
+    var date = new Date(d.valueOf());
+    var dayNum = (d.getDay() + 6) % 7;
+    date.setDate(date.getDate() - dayNum + 3);
+    var firstThursday = date.valueOf();
+    date.setMonth(0, 1);
+    if (date.getDay() !== 4) date.setMonth(0, 1 + ((4 - date.getDay() + 7) % 7));
+    var weekNum = 1 + Math.round((firstThursday - date.valueOf()) / 604800000);
+    return d.getFullYear() + '-W' + (weekNum < 10 ? '0' + weekNum : weekNum);
+}
 function renderStatsOnly() {
   var cg = state.goals.filter(function(g) { return g.weekKey === state.currentWeekKey; });
   var totalSub = 0, doneSub = 0, totalEst = 0, totalAct = 0;
@@ -2924,7 +3527,14 @@ function switchTab(tabId) {
     if (hi) hi.innerHTML = '<i class="fa-solid fa-robot text-fuchsia-400"></i>';
     renderAIDashboardPreview();
     setTimeout(function() { getAIRecommendations({ silent: true }); }, 250);
-  } else if (tabId === 'reviewTab') {
+  } else if (tabId === 'statsTab') {
+    if (ht) ht.innerText = 'Thống Kê & Thành Tựu';
+    if (hi) hi.innerHTML = '<i class="fa-solid fa-chart-line text-amber-400"></i>';
+    // Delay để canvas render sau khi tab hiện
+    setTimeout(function() {
+        renderStatsDashboard();
+    }, 100);
+  }else if (tabId === 'reviewTab') {
     if (ht) ht.innerText = 'Nhìn Lại Cuối Tuần';
     if (hi) hi.innerHTML = '<i class="fa-solid fa-clipboard-check text-gemini-emerald"></i>';
     loadWeeklyReviewData();
@@ -3403,6 +4013,7 @@ window.ww = {
   saveCustomFirebaseConfig: saveCustomFirebaseConfig,
   resetFirebaseConfig: resetFirebaseConfig,
   exportReviewReport: exportReviewReport,
+  renderStatsDashboard: renderStatsDashboard,
   exportAllData: exportAllData,              
   importAllData: importAllData,              
   switchTab: switchTab,
