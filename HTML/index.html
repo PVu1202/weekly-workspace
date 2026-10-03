@@ -20,6 +20,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <script src="https://www.google.com/recaptcha/enterprise.js?render=6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d"></script>
 <script>
 tailwind.config = {
@@ -3579,6 +3580,88 @@ body.light-mode #authScreen {
     radial-gradient(ellipse 70% 50% at 80% 70%, rgba(34,211,238,.05), transparent 60%);
 }
 /* ═══════════════ END AUTH SCREEN ═══════════════ */
+/* ═══ CELEBRATION ═══ */
+.celebration-badge {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 100000;
+  padding: 24px 40px;
+  background: linear-gradient(135deg, rgba(19, 19, 29, 0.98), rgba(13, 13, 20, 0.98));
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 20px;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(251, 191, 36, 0.2);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(20px);
+}
+
+.celebration-badge.show {
+  animation: celebrationPop 2.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes celebrationPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+  15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(3deg); }
+  25% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  85% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+.celebration-emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+  animation: celebrationEmoji 1.2s ease-in-out infinite;
+}
+
+@keyframes celebrationEmoji {
+  0%, 100% { transform: scale(1) rotate(-5deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+}
+
+.celebration-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fafafa;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.celebration-text {
+  font-size: 13px;
+  color: #b4b4be;
+}
+
+/* Streak fire */
+.streak-fire {
+  display: inline-block;
+  animation: fireShake 0.8s ease-in-out infinite;
+}
+
+@keyframes fireShake {
+  0%, 100% { transform: rotate(-5deg) scale(1); }
+  50% { transform: rotate(5deg) scale(1.1); }
+}
+
+/* Subtask sparkle khi complete */
+@keyframes sparkleBurst {
+  0% { opacity: 1; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+.sparkle-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  font-size: 16px;
+  animation: sparkleBurst 0.8s ease-out forwards;
+}
 /* ═══ DEADLINE BADGE ═══ */
 .deadline-badge {
   display: inline-flex;
@@ -4409,7 +4492,12 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
   </div>
   <p class="text-sm text-gray-400">Đang kết nối máy chủ...</p>
 </div>
-
+<!-- Celebration overlay -->
+<div id="celebrationBadge" class="celebration-badge">
+  <span class="celebration-emoji" id="celebrationEmoji">🎉</span>
+  <div class="celebration-title" id="celebrationTitle">Tuyệt vời!</div>
+  <div class="celebration-text" id="celebrationText">Hoàn thành mục tiêu</div>
+</div>
 <!-- Toasts -->
 <div id="taskToast" class="task-toast" role="status" aria-live="polite">
   <div class="task-toast-icon"><i class="fa-solid fa-check"></i></div>
@@ -4910,6 +4998,9 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
     </div>
     <div class="flex items-center space-x-3">
       <!-- Nút đổi theme -->
+       <button onclick="ww.toggleSound()" id="soundToggleBtn" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" title="Bật/Tắt âm thanh">
+          <i class="fa-solid fa-volume-high text-sm" id="soundIcon"></i>
+        </button>
       <button onclick="ww.toggleTheme()" id="themeToggleBtn" 
           class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" 
           title="Đổi giao diện sáng/tối">
@@ -5612,6 +5703,118 @@ function createNewBigGoal() {
   if (deadlineInput) deadlineInput.value = '';
   Swal.fire({ icon:'success', title:'Thành công', text:'Đã tạo mục tiêu!', timer:1200, showConfirmButton:false, background:'#1a1b2e', color:'#fff' });
 }
+// ═══ CELEBRATION EFFECTS ═══
+var soundEnabled = localStorage.getItem('ws_sound_enabled') !== 'false';
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    var audio = new Audio();
+    var sounds = {
+      complete: 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQBvT18AAAA=',
+      // Fallback dùng beep bằng Web Audio API
+    };
+    
+    // Dùng Web Audio API để tạo âm thanh
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    if (type === 'complete') {
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'success') {
+      // 2 nốt
+      osc.frequency.setValueAtTime(660, ctx.currentTime);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'celebrate') {
+      // 3 nốt đi lên
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.12);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.24);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.6);
+    }
+  } catch(e) {
+    console.warn('Sound error:', e);
+  }
+}
+
+function fireConfetti(options) {
+  if (typeof confetti === 'undefined') {
+    console.warn('Confetti library chưa load');
+    return;
+  }
+  
+  var opts = options || {};
+  var count = opts.count || 100;
+  var spread = opts.spread || 90;
+  var origin = opts.origin || { y: 0.6 };
+  
+  confetti({
+    particleCount: count,
+    spread: spread,
+    origin: origin,
+    colors: ['#7c5dfa', '#3b82f6', '#22d3ee', '#10b981', '#ec4899', '#fbbf24'],
+    disableForReducedMotion: true
+  });
+}
+
+function showCelebration(emoji, title, text, options) {
+  var opts = options || {};
+  var badge = document.getElementById('celebrationBadge');
+  if (!badge) return;
+  
+  document.getElementById('celebrationEmoji').textContent = emoji;
+  document.getElementById('celebrationTitle').textContent = title;
+  document.getElementById('celebrationText').textContent = text;
+  
+  badge.classList.remove('show');
+  void badge.offsetWidth;
+  badge.classList.add('show');
+  
+  // Fire confetti
+  if (opts.confetti !== false) {
+    fireConfetti({ count: opts.confettiCount || 100 });
+  }
+  
+  // Play sound
+  if (opts.sound !== false) {
+    playSound(opts.soundType || 'celebrate');
+  }
+  
+  setTimeout(function() {
+    badge.classList.remove('show');
+  }, 2500);
+}
+
+// Sparkle khi hoàn thành subtask
+function createSparkle(x, y) {
+  var emojis = ['✨', '⭐', '💫', '🌟'];
+  for (var i = 0; i < 3; i++) {
+    var s = document.createElement('div');
+    s.className = 'sparkle-particle';
+    s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    s.style.left = (x + (Math.random() - 0.5) * 40) + 'px';
+    s.style.top = (y + (Math.random() - 0.5) * 40) + 'px';
+    document.body.appendChild(s);
+    setTimeout(function(el) {
+      return function() { el.remove(); };
+    }(s), 800);
+  }
+}
 // ═══ DEADLINE HELPERS ═══
 function getDeadlineInfo(deadlineStr) {
   if (!deadlineStr) return null;
@@ -5750,12 +5953,33 @@ function toggleSubtask(goalId, subtaskId) {
   sub.completed = !sub.completed;
   saveStateToFirestore();
   renderAll();
-  if (sub.completed) {
+if (sub.completed) {
     var done = goal.subtasks.filter(function(s) { return s.completed; }).length;
     var total = goal.subtasks.length;
-    if (done === total) showTaskToast('🎉 Hoàn thành mục tiêu!', 'Bạn đã hoàn thành tất cả ' + total + ' bước nhỏ.');
-    else showTaskToast('✅ Task đã hoàn thành!', sub.text + ' • Tiến độ ' + done + '/' + total);
-  }
+    
+    // Lấy vị trí click để tạo sparkle
+    var clickX = window.event ? window.event.clientX : window.innerWidth / 2;
+    var clickY = window.event ? window.event.clientY : window.innerHeight / 2;
+    createSparkle(clickX, clickY);
+    
+    if (done === total) {
+        // Hoàn thành toàn bộ mục tiêu → BIG celebration
+        showTaskToast('🎉 Hoàn thành mục tiêu!', 'Bạn đã hoàn thành tất cả ' + total + ' bước nhỏ.');
+        showCelebration(
+            '🎉',
+            'Hoàn thành mục tiêu!',
+            goal.title,
+            { confettiCount: 150, soundType: 'celebrate' }
+        );
+    } else {
+        // Hoàn thành 1 subtask → sparkle nhỏ
+        playSound('complete');
+        showTaskToast('✅ Task đã hoàn thành!', sub.text + ' • Tiến độ ' + done + '/' + total);
+    }
+    
+    // Check streak
+    checkStreakCelebration();
+}
 }
 
 function deleteGoal(goalId) {
@@ -6718,6 +6942,61 @@ function getWeekCodeFromDate(d) {
     var weekNum = 1 + Math.round((firstThursday - date.valueOf()) / 604800000);
     return d.getFullYear() + '-W' + (weekNum < 10 ? '0' + weekNum : weekNum);
 }
+// ═══ WEEKLY COMPLETION CELEBRATION ═══
+function checkWeeklyCompletion() {
+  var cg = state.goals.filter(function(g) { return g.weekKey === state.currentWeekKey; });
+  if (cg.length === 0) return;
+  
+  var totalSubs = 0, doneSubs = 0;
+  cg.forEach(function(g) {
+    (g.subtasks || []).forEach(function(s) {
+      totalSubs++;
+      if (s.completed) doneSubs++;
+    });
+  });
+  
+  if (totalSubs === 0 || doneSubs < totalSubs) return;
+  
+  var lastCelebrated = localStorage.getItem('ws_week_celebrated_' + state.currentWeekKey);
+  if (lastCelebrated === 'true') return;
+  
+  localStorage.setItem('ws_week_celebrated_' + state.currentWeekKey, 'true');
+  
+  setTimeout(function() {
+    showCelebration(
+      '🏆',
+      'Hoàn thành cả tuần!',
+      'Bạn đã xong ' + totalSubs + ' bước trong ' + cg.length + ' mục tiêu',
+      { confettiCount: 250, soundType: 'celebrate' }
+    );
+    
+    // Extra confetti burst
+    setTimeout(function() {
+      fireConfetti({ count: 200, origin: { x: 0, y: 0.6 }, spread: 60 });
+    }, 300);
+    setTimeout(function() {
+      fireConfetti({ count: 200, origin: { x: 1, y: 0.6 }, spread: 60 });
+    }, 500);
+  }, 500);
+}
+
+function checkStreakCelebration() {
+  var streak = parseInt(document.getElementById('statsStreak') ? document.getElementById('statsStreak').innerText : '0');
+  if (streak > 0 && streak % 7 === 0) {
+    var lastCelebrated = localStorage.getItem('ws_streak_' + streak);
+    if (lastCelebrated === 'true') return;
+    localStorage.setItem('ws_streak_' + streak, 'true');
+    
+    setTimeout(function() {
+      showCelebration(
+        '🔥',
+        'Chuỗi ' + streak + ' ngày!',
+        'Bạn đang rất kiên trì!',
+        { confettiCount: 100, soundType: 'success' }
+      );
+    }, 800);
+  }
+}
 function renderStatsOnly() {
   var cg = state.goals.filter(function(g) { return g.weekKey === state.currentWeekKey; });
   var totalSub = 0, doneSub = 0, totalEst = 0, totalAct = 0;
@@ -6739,6 +7018,7 @@ function renderStatsOnly() {
   var actEl = document.getElementById('statTotalAct');
   if (estEl) estEl.innerText = totalEst.toFixed(1) + ' giờ';
   if (actEl) actEl.innerText = totalAct.toFixed(1) + ' giờ';
+  if (typeof checkWeeklyCompletion === 'function') checkWeeklyCompletion();
 }
 // ========== SEARCH ==========
 var searchDebounceTimer = null;
@@ -8001,6 +8281,35 @@ function toggleTheme() {
   } catch(e) {}
   console.log('🎨 Theme:', isLight ? 'light' : 'dark');
 }
+function toggleTheme() {
+  // ... code cũ giữ nguyên
+}
+
+// ⬇️ THÊM TOÀN BỘ ĐOẠN NÀY VÀO ĐÂY ⬇️
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('ws_sound_enabled', soundEnabled ? 'true' : 'false');
+  var icon = document.getElementById('soundIcon');
+  if (icon) icon.className = soundEnabled ? 'fa-solid fa-volume-high text-sm' : 'fa-solid fa-volume-xmark text-sm';
+  if (soundEnabled && typeof playSound === 'function') playSound('success');
+  if (typeof showTaskToast === 'function') {
+    showTaskToast(soundEnabled ? '🔊 Đã bật âm thanh' : '🔇 Đã tắt âm thanh', '');
+  }
+  console.log('🔊 Sound:', soundEnabled ? 'on' : 'off');
+}
+
+// Restore trạng thái âm thanh khi load
+(function restoreSoundState() {
+  var icon = document.getElementById('soundIcon');
+  if (icon && !soundEnabled) {
+    icon.className = 'fa-solid fa-volume-xmark text-sm';
+  }
+})();
+
+// ⬆️ KẾT THÚC ĐOẠN THÊM ⬆️
+
+// ... các hàm khác tiếp tục
 
 // Khôi phục theme khi load
 (function restoreTheme() {
@@ -8149,6 +8458,7 @@ document.addEventListener('click', function(e) {
 window.switchTab = switchTab;
 window.toggleSidebar = toggleSidebar;
 window.toggleTheme = toggleTheme;
+window.toggleSound = toggleSound;
 window.setPriorityFilter = setPriorityFilter;
 window.cyclePriority = cyclePriority;
 window.clearSearch = clearSearch;
