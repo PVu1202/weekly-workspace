@@ -3579,6 +3579,81 @@ body.light-mode #authScreen {
     radial-gradient(ellipse 70% 50% at 80% 70%, rgba(34,211,238,.05), transparent 60%);
 }
 /* ═══════════════ END AUTH SCREEN ═══════════════ */
+/* ═══ INLINE EDIT SUBTASK ═══ */
+.subtask-text-editable {
+  cursor: text;
+  padding: 2px 6px;
+  margin: -2px -6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  outline: none;
+  display: inline-block;
+  min-width: 20px;
+  border: 1px solid transparent;
+}
+
+.subtask-text-editable:hover {
+  background: rgba(124, 93, 250, 0.08);
+  border-color: rgba(124, 93, 250, 0.2);
+}
+
+.subtask-text-editable:focus,
+.subtask-text-editable.editing {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(124, 93, 250, 0.5);
+  box-shadow: 
+    0 0 0 3px rgba(124, 93, 250, 0.1),
+    0 0 20px rgba(124, 93, 250, 0.15);
+  padding: 4px 8px;
+  margin: -4px -8px;
+  cursor: text;
+}
+
+.subtask-text-editable[contenteditable="true"] {
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+/* Save animation */
+.subtask-text-editable.saved {
+  animation: subtaskSaveFlash 0.6s ease;
+}
+
+@keyframes subtaskSaveFlash {
+  0% {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+  }
+  100% {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(124, 93, 250, 0.5);
+    box-shadow: 0 0 0 3px rgba(124, 93, 250, 0.1);
+  }
+}
+
+/* Small hint icon */
+.subtask-edit-hint {
+  opacity: 0;
+  margin-left: 4px;
+  font-size: 9px;
+  color: #7d7d8a;
+  transition: opacity 0.2s ease;
+}
+
+.week-day-subtask:hover .subtask-edit-hint,
+.week-inline-subtask:hover .subtask-edit-hint {
+  opacity: 0.6;
+}
+
+/* Light mode */
+body.light-mode .subtask-text-editable:hover {
+  background: rgba(124, 93, 250, 0.06);
+}
+body.light-mode .subtask-text-editable:focus {
+  background: #ffffff;
+  border-color: rgba(124, 93, 250, 0.5);
+}
 /* ═══════════════ LIGHT MODE (IMPROVED) ═══════════════ */
 body.light-mode {
   background-color: #f0f2f7 !important;
@@ -5455,7 +5530,80 @@ function createNewBigGoal() {
   titleInput.value = ''; estInput.value = '';
   Swal.fire({ icon:'success', title:'Thành công', text:'Đã tạo mục tiêu!', timer:1200, showConfirmButton:false, background:'#1a1b2e', color:'#fff' });
 }
+// ═══ INLINE EDIT SUBTASK ═══
+function makeSubtaskEditable(el, goalId, subtaskId) {
+  if (el.getAttribute('contenteditable') === 'true') return;
+  
+  var originalText = el.textContent;
+  el.setAttribute('contenteditable', 'true');
+  el.classList.add('editing');
+  el.focus();
+  
+  // Chọn hết text
+  var range = document.createRange();
+  range.selectNodeContents(el);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  
+  function saveEdit() {
+    var newText = el.textContent.trim();
+    el.setAttribute('contenteditable', 'false');
+    el.classList.remove('editing');
+    
+    if (newText === '') {
+      // Nếu xóa hết → restore text cũ
+      el.textContent = originalText;
+      return;
+    }
+    
+    if (newText === originalText) return;  // Không đổi
+    
+    // Update state
+    var goal = state.goals.find(function(g) { return g.id === goalId; });
+    if (!goal) return;
+    var sub = goal.subtasks.find(function(s) { return s.id === subtaskId; });
+    if (!sub) return;
+    
+    sub.text = newText;
+    saveStateToFirestore();
+    
+    // Flash hiệu ứng
+    el.classList.add('saved');
+    setTimeout(function() { el.classList.remove('saved'); }, 600);
+    
+    showTaskToast('✏️ Đã lưu', 'Đã cập nhật: ' + (newText.length > 40 ? newText.substring(0, 40) + '...' : newText));
+  }
+  
+  function cancelEdit() {
+    el.textContent = originalText;
+    el.setAttribute('contenteditable', 'false');
+    el.classList.remove('editing');
+  }
+  
+  el.onblur = function() { saveEdit(); };
+  
+  el.onkeydown = function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      el.blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelEdit();
+      el.blur();
+    }
+  };
+}
 
+// Expose
+window.editSubtask = function(goalId, subtaskId, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  var el = event && event.currentTarget ? event.currentTarget : document.activeElement;
+  makeSubtaskEditable(el, goalId, subtaskId);
+};
 function toggleSubtask(goalId, subtaskId) {
   var goal = state.goals.find(function(g) { return g.id === goalId; });
   if (!goal) return;
@@ -5711,7 +5859,10 @@ function renderSelectedWeekDetails() {
             '<div class="week-day-subtask-list">' + gSubs.map(function(st) {
   return '<div class="week-day-subtask ' + (st.completed ? 'done' : '') + ' flex items-start gap-2" data-subtask-id="' + st.id + '">' +
     '<input type="checkbox" class="w-3.5 h-3.5 accent-violet-500 shrink-0 mt-0.5 cursor-pointer" ' + (st.completed ? 'checked' : '') + ' onchange="ww.toggleSubtask(\'' + goal.id + '\',\'' + st.id + '\')">' +
-    '<span class="subtask-text flex-1">' + escapeHtml(st.title || st.text || 'Bước cần làm') + '</span>' +
+    '<span class="subtask-text-editable" onclick="event.preventDefault(); event.stopPropagation(); window.editSubtask(\'' + goal.id + '\',\'' + st.id + '\', event)">' + 
+      escapeHtml(st.title || st.text || 'Bước cần làm') + 
+    '</span>' +
+    '<i class="fa-solid fa-pen subtask-edit-hint"></i>' +
     '<div class="subtask-actions">' +
       '<button class="subtask-action-btn" title="Sửa" onclick="ww.editSubtask(\'' + goal.id + '\',\'' + st.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
       '<button class="subtask-action-btn del" title="Xóa" onclick="ww.deleteSubtask(\'' + goal.id + '\',\'' + st.id + '\')"><i class="fa-solid fa-xmark"></i></button>' +
