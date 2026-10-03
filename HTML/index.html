@@ -1064,7 +1064,7 @@ body.light-mode .auth-stat-label {
 .auth-subtitle {
   font-size: 16px;
   line-height: 1.5;
-  color: #52525b;
+  color: #b4b4be;
   max-width: 480px;
   margin-bottom: 40px;
   opacity: 0;
@@ -1805,7 +1805,7 @@ body.light-mode #authScreen {
   flex: 1;
   font-size: 11px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #e5e7eb;
   line-height: 1.3;
 }
 .preview-mockup-task.done .preview-mockup-task-text {
@@ -2505,6 +2505,207 @@ body.light-mode .swal2-container {
   z-index: 6;
 }
 /* ═══════════════ END TASTE SKILL BG ═══════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   CYBER WAVES BACKGROUND — Dark + Neon Glow
+   Áp dụng cho cả Auth Screen và Main App
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ BASE WRAPPER ═══ */
+.cyber-waves-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cyber-waves-bg svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* ═══ WAVE ANIMATIONS — Slow drift ═══ */
+.cyber-wave-1 {
+  animation: cyberDrift1 25s ease-in-out infinite;
+  transform-origin: center;
+}
+.cyber-wave-2 {
+  animation: cyberDrift2 30s ease-in-out infinite;
+  transform-origin: center;
+}
+.cyber-wave-3 {
+  animation: cyberDrift3 35s ease-in-out infinite;
+  transform-origin: center;
+}
+.cyber-wave-4 {
+  animation: cyberDrift4 40s ease-in-out infinite;
+  transform-origin: center;
+}
+.cyber-wave-5 {
+  animation: cyberDrift5 45s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes cyberDrift1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-20px, -12px, 0) scale(1.03); }
+}
+@keyframes cyberDrift2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(25px, 15px, 0) scale(0.97); }
+}
+@keyframes cyberDrift3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-30px, 20px, 0) scale(1.04); }
+}
+@keyframes cyberDrift4 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(22px, -15px, 0) scale(0.96); }
+}
+@keyframes cyberDrift5 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-18px, 18px, 0) scale(1.02); }
+}
+
+/* ═══ GLOW PULSE cho từng wave ═══ */
+.cyber-glow-pulse {
+  animation: glowPulse 6s ease-in-out infinite;
+}
+.cyber-glow-pulse-2 {
+  animation: glowPulse 8s ease-in-out infinite;
+  animation-delay: -2s;
+}
+.cyber-glow-pulse-3 {
+  animation: glowPulse 10s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+
+/* ═══ GRID OVERLAY — Tech grid pattern ═══ */
+.cyber-waves-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ═══ NOISE TEXTURE ═══ */
+.cyber-waves-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY CHO AUTH SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+#authScreen {
+  background: #06060a !important;
+}
+
+#authScreen .auth-waves-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Đảm bảo content nằm trên waves */
+#authScreen .auth-left,
+#authScreen .auth-right {
+  position: relative;
+  z-index: 5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY CHO MAIN APP
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Main app wrapper có waves bg */
+#appMain {
+  position: relative;
+  background: #06060a !important;
+}
+
+#appMain .cyber-waves-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Main app content nằm trên waves */
+#appMain > *:not(.cyber-waves-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Header riêng */
+#appMain header {
+  z-index: 10 !important;
+  background: linear-gradient(180deg, rgba(8, 8, 12, 0.85), rgba(6, 6, 10, 0.85)) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+}
+
+/* Body main — bỏ bg-image cũ, dùng waves */
+#appMain > div.flex-1 {
+  background: transparent !important;
+}
+
+/* Decor grid cũ có thể xóa */
+.main-decor-grid {
+  opacity: 0.15 !important;
+  mix-blend-mode: screen;
+}
+
+/* Sidebar — giữ nguyên dark, không cần waves */
+#appSidebar {
+  position: relative;
+  z-index: 20;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .cyber-wave-1,
+  .cyber-wave-2,
+  .cyber-wave-3,
+  .cyber-wave-4,
+  .cyber-wave-5 {
+    animation-duration: 60s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cyber-wave-1,
+  .cyber-wave-2,
+  .cyber-wave-3,
+  .cyber-wave-4,
+  .cyber-wave-5,
+  .cyber-glow-pulse {
+    animation: none !important;
+  }
+}
+/* ═══════════════ END CYBER WAVES BG ═══════════════ */
 /* ═══ SMOOTH EASING LIBRARY ═══ */
 :root {
   /* Easing tự nhiên — không đều, mượt */
@@ -2730,7 +2931,7 @@ body.light-mode .swal2-container {
 .auth-brand-logo-text {
   font-weight: 700;
   font-size: 15px;
-  color: #1a1a1a;                         
+  color: #fafafa;                        
   letter-spacing: -0.02em;
 }
 
@@ -2740,11 +2941,11 @@ body.light-mode .swal2-container {
   gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.08);
   font-size: 12px;
   font-weight: 600;
-  color: #52525b;
+  color: #b4b4be;
+  background: rgba(255, 255, 255, 0.04);
   width: fit-content;
   margin-bottom: 24px;
   margin-top: 40px;                         /* ← Thêm khoảng cách trên */
@@ -2783,7 +2984,7 @@ body.light-mode .swal2-container {
   line-height: 1.08;
   letter-spacing: -0.03em;
   font-weight: 400;
-  color: #1a1a1a;
+  color: #fafafa;
   margin-bottom: 24px;
   opacity: 0;
   animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
@@ -2887,12 +3088,13 @@ body.light-mode .swal2-container {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 380px;
-  background: linear-gradient(160deg, #ffffff 0%, #fafafc 100%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(160deg, rgba(19,19,29,.95), rgba(13,13,20,.92));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
-    0 24px 60px rgba(0, 0, 0, 0.08),
-    0 4px 12px rgba(0, 0, 0, 0.04);
+    0 1px 0 0 rgba(255,255,255,.05) inset,
+    0 30px 60px -20px rgba(0,0,0,.7),
+    0 18px 36px -18px rgba(124,93,250,.2),
+    0 0 0 1px rgba(124,93,250,.1);
   border: 1px solid rgba(255,255,255,.08);
   overflow: hidden;
   animation: mockupFloat 7s ease-in-out infinite;
@@ -2925,8 +3127,8 @@ body.light-mode .swal2-container {
   align-items: center;
   gap: 6px;
   padding: 12px 14px;
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0,0,0,.3);
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
 .preview-mockup-dots {
   display: flex;
@@ -2945,10 +3147,10 @@ body.light-mode .swal2-container {
   flex: 1;
   margin-left: 10px;
   padding: 4px 12px;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255,255,255,.04);
+  color: #7d7d8a;
   border-radius: 6px;
   font-size: 10px;
-  color: #71717a;
   font-weight: 500;
   font-family: 'SF Mono', Menlo, monospace;
 }
@@ -2968,7 +3170,7 @@ body.light-mode .swal2-container {
 .preview-mockup-title {
   font-size: 11px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: #fafafa;
   letter-spacing: -0.02em;
 }
 .preview-mockup-progress-pill {
@@ -3024,8 +3226,8 @@ body.light-mode .swal2-container {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: linear-gradient(135deg, #fafafc, #ffffff);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, rgba(26,26,40,.7), rgba(19,19,29,.5));
+  border: 1px solid rgba(255,255,255,.06);
   border-left-width: 3px;
   border-radius: 10px;
   margin-bottom: 8px;
@@ -3080,7 +3282,7 @@ body.light-mode .swal2-container {
   flex: 1;
   font-size: 11px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #e5e7eb;
   line-height: 1.3;
 }
 .preview-mockup-task.done .preview-mockup-task-text {
@@ -3277,7 +3479,7 @@ body.light-mode .swal2-container {
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: rgba(255, 255, 255, 0.85);
+  background: linear-gradient(160deg, rgba(19, 19, 29, 0.85) 0%, rgba(13, 13, 20, 0.9) 100%);
   backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow:
@@ -3334,7 +3536,7 @@ body.light-mode .swal2-container {
 .auth-card-title {
   font-size: 24px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: #fafafa;
   letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
@@ -3385,7 +3587,7 @@ body.light-mode .swal2-container {
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #52525b;
+  color: #b4b4be;
   margin-bottom: 8px;
   letter-spacing: -0.005em;
 }
@@ -3407,16 +3609,16 @@ body.light-mode .swal2-container {
   padding: 14px 16px 14px 42px;
   border: 1.5px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fafafa;
   font-family: inherit;
   font-size: 14px;
-  color: #1a1a1a;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
   font-weight: 500;
 }
 .auth-input::placeholder {
-  color: #a1a1aa;
+  color: #55555f;
   font-weight: 400;
 }
 .auth-input:hover {
@@ -3434,7 +3636,7 @@ body.light-mode .swal2-container {
 }
 .auth-input:focus ~ .auth-input-icon,
 .auth-input:focus + .auth-input-icon {
-  color: #a1a1aa;
+  color: #55555f;
 }
 
 /* Primary button */
@@ -4682,6 +4884,82 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
           fill="url(#wave1Grad)"/>
   </svg>
 </div>
+<!-- ═══ CYBER WAVES BACKGROUND ═══ -->
+<div class="auth-waves-bg cyber-waves-bg">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Wave Gradients — Cyber colors -->
+      <linearGradient id="cyberWave1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7c5dfa" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.08"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.05"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave3" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ec4899" stop-opacity="0.10"/>
+        <stop offset="100%" stop-color="#d946ef" stop-opacity="0.04"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave4" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.06"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave5" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.14"/>
+        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.06"/>
+      </linearGradient>
+
+      <!-- Glow filter -->
+      <filter id="cyberGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="8" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Wave 1 — Big curve top right -->
+    <path class="cyber-wave-1 cyber-glow-pulse" filter="url(#cyberGlow)"
+          d="M 800 -50 Q 1000 80 1150 250 T 1500 380 L 1500 -50 Z"
+          fill="url(#cyberWave1)"/>
+    
+    <!-- Wave 2 — Mid right -->
+    <path class="cyber-wave-2 cyber-glow-pulse-2" filter="url(#cyberGlow)"
+          d="M 700 100 Q 950 220 1100 420 T 1500 600 L 1500 100 Z"
+          fill="url(#cyberWave2)"/>
+    
+    <!-- Wave 3 — Accent cyan -->
+    <path class="cyber-wave-3 cyber-glow-pulse-3" filter="url(#cyberGlow)"
+          d="M 400 400 Q 700 500 950 650 T 1500 820 L 1500 400 Z"
+          fill="url(#cyberWave3)"/>
+    
+    <!-- Wave 4 — Bottom -->
+    <path class="cyber-wave-4" filter="url(#cyberGlow)"
+          d="M 0 650 Q 400 600 800 750 T 1500 950 L 0 950 Z"
+          fill="url(#cyberWave4)"/>
+    
+    <!-- Wave 5 — Top left small -->
+    <path class="cyber-wave-5 cyber-glow-pulse" filter="url(#cyberGlow)"
+          d="M -50 -50 Q 200 80 380 180 T 550 250 L -50 250 Z"
+          fill="url(#cyberWave5)"/>
+
+    <!-- Neon accent lines -->
+    <g opacity="0.4">
+      <path d="M 850 0 Q 1050 100 1200 300 T 1500 450" 
+            stroke="#a78bfa" stroke-width="1" fill="none" 
+            stroke-dasharray="8 12" filter="url(#cyberGlow)"/>
+      <path d="M 900 50 Q 1100 150 1250 350 T 1500 500" 
+            stroke="#22d3ee" stroke-width="0.8" fill="none" 
+            stroke-dasharray="6 10" filter="url(#cyberGlow)"/>
+    </g>
+  </svg>
+</div>
   <!-- Floating orbs -->
   <div class="auth-orb auth-orb-1"></div>
   <div class="auth-orb auth-orb-2"></div>
@@ -5130,6 +5408,53 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
 <!-- MAIN -->
 <div id="sidebarBackdrop" onclick="ww.toggleSidebar()"></div>
 <main id="appMain" class="flex-1 flex flex-col min-w-0 overflow-hidden bg-gemini-bg relative hidden">
+  <main id="appMain" class="flex-1 flex flex-col min-w-0 overflow-hidden bg-gemini-bg relative hidden">
+  
+  <!-- ═══ CYBER WAVES BACKGROUND ═══ -->
+  <div class="cyber-waves-bg">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="appCyberWave1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#7c5dfa" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.04"/>
+        </linearGradient>
+        
+        <linearGradient id="appCyberWave2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.08"/>
+          <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.02"/>
+        </linearGradient>
+        
+        <linearGradient id="appCyberWave3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ec4899" stop-opacity="0.06"/>
+          <stop offset="100%" stop-color="#d946ef" stop-opacity="0.02"/>
+        </linearGradient>
+
+        <filter id="appCyberGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="10" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Subtle waves cho app chính -->
+      <path class="cyber-wave-1 cyber-glow-pulse" filter="url(#appCyberGlow)"
+            d="M 900 -50 Q 1100 150 1250 350 T 1500 500 L 1500 -50 Z"
+            fill="url(#appCyberWave1)"/>
+      
+      <path class="cyber-wave-3 cyber-glow-pulse-2" filter="url(#appCyberGlow)"
+            d="M 500 500 Q 800 600 1050 750 T 1500 900 L 1500 500 Z"
+            fill="url(#appCyberWave2)"/>
+      
+      <path class="cyber-wave-5 cyber-glow-pulse-3" filter="url(#appCyberGlow)"
+            d="M -50 -50 Q 150 50 300 150 T 450 220 L -50 220 Z"
+            fill="url(#appCyberWave3)"/>
+    </svg>
+  </div>
+  <!-- ═══ END CYBER WAVES ═══ -->
+
+  <header class="h-16 border-b border-gemini-cardBorder glass-panel flex items-center justify-between px-3 sm:px-6 z-10">
 <header class="h-16 border-b border-gemini-cardBorder glass-panel flex items-center justify-between gap-2 px-3 sm:px-6 z-10">
   <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
     <!-- Nút ☰ hiện trên Mobile/Tablet -->
