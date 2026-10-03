@@ -3912,8 +3912,13 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
 /* ═══════════════ END LIGHT MODE ═══════════════ */
 /* ═══════════ RESPONSIVE SIDEBAR ═══════════ */
 #appSidebar {
-  transition: width 0.3s ease, transform 0.3s ease;
+  transition: 
+    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
   will-change: width, transform;
+  transform: translateZ(0);           /* GPU acceleration */
+  backface-visibility: hidden;
 }
 
 /* ═══ TABLET + MOBILE (< 1024px) ═══ */
@@ -3956,14 +3961,34 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
   
   /* Khi collapsed: chỉ còn icon */
   #appSidebar.collapsed {
-    width: 72px !important;
-    min-width: 72px !important;
+  width: 76px !important;
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
   }
   
   /* Ẩn mọi text/badge khi collapsed */
-  #appSidebar.collapsed .sidebar-text {
-    display: none !important;
-  }
+ /* Text fade trước khi width collapse */
+#appSidebar .sidebar-text {
+  opacity: 1;
+  transform: translateX(0);
+  transition: 
+    opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  will-change: opacity, transform;
+}
+
+#appSidebar.collapsed .sidebar-text {
+  opacity: 0;
+  transform: translateX(-12px);
+  pointer-events: none;
+  width: 0;
+  visibility: hidden;
+  transition: 
+    opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.2s;
+}
   
   /* Logo: chỉ hiện icon */
   #appSidebar.collapsed .sidebar-logo-text {
@@ -3996,10 +4021,38 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
   
   /* Nav button: căn giữa, chỉ hiện icon */
   #appSidebar.collapsed nav button {
-    justify-content: center !important;
-    padding: 12px 0 !important;
-    position: relative;
+  justify-content: center !important;
+  padding: 12px 0 !important;
+  transition: 
+    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  #appSidebar.collapsed nav button:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  background: rgba(19, 19, 29, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #fafafa;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  animation: tooltipIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes tooltipIn {
+  0% { opacity: 0; transform: translateY(-50%) translateX(-4px); }
+  100% { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
   
   #appSidebar.collapsed nav button > div {
     justify-content: center !important;
@@ -4007,9 +4060,17 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
     gap: 0 !important;
   }
   
+  #appSidebar nav button i {
+  transition: 
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    font-size 0.3s ease;
+  will-change: transform;
+  }
+
   #appSidebar.collapsed nav button i {
-    width: auto !important;
-    font-size: 18px !important;
+  width: auto !important;
+  font-size: 18px !important;
+  transform: scale(1.08);
   }
   
   #appSidebar.collapsed nav button > span {
@@ -4605,7 +4666,7 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
     </div>
   </div>
   <button onclick="ww.toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition shrink-0" title="Thu gọn / Mở rộng">
-    <i class="fa-solid fa-bars text-base"></i>
+    <i class="fa-solid fa-bars text-base" id="sidebarToggleIcon"></i>
   </button>
 </div>
     <div class="p-4 border-b border-gemini-cardBorder bg-black/20">
@@ -4616,7 +4677,7 @@ body.light-mode #syncBadgeText { color: #059669 !important; }
       </div>
     </div>
     <nav class="p-3 space-y-1">
-      <button onclick="ww.switchTab('breakoutTab')" id="nav-breakoutTab" class="tab-btn active w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+      <button onclick="ww.switchTab('breakoutTab')" id="nav-breakoutTab" data-tooltip="Chia Nhỏ Nhiệm Vụ" class="tab-btn active w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
         <div class="flex items-center space-x-3"><i class="fa-solid fa-sitemap text-purple-400 w-4"></i><span class="sidebar-text">Chia Nhỏ Nhiệm Vụ</span></div>
         <span id="badge-tasks" class="text-[10px] px-2 py-0.5 rounded-full bg-gemini-accent/20 text-purple-300">0</span>
       </button>
@@ -7624,6 +7685,7 @@ function toggleTheme() {
 function toggleSidebar() {
   var sidebar = document.getElementById('appSidebar');
   var backdrop = document.getElementById('sidebarBackdrop');
+  var toggleIcon = document.getElementById('sidebarToggleIcon');
   if (!sidebar) return;
 
   var isMobile = window.innerWidth < 1024;
@@ -7640,9 +7702,25 @@ function toggleSidebar() {
       document.body.style.overflow = 'hidden';
     }
   } else {
+    // Thêm class để block click liên tục
+    if (sidebar.dataset.animating === '1') return;
+    sidebar.dataset.animating = '1';
+    
+    var willCollapse = !sidebar.classList.contains('collapsed');
     sidebar.classList.toggle('collapsed');
-    var isCollapsed = sidebar.classList.contains('collapsed');
-    try { localStorage.setItem('sidebar_collapsed', isCollapsed ? '1' : '0'); } catch(e) {}
+    
+    // Xoay icon toggle
+    if (toggleIcon) {
+      toggleIcon.style.transform = willCollapse ? 'rotate(90deg)' : 'rotate(0deg)';
+      toggleIcon.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    }
+    
+    try { localStorage.setItem('sidebar_collapsed', willCollapse ? '1' : '0'); } catch(e) {}
+    
+    // Mở khóa sau khi animation xong
+    setTimeout(function() {
+      sidebar.dataset.animating = '0';
+    }, 460);
   }
 }
 
@@ -7652,7 +7730,19 @@ function toggleSidebar() {
     try {
       if (localStorage.getItem('sidebar_collapsed') === '1') {
         var sb = document.getElementById('appSidebar');
-        if (sb) sb.classList.add('collapsed');
+        if (sb) {
+          // Tắt transition tạm để không nhấp nháy lúc load
+          sb.style.transition = 'none';
+          sb.classList.add('collapsed');
+          void sb.offsetWidth;
+          // Bật lại transition sau khi render xong
+          requestAnimationFrame(function() {
+            sb.style.transition = '';
+          });
+        }
+        // Xoay icon toggle
+        var ic = document.getElementById('sidebarToggleIcon');
+        if (ic) ic.style.transform = 'rotate(90deg)';
       }
     } catch(e) {}
   }
@@ -8164,7 +8254,13 @@ body::before {
   position: relative;
   border-radius: var(--radius-md) !important;
   padding: 10px 14px !important;
-  transition: all var(--transition-base) !important;
+  transition: 
+    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s ease,
+    border-color 0.3s ease;
+  overflow: hidden;
   color: var(--text-2) !important;
   border: 1px solid transparent !important;
   background: transparent !important;
