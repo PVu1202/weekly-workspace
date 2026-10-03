@@ -1667,18 +1667,16 @@ function renderSelectedWeekDetails() {
           var gSubs = goal.subtasks || [];
           var gDone = gSubs.filter(function(st) { return st.completed; }).length;
           var gPct = gSubs.length ? Math.round((gDone / gSubs.length) * 100) : 0;
-          var p = goal.priority || 'medium';
-          return '<div class="week-day-task-card">' +
-            '<div class="flex items-start justify-between gap-3">' +
-              '<div class="min-w-0">' +
-                '<div class="flex items-center gap-2 mb-1">' +
-                  '<span class="priority-badge ' + getPriorityClass(p) + '">' + getPriorityLabel(p) + '</span>' +
-                '</div>' +
-                '<div class="week-selected-task-title">' + escapeHtml(goal.title) + '</div>' +
-                '<div class="week-selected-task-meta">⏱ ' + (goal.estimatedHours || 0) + ' giờ • ' + gDone + '/' + gSubs.length + ' bước</div>' +
+          var pr = goal.priority || 'medium';
+          '<div class="week-day-task-card">' +
+              '<div class="flex items-start justify-between gap-3">' +
+                  '<div class="min-w-0">' +
+                      '<div class="mb-1"><span class="priority-badge ' + getPriorityClass(pr) + '">' + getPriorityLabel(pr) + '</span></div>' +
+                      '<div class="week-selected-task-title">' + escapeHtml(goal.title) + '</div>' +
+                      '<div class="week-selected-task-meta">⏱ ' + (goal.estimatedHours || 0) + ' giờ • ' + goalDone + '/' + goalSubs.length + ' bước</div>' +
+                  '</div>' +
+                  '<span class="week-day-task-percent">' + goalPct + '%</span>' +
               '</div>' +
-              '<span class="week-day-task-percent">' + gPct + '%</span>' +
-            '</div>' +
             '<div class="week-progress-track mt-2"><div class="week-progress-fill ' + (gPct === 100 && gSubs.length ? 'done' : '') + '" style="width:' + gPct + '%"></div></div>' +
             '<div class="week-day-subtask-list">' + gSubs.map(function(st) {
   return '<div class="week-day-subtask ' + (st.completed ? 'done' : '') + ' flex items-start gap-2" data-subtask-id="' + st.id + '">' +
@@ -1727,6 +1725,22 @@ function renderBreakoutTasks(goals) {
   container.innerHTML = days.map(function(day) {
     var dayGoals = goals.filter(function(g) { return g.day === day.key; })
                     .sort(sortByPriority);
+                    var priority = goal.priority || 'medium';
+                    return '<div class="daily-goal ' + getPriorityTaskClass(priority) + '">' +
+                        '<div class="flex items-start justify-between gap-2">' +
+                            '<div class="min-w-0 flex-1">' +
+                                '<div class="mb-1"><span class="priority-badge ' + getPriorityClass(priority) + '">' + getPriorityLabel(priority) + '</span></div>' +
+                                '<div class="daily-goal-title">' + escapeHtml(goal.title) + '</div>' +
+                                '<div class="daily-goal-meta">⏱ ' + (goal.estimatedHours || 0) + 'h • ' + completed + '/' + subs.length + ' bước' + (pending ? ' • còn ' + pending : ' • hoàn thành') + '</div>' +
+                            '</div>' +
+                            '<span class="text-[10px] font-bold ' + (gpct === 100 && subs.length ? 'text-emerald-300' : 'text-purple-300') + '">' + gpct + '%</span>' +
+                        '</div>' +
+                        '<div class="mt-2 h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:' + gpct + '%"></div></div>' +
+                        '<div class="flex items-center justify-between mt-2">' +
+                            '<span class="text-[9px] ' + (pending ? 'text-gray-500' : 'text-emerald-300') + '">' + (pending ? 'Chưa hoàn tất' : '✓ Đã hoàn tất') + '</span>' +
+                            '<button onclick="ww.deleteGoal(\'' + goal.id + '\')" class="text-gray-600 hover:text-red-400 transition" title="Xóa mục tiêu"><i class="fa-solid fa-trash-can text-[10px]"></i></button>' +
+                        '</div>' +
+                    '</div>';
     var total = 0, done = 0;
     dayGoals.forEach(function(g) {
       var subs = g.subtasks || [];
