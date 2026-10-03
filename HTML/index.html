@@ -940,7 +940,8 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4
         </div>
 
         <div id="selectedWeekDetails" class="glass-panel rounded-2xl p-5 border border-white/5 relative overflow-hidden mt-5"></div>
-        <!-- Filter bar -->
+    
+          <!-- Filter bar 
         <div class="glass-panel rounded-2xl p-3 border border-white/5 mb-4">
           <div class="flex flex-wrap items-center gap-2">
             <span class="text-[11px] text-gray-400 font-medium mr-2">Lọc:</span>
@@ -950,7 +951,7 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(124,93,250,.4
             <button onclick="ww.setPriorityFilter('low')" data-filter="low" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition">🟢 Thấp</button>
             <span id="filterCount" class="text-[10px] text-gray-500 ml-auto"></span>
           </div>
-        </div>
+        </div> -->
         <div id="bigGoalsList" class="space-y-4"></div>
       </section>
 
@@ -1663,17 +1664,20 @@ function renderSelectedWeekDetails() {
       '</div>' +
       '<div class="week-progress-track mb-4"><div class="week-progress-fill ' + (sPct === 100 && sTotal ? 'done' : '') + '" style="width:' + sPct + '%"></div></div>' +
       (selectedGoals.length ?
-        '<div class="week-day-task-list">' + selectedGoals.map(function(goal) {
+      '<div class="week-day-task-list">' + selectedGoals.map(function(goal) {
           var gSubs = goal.subtasks || [];
           var gDone = gSubs.filter(function(st) { return st.completed; }).length;
           var gPct = gSubs.length ? Math.round((gDone / gSubs.length) * 100) : 0;
           var pr = goal.priority || 'medium';
-          '<div class="week-day-task-card">' +
+          
+          return '<div class="week-day-task-card">' +
               '<div class="flex items-start justify-between gap-3">' +
                   '<div class="min-w-0">' +
                       '<div class="mb-1"><span class="priority-badge ' + getPriorityClass(pr) + '">' + getPriorityLabel(pr) + '</span></div>' +
                       '<div class="week-selected-task-title">' + escapeHtml(goal.title) + '</div>' +
-                      '<div class="week-selected-task-meta">⏱ ' + (goal.estimatedHours || 0) + ' giờ • ' + goalDone + '/' + goalSubs.length + ' bước</div>' +
+                      '<div class="week-selected-task-meta">⏱ ' + (goal.estimatedHours || 0) + ' giờ • ' + gDone + '/' + gSubs.length + ' bước</div>' +
+                      //                                                                               ↑ ĐỔI goalDone → gDone
+                      //                                                                                        ↑ ĐỔI goalSubs → gSubs
                   '</div>' +
                   '<span class="week-day-task-percent">' + goalPct + '%</span>' +
               '</div>' +
@@ -1725,7 +1729,6 @@ function renderBreakoutTasks(goals) {
   container.innerHTML = days.map(function(day) {
     var dayGoals = goals.filter(function(g) { return g.day === day.key; })
                     .sort(sortByPriority);
-                    var priority = goal.priority || 'medium';
                     return '<div class="daily-goal ' + getPriorityTaskClass(priority) + '">' +
                         '<div class="flex items-start justify-between gap-2">' +
                             '<div class="min-w-0 flex-1">' +
@@ -1763,11 +1766,11 @@ function renderBreakoutTasks(goals) {
       '</div>' +
       '<div class="daily-progress-track"><div class="daily-progress-fill ' + (pct === 100 && total ? 'done' : '') + '" style="width:' + pct + '%"></div></div>' +
       (dayGoals.length ? dayGoals.map(function(goal) {
+        var priority = goal.priority || 'medium';
         var subs = goal.subtasks || [];
         var completed = subs.filter(function(s) { return s.completed; }).length;
         var gpct = subs.length ? Math.round((completed / subs.length) * 100) : 0;
         var pending = subs.filter(function(s) { return !s.completed; }).length;
-        var priority = goal.priority || 'medium';
         return '<div class="daily-goal ' + getPriorityTaskClass(priority) + '">' +
             '<div class="flex items-start justify-between gap-2">' +
                 '<div class="min-w-0 flex-1">' +
