@@ -16,25 +16,20 @@ function toggleTheme() {
 }
 
 function toggleSound() {
-  soundEnabled = !soundEnabled;
-  localStorage.setItem('ws_sound_enabled', soundEnabled ? 'true' : 'false');
+  window.soundEnabled = !window.soundEnabled;
+  localStorage.setItem('ws_sound_enabled', window.soundEnabled ? 'true' : 'false');
   var icon = document.getElementById('soundIcon');
-  if (icon) {
-    icon.className = soundEnabled
-      ? 'fa-solid fa-volume-high text-sm'
-      : 'fa-solid fa-volume-xmark text-sm';
-  }
-  if (soundEnabled && typeof playSound === 'function') playSound('success');
+  if (icon) icon.className = window.soundEnabled ? 'fa-solid fa-volume-high text-sm' : 'fa-solid fa-volume-xmark text-sm';
+  if (window.soundEnabled && typeof playSound === 'function') playSound('success');
   if (typeof showTaskToast === 'function') {
-    showTaskToast(soundEnabled ? '🔊 Đã bật âm thanh' : '🔇 Đã tắt âm thanh', '');
+    showTaskToast(window.soundEnabled ? '🔊 Đã bật âm thanh' : '🔇 Đã tắt âm thanh', '');
   }
-  console.log('🔊 Sound:', soundEnabled ? 'on' : 'off');
+  console.log('🔊 Sound:', window.soundEnabled ? 'on' : 'off');
 }
 
-// Restore trạng thái âm thanh khi load
 (function restoreSoundState() {
   var icon = document.getElementById('soundIcon');
-  if (icon && !soundEnabled) {
+  if (icon && !window.soundEnabled) {
     icon.className = 'fa-solid fa-volume-xmark text-sm';
   }
 })();

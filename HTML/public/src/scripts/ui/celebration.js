@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 function playSound(type) {
-  if (!soundEnabled) return;
+  if (!window.soundEnabled) return;
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
     var osc = ctx.createOscillator();

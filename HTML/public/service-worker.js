@@ -53,6 +53,11 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('fetch', function(event) {
   var url = new URL(event.request.url);
   
+  // ✅ Skip các protocol không phải http/https
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+  
   // Không cache Firebase/Firestore API
   if (url.hostname.includes('firebase') ||
       url.hostname.includes('googleapis.com') ||
