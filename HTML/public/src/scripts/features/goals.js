@@ -24,6 +24,7 @@ function createNewBigGoal() {
     id: 'g_' + ts,
     weekKey: targetWeekKey,
     title: title,
+    notes: '',
     day: dayInput.value || 'Mon',
     estimatedHours: parseFloat(estInput.value) || 2,
     actualHours: 0,

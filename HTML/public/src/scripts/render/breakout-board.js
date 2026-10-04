@@ -93,16 +93,26 @@ function renderBreakoutTasks(goals) {
                         : '') +
                     '</div>' +
                     '<div class="daily-goal-title">' + escapeHtml(goal.title) + '</div>' +
+                    (goal.notes ? '<div class="text-[9px] text-cyan-400/70 mt-1 truncate italic">📝 ' + escapeHtml(goal.notes.substring(0, 60)) + (goal.notes.length > 60 ? '...' : '') + '</div>' : '') +
                     '<div class="daily-goal-meta">⏱ ' + (goal.estimatedHours || 0) + 'h • ' + completed + '/' + subs.length + ' bước' + (pending ? ' • còn ' + pending : ' • hoàn thành') + '</div>' +
                 '</div>' +
                 '<span class="text-[10px] font-bold ' + (gpct === 100 && subs.length ? 'text-emerald-300' : 'text-purple-300') + '">' + gpct + '%</span>' +
             '</div>' +
             '<div class="mt-2 h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:' + gpct + '%"></div></div>' +
             '<div class="flex items-center justify-between mt-2">' +
-                '<span class="text-[9px] ' + (pending ? 'text-gray-500' : 'text-emerald-300') + '">' + (pending ? 'Chưa hoàn tất' : '✓ Đã hoàn tất') + '</span>' +
-                '<button onclick="ww.cyclePriority(\'' + goal.id + '\')" class="text-gray-600 hover:text-amber-400 transition mr-2" title="Đổi độ ưu tiên"><i class="fa-solid fa-arrows-rotate text-[10px]"></i></button>' +
-                '<button onclick="ww.deleteGoal(\'' + goal.id + '\')" class="text-gray-600 hover:text-red-400 transition" title="Xóa mục tiêu"><i class="fa-solid fa-trash-can text-[10px]"></i></button>' +
+            '<span class="text-[9px] ' + (pending ? 'text-gray-500' : 'text-emerald-300') + '">' + (pending ? 'Chưa hoàn tất' : '✓ Đã hoàn tất') + '</span>' +
+            '<div class="flex items-center gap-1">' +
+              '<button onclick="ww.openNotes(\'' + goal.id + '\')" class="text-gray-600 hover:text-cyan-400 transition" title="Ghi chú">' +
+                '<i class="fa-solid fa-' + (goal.notes ? 'note-sticky text-cyan-400' : 'note-sticky') + ' text-[10px]"></i>' +
+              '</button>' +
+              '<button onclick="ww.cyclePriority(\'' + goal.id + '\')" class="text-gray-600 hover:text-amber-400 transition" title="Đổi độ ưu tiên">' +
+                '<i class="fa-solid fa-arrows-rotate text-[10px]"></i>' +
+              '</button>' +
+              '<button onclick="ww.deleteGoal(\'' + goal.id + '\')" class="text-gray-600 hover:text-red-400 transition" title="Xóa mục tiêu">' +
+                '<i class="fa-solid fa-trash-can text-[10px]"></i>' +
+              '</button>' +
             '</div>' +
+          '</div>' +
         '</div>';
       }).join('') : '<div class="daily-empty"><i class="fa-regular fa-calendar text-lg mb-2 block"></i>Chưa có công việc</div>') +
     '</div>';
