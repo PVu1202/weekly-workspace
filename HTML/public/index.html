@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Workspace - Task Management</title>
+<!-- PWA Meta -->
+<meta name="description" content="Quản lý công việc theo tuần với AI Coach, Pomodoro và thống kê chi tiết.">
+<meta name="theme-color" content="#7c5dfa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Weekly WS">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- ═══ CSS MODULES ═══ -->
+ <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="/src/styles/01-base.css">
+<link rel="stylesheet" href="/src/styles/02-theme.css">
+<link rel="stylesheet" href="/src/styles/03-layout.css">
+<link rel="stylesheet" href="/src/styles/04-components.css">
+<link rel="stylesheet" href="/src/styles/05-task-board.css">
+<link rel="stylesheet" href="/src/styles/06-ai-coach.css">
+<link rel="stylesheet" href="/src/styles/07-stats.css">
+<link rel="stylesheet" href="/src/styles/08-auth-screen.css">
+<link rel="stylesheet" href="/src/styles/09-modals.css">
+<link rel="stylesheet" href="/src/styles/10-animations.css">
+<link rel="stylesheet" href="/src/styles/11-light-mode.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Chart.js -->
+<!-- Google reCAPTCHA v3 -->
+<script src="https://www.google.com/recaptcha/api.js?render=6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d"></script>
+</head>
+<body class="h-screen flex overflow-hidden text-gray-200">
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-gemini-accent via-gemini-blue to-gemini-pink p-3 flex items-center justify-center shadow-lg shadow-gemini-accent/30 text-white animate-pulse">
+    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor"><path d="M50 8V24M30 14L41 29M70 14L59 29M14 28L30 38M86 28L70 38M8 46L26 48M92 46L74 48" stroke-width="3.5" stroke-linecap="round"/><path d="M42 36C42 31.5 45.5 28 50 28C54.5 28 58 31.5 58 36" stroke-width="3"/><path d="M50 72C38 67 24 68 18 72V42C24 38 38 37 50 42M50 72C62 67 76 68 82 72V42C76 38 62 37 50 42" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 42V72" stroke-width="3.5" stroke-linecap="round"/><path d="M10 82L18 72H82L90 82H10Z" fill="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+  </div>
+  <p class="text-sm text-gray-400">Đang kết nối máy chủ...</p>
+</div>
+<!-- Celebration overlay -->
+<div id="celebrationBadge" class="celebration-badge">
+  <span class="celebration-emoji" id="celebrationEmoji">🎉</span>
+  <div class="celebration-title" id="celebrationTitle">Tuyệt vời!</div>
+  <div class="celebration-text" id="celebrationText">Hoàn thành mục tiêu</div>
+</div>
+<!-- Toasts -->
+<div id="taskToast" class="task-toast" role="status" aria-live="polite">
+  <div class="task-toast-icon"><i class="fa-solid fa-check"></i></div>
+  <div class="min-w-0">
+    <div id="taskToastTitle" class="task-toast-title">Đã hoàn thành!</div>
+    <div id="taskToastMessage" class="task-toast-message"></div>
+  </div>
+</div>
+<div id="aiToast" class="ai-toast" role="status" aria-live="polite">
+  <div class="ai-toast-icon"><i class="fa-solid fa-robot"></i></div>
+  <div class="min-w-0">
+    <div id="aiToastTitle" class="ai-toast-title">🤖 AI Coach có gợi ý cho bạn</div>
+    <div id="aiToastMessage" class="ai-toast-message">Đang kiểm tra công việc hôm nay...</div>
+  </div>
+  <button class="ai-toast-close" onclick="ww.hideAIToast()" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+<!-- ═══════════ AUTH SCREEN — EDITORIAL ═══════════ -->
+<div id="authScreen" class="hidden">
+  <!-- ═══ LAYERED WAVES BACKGROUND ═══ -->
+<div class="auth-waves-bg">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Gradients cho từng layer -->
+      <linearGradient id="wave1Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#faf5ed" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#f5ede0" stop-opacity="1"/>
+      </linearGradient>
+      
+      <linearGradient id="wave2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f7f2e8" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#ede5d5" stop-opacity="1"/>
+      </linearGradient>
+      
+      <linearGradient id="wave3Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f2ece1" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#e8ddc8" stop-opacity="1"/>
+      </linearGradient>
+      
+      <linearGradient id="wave4Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ede5d4" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#e2d5ba" stop-opacity="1"/>
+      </linearGradient>
+      
+      <!-- Shadow filters cho depth -->
+      <filter id="waveShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+        <feOffset dx="0" dy="2" result="offsetblur"/>
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.08"/>
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    
+    <!-- Wave Layer 1 — Top right soft curve -->
+    <path class="wave-layer-1" filter="url(#waveShadow)" 
+          d="M 800 0 Q 950 100 1050 250 T 1440 300 L 1440 0 Z" 
+          fill="url(#wave1Grad)"/>
+    
+    <!-- Wave Layer 2 — Big mid-right curve -->
+    <path class="wave-layer-2" filter="url(#waveShadow)" 
+          d="M 700 100 Q 900 200 1000 400 T 1440 550 L 1440 100 Z" 
+          fill="url(#wave2Grad)"/>
+    
+    <!-- Wave Layer 3 — Bottom right layered -->
+    <path class="wave-layer-3" filter="url(#waveShadow)" 
+          d="M 400 500 Q 700 600 1000 700 T 1440 850 L 1440 500 Z" 
+          fill="url(#wave3Grad)"/>
+    
+    <!-- Wave Layer 4 — Bottom soft curve -->
+    <path class="wave-layer-4" filter="url(#waveShadow)" 
+          d="M 0 700 Q 300 650 600 750 T 1440 900 L 0 900 Z" 
+          fill="url(#wave4Grad)"/>
+    
+    <!-- Wave Layer 5 — Small accent top-left -->
+    <path class="wave-layer-1" opacity="0.6" 
+          d="M 0 0 Q 200 80 350 150 T 500 200 L 500 0 Z" 
+          fill="url(#wave1Grad)"/>
+  </svg>
+</div>
+<!-- ═══ CYBER WAVES BACKGROUND ═══ -->
+<div class="auth-waves-bg cyber-waves-bg">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Wave Gradients — Cyber colors -->
+      <linearGradient id="cyberWave1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7c5dfa" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.08"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.05"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave3" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ec4899" stop-opacity="0.10"/>
+        <stop offset="100%" stop-color="#d946ef" stop-opacity="0.04"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave4" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.06"/>
+      </linearGradient>
+      
+      <linearGradient id="cyberWave5" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.14"/>
+        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.06"/>
+      </linearGradient>
+
+      <!-- Glow filter -->
+      <filter id="cyberGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="8" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Wave 1 — Big curve top right -->
+    <path class="cyber-wave-1 cyber-glow-pulse" filter="url(#cyberGlow)"
+          d="M 800 -50 Q 1000 80 1150 250 T 1500 380 L 1500 -50 Z"
+          fill="url(#cyberWave1)"/>
+    
+    <!-- Wave 2 — Mid right -->
+    <path class="cyber-wave-2 cyber-glow-pulse-2" filter="url(#cyberGlow)"
+          d="M 700 100 Q 950 220 1100 420 T 1500 600 L 1500 100 Z"
+          fill="url(#cyberWave2)"/>
+    
+    <!-- Wave 3 — Accent cyan -->
+    <path class="cyber-wave-3 cyber-glow-pulse-3" filter="url(#cyberGlow)"
+          d="M 400 400 Q 700 500 950 650 T 1500 820 L 1500 400 Z"
+          fill="url(#cyberWave3)"/>
+    
+    <!-- Wave 4 — Bottom -->
+    <path class="cyber-wave-4" filter="url(#cyberGlow)"
+          d="M 0 650 Q 400 600 800 750 T 1500 950 L 0 950 Z"
+          fill="url(#cyberWave4)"/>
+    
+    <!-- Wave 5 — Top left small -->
+    <path class="cyber-wave-5 cyber-glow-pulse" filter="url(#cyberGlow)"
+          d="M -50 -50 Q 200 80 380 180 T 550 250 L -50 250 Z"
+          fill="url(#cyberWave5)"/>
+
+    <!-- Neon accent lines -->
+    <g opacity="0.4">
+      <path d="M 850 0 Q 1050 100 1200 300 T 1500 450" 
+            stroke="#a78bfa" stroke-width="1" fill="none" 
+            stroke-dasharray="8 12" filter="url(#cyberGlow)"/>
+      <path d="M 900 50 Q 1100 150 1250 350 T 1500 500" 
+            stroke="#22d3ee" stroke-width="0.8" fill="none" 
+            stroke-dasharray="6 10" filter="url(#cyberGlow)"/>
+    </g>
+  </svg>
+</div>
+  <!-- Floating orbs -->
+  <div class="auth-orb auth-orb-1"></div>
+  <div class="auth-orb auth-orb-2"></div>
+  <div class="auth-orb auth-orb-3"></div>
+  <!-- Animated particles -->
+  <div class="auth-particles" id="authParticles"></div>
+  <!-- LEFT: Branding -->
+  <div class="auth-left">
+    
+    <!-- Logo top-left -->
+    <div class="auth-brand-logo">
+      <div class="auth-brand-logo-mark">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor">
+          <path d="M50 8V24M30 14L41 29M70 14L59 29M14 28L30 38M86 28L70 38M8 46L26 48M92 46L74 48" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M42 36C42 31.5 45.5 28 50 28C54.5 28 58 31.5 58 36" stroke-width="3"/>
+          <path d="M50 72C38 67 24 68 18 72V42C24 38 38 37 50 42M50 72C62 67 76 68 82 72V42C76 38 62 37 50 42" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M50 42V72" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="auth-brand-logo-text">Weekly Workspace</span>
+    </div>
+
+    <!-- Badge -->
+    <div class="auth-badge">
+      <span class="auth-badge-dot"></span>
+      Phiên bản mới vừa ra mắt
+    </div>
+
+    <!-- Title -->
+    <h1 class="auth-title">
+      Công việc <em>theo tuần</em>,<br>
+      gọn gàng và hiệu quả.
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="auth-subtitle">
+      Quản lý mục tiêu, chia nhỏ nhiệm vụ, theo dõi tiến độ và <strong>thực sự hoàn thành</strong> những gì bạn đã đề ra.
+    </p>
+
+    <!-- Marquee Features -->
+    <div class="auth-marquee-wrap">
+      <div class="auth-marquee">
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-layer-group" style="color:#7c5dfa"></i>
+          <span>Chia nhỏ mục tiêu</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-chart-line" style="color:#0891b2"></i>
+          <span>Theo dõi tiến độ</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-bolt" style="color:#059669"></i>
+          <span>AI Coach</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-stopwatch" style="color:#d97706"></i>
+          <span>Pomodoro</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-chart-pie" style="color:#a21caf"></i>
+          <span>Thống kê</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <!-- Duplicate for infinite loop -->
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-layer-group" style="color:#7c5dfa"></i>
+          <span>Chia nhỏ mục tiêu</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-chart-line" style="color:#0891b2"></i>
+          <span>Theo dõi tiến độ</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-bolt" style="color:#059669"></i>
+          <span>AI Coach</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-stopwatch" style="color:#d97706"></i>
+          <span>Pomodoro</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+        <div class="auth-marquee-item">
+          <i class="fa-solid fa-chart-pie" style="color:#a21caf"></i>
+          <span>Thống kê</span>
+        </div>
+        <div class="auth-marquee-sep">✦</div>
+      </div>
+    </div>
+    <!-- ═══ ANIMATED PREVIEW SCENE ═══ -->
+<!-- ═══ LIVE STATS ROW ═══ -->
+<div class="auth-stats-row">
+  
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-violet">
+      <i class="fa-solid fa-bullseye"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="12">0</div>
+      <div class="auth-stat-label">Mục tiêu</div>
+    </div>
+  </div>
+
+  <div class="auth-stat-divider"></div>
+
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-cyan">
+      <i class="fa-solid fa-list-check"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="48">0</div>
+      <div class="auth-stat-label">Bước nhỏ</div>
+    </div>
+  </div>
+
+  <div class="auth-stat-divider"></div>
+
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-emerald">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="24">0</div>
+      <div class="auth-stat-label">Đã xong</div>
+    </div>
+  </div>
+
+  <div class="auth-stat-divider"></div>
+
+  <div class="auth-stat">
+    <div class="auth-stat-icon auth-stat-amber">
+      <i class="fa-solid fa-clock"></i>
+    </div>
+    <div class="auth-stat-body">
+      <div class="auth-stat-value" data-count="42">0<span class="auth-stat-unit">h</span></div>
+      <div class="auth-stat-label">Giờ làm</div>
+    </div>
+  </div>
+
+</div>     
+<div class="auth-preview-scene">
+  
+  <!-- Sparkles -->
+  <div class="preview-sparkle preview-sparkle-1">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
+    </svg>
+  </div>
+  <div class="preview-sparkle preview-sparkle-2">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
+    </svg>
+  </div>
+  <div class="preview-sparkle preview-sparkle-3">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
+    </svg>
+  </div>
+
+  <!-- Main mockup -->
+  <div class="preview-mockup">
+    
+    <!-- Header bar -->
+    <div class="preview-mockup-header">
+      <div class="preview-mockup-dots">
+        <span class="preview-mockup-dot red"></span>
+        <span class="preview-mockup-dot yellow"></span>
+        <span class="preview-mockup-dot green"></span>
+      </div>
+      <div class="preview-mockup-url">weekly-workspace.app</div>
+    </div>
+
+    <!-- Body -->
+    <div class="preview-mockup-body">
+      
+      <div class="preview-mockup-topbar">
+        <div class="preview-mockup-title">Công việc tuần này</div>
+        <div class="preview-mockup-progress-pill">
+          <i class="fa-solid fa-fire" style="font-size:8px;"></i>
+          68%
+        </div>
+      </div>
+
+      <div class="preview-mockup-progressbar">
+        <div class="preview-mockup-progressfill"></div>
+      </div>
+
+      <div class="preview-mockup-task done">
+        <div class="preview-mockup-checkbox"></div>
+        <div class="preview-mockup-task-text">Chuẩn bị tài liệu & nguồn lực</div>
+        <div class="preview-mockup-priority high"></div>
+      </div>
+
+      <div class="preview-mockup-task done">
+        <div class="preview-mockup-checkbox"></div>
+        <div class="preview-mockup-task-text">Thực hiện nội dung cốt lõi</div>
+        <div class="preview-mockup-priority medium"></div>
+      </div>
+
+      <div class="preview-mockup-task">
+        <div class="preview-mockup-checkbox"></div>
+        <div class="preview-mockup-task-text">Kiểm tra & hoàn thiện sản phẩm</div>
+        <div class="preview-mockup-priority low"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Floating card 1 — Streak -->
+  <div class="preview-float-card preview-float-1">
+    <div class="preview-float-card-row">
+      <div class="preview-float-card-icon violet">
+        <i class="fa-solid fa-fire"></i>
+      </div>
+      <div>
+        <div class="preview-float-card-label">Chuỗi ngày</div>
+        <div class="preview-float-card-value">12</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating card 2 — Completed -->
+  <div class="preview-float-card preview-float-2">
+    <div class="preview-float-card-row">
+      <div class="preview-float-card-icon emerald">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <div class="preview-float-card-label">Hoàn thành</div>
+        <div class="preview-float-card-value">24</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating card 3 — Hours -->
+  <div class="preview-float-card preview-float-3">
+    <div class="preview-float-card-row">
+      <div class="preview-float-card-icon amber">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <div>
+        <div class="preview-float-card-label">Giờ làm việc</div>
+        <div class="preview-float-card-value">42h</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- RIGHT: Form -->
+  <div class="auth-right">
+    
+    <div class="auth-card">
+      
+      <h2 class="auth-card-title">Chào mừng trở lại</h2>
+      <p class="auth-card-subtitle">Đăng nhập để tiếp tục quản lý công việc của bạn.</p>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button type="button" id="tabLoginBtn" class="auth-tab active" onclick="ww.switchAuthTab('login')">Đăng Nhập</button>
+        <button type="button" id="tabRegisterBtn" class="auth-tab" onclick="ww.switchAuthTab('register')">Đăng Ký</button>
+      </div>
+
+      <!-- Form -->
+      <form id="authForm" onsubmit="ww.handleAuthSubmit(event)">
+        
+        <div id="displayNameGroup" class="auth-group hidden">
+          <label class="auth-label">Họ & Tên</label>
+          <div class="auth-input-wrap">
+            <i class="fa-regular fa-user auth-input-icon"></i>
+            <input type="text" id="authDisplayName" placeholder="Nguyễn Văn A" class="auth-input">
+          </div>
+        </div>
+
+        <div class="auth-group">
+          <label class="auth-label">Email</label>
+          <div class="auth-input-wrap">
+            <i class="fa-regular fa-envelope auth-input-icon"></i>
+            <input type="email" id="authEmail" required placeholder="name@example.com" class="auth-input" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="auth-group">
+          <label class="auth-label">Mật khẩu</label>
+          <div class="auth-input-wrap">
+            <i class="fa-solid fa-lock auth-input-icon"></i>
+            <input type="password" id="authPassword" required placeholder="••••••••" class="auth-input" autocomplete="current-password">
+          </div>
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="auth-btn-primary">
+          <span id="authSubmitText">Đăng Nhập</span>
+          <i id="authSubmitSpinner" class="fa-solid fa-spinner animate-spin-fast hidden"></i>
+        </button>
+
+      </form>
+
+      <!-- Divider -->
+      <div class="auth-divider">hoặc</div>
+
+      <!-- Google -->
+      <button type="button" id="btnGoogleLogin" onclick="ww.handleGoogleLogin()" class="auth-btn-google">
+        <svg viewBox="0 0 24 24">
+          <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
+          <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+          <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.4 0 15.3s.7 5.6 1.9 8l3.7-2.9c-.2-.7-.2-1.5-.2-2.3z"/>
+          <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 22.3 12 23z"/>
+        </svg>
+        <span id="txtGoogleBtn">Tiếp tục với Google</span>
+        <i id="spinGoogleBtn" class="fa-solid fa-spinner animate-spin-fast hidden text-xs"></i>
+      </button>
+
+      <!-- Guest -->
+      <button type="button" id="btnGuestLogin" onclick="ww.handleGuestLogin()" class="auth-btn-guest">
+        <i class="fa-solid fa-user-secret text-emerald-500"></i>
+        <span id="txtGuestBtn">Dùng thử với tư cách Khách</span>
+        <i id="spinGuestBtn" class="fa-solid fa-spinner animate-spin-fast hidden text-xs"></i>
+      </button>
+
+      <!-- Footer -->
+      <div class="auth-footer">
+        <button type="button" onclick="ww.openFirebaseConfigModal()" class="auth-footer-link">
+          <i class="fa-solid fa-gear"></i>
+          <span>Cấu hình Firebase</span>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Decorative code block -->
+  <div class="auth-decor-code">
+    <span class="auth-decor-code-line"><span class="c">// tất cả ở một nơi</span></span>
+    <span class="auth-decor-code-line"><span class="k">const</span> <span class="f">goals</span> = [<span class="s">'tuần này'</span>];</span>
+    <span class="auth-decor-code-line"><span class="f">focus</span>(goals).<span class="f">ship</span>();</span>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Firebase Config Modal -->
+<div id="firebaseConfigModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+  <div class="glass-panel w-full max-w-lg rounded-3xl p-6 border border-gemini-cyan/40 shadow-2xl relative">
+    <div class="flex justify-between items-center pb-3 border-b border-white/10 mb-4">
+      <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-fire text-amber-500"></i> Cấu Hình Firebase</h3>
+      <button onclick="ww.closeFirebaseConfigModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="text-xs text-gray-300 mb-3">Dán <code>firebaseConfig</code> của dự án bạn:</p>
+    <textarea id="firebaseConfigInput" rows="7" class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs text-emerald-400 font-mono focus:outline-none focus:border-gemini-cyan mb-4 resize-none leading-relaxed"></textarea>
+    <div class="flex justify-end gap-2">
+      <button onclick="ww.resetFirebaseConfig()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 rounded-xl transition">Khôi phục mặc định</button>
+      <button onclick="ww.saveCustomFirebaseConfig()" class="px-5 py-2 bg-gemini-cyan hover:bg-cyan-500 text-xs font-bold text-black rounded-xl shadow-lg transition">Lưu & Kết Nối</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside id="appSidebar" class="w-72 bg-gemini-sidebar border-r border-gemini-cardBorder flex flex-col justify-between z-20 shrink-0 hidden">
+  <div>
+ <div class="p-4 flex items-center justify-between border-b border-gemini-cardBorder">
+  <div class="flex items-center space-x-3 min-w-0 hide-when-collapsed">
+    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gemini-accent via-gemini-blue to-gemini-pink p-1.5 flex items-center justify-center shadow-lg text-white shrink-0">
+      <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 8V24M30 14L41 29M70 14L59 29M14 28L30 38M86 28L70 38M8 46L26 48M92 46L74 48" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M42 36C42 31.5 45.5 28 50 28C54.5 28 58 31.5 58 36" stroke-width="3"/>
+        <path d="M50 72C38 67 24 68 18 72V42C24 38 38 37 50 42M50 72C62 67 76 68 82 72V42C76 38 62 37 50 42" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50 42V72" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M10 82L18 72H82L90 82H10Z" fill="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="min-w-0">
+      <h1 class="sidebar-logo-text sidebar-text font-bold text-sm tracking-wide text-white truncate">Weekly Workspace</h1>
+      <p class="text-[10px] text-purple-300 font-medium truncate">Quản lý công việc</p>
+    </div>
+  </div>
+  <button onclick="ww.toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition shrink-0" title="Thu gọn / Mở rộng">
+    <i class="fa-solid fa-bars text-base" id="sidebarToggleIcon"></i>
+  </button>
+</div>
+    <div class="p-4 border-b border-gemini-cardBorder bg-black/20">
+      <label class="sidebar-week-label sidebar-text block text-[11px] text-gray-400 font-medium mb-1.5">Chọn Tuần Làm Việc</label>
+      <div class="sidebar-week-controls flex items-center space-x-2">
+        <input type="week" id="weekPicker" class="bg-gemini-card border border-gemini-cardBorder rounded-lg px-3 py-1.5 text-xs text-white w-full focus:outline-none focus:border-gemini-accent transition">
+        <button onclick="ww.setCurrentWeek()" title="Tuần Hiện Tại" class="px-2.5 py-1.5 bg-gemini-card hover:bg-gemini-accent/20 border border-gemini-cardBorder text-gray-300 rounded-lg text-xs transition"><i class="fa-solid fa-calendar-day"></i></button>
+      </div>
+    </div>
+    <nav class="p-3 space-y-1">
+      <button onclick="ww.switchTab('breakoutTab')" id="nav-breakoutTab" data-tooltip="Chia Nhỏ Nhiệm Vụ" class="tab-btn active w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3"><i class="fa-solid fa-sitemap text-purple-400 w-4"></i><span class="sidebar-text">Chia Nhỏ Nhiệm Vụ</span></div>
+        <span id="badge-tasks" class="text-[10px] px-2 py-0.5 rounded-full bg-gemini-accent/20 text-purple-300">0</span>
+      </button>
+      <button onclick="ww.switchTab('calendarTab')" id="nav-calendarTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3"><i class="fa-solid fa-calendar-week text-blue-400 w-4"></i><span class="sidebar-text">Lịch Tuần 7 Ngày</span></div>
+      </button>
+      <button onclick="ww.switchTab('timerTab')" id="nav-timerTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3"><i class="fa-solid fa-stopwatch text-cyan-400 w-4"></i><span class="sidebar-text">Thời Gian & Pomodoro</span></div>
+      </button>
+      <button onclick="ww.switchTab('aiCoachTab')" id="nav-aiCoachTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3"><i class="fa-solid fa-robot text-fuchsia-400 w-4"></i><span class="sidebar-text">AI Coach</span></div>
+        <span id="aiReminderBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300">!</span>
+      </button>
+      <button onclick="ww.switchTab('statsTab')" id="nav-statsTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-chart-line text-amber-400 w-4"></i>
+          <span class="sidebar-text">Thống Kê</span>
+        </div>
+      </button>
+      <button onclick="ww.switchTab('reviewTab')" id="nav-reviewTab" class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <div class="flex items-center space-x-3"><i class="fa-solid fa-clipboard-check text-emerald-400 w-4"></i><span class="sidebar-text">Nhìn Lại Cuối Tuần</span></div>
+      </button>
+    </nav>
+    <div class="sidebar-progress-box px-4 py-3 mx-3 my-2 rounded-xl glass-card text-xs space-y-2">
+      <div class="flex justify-between items-center text-gray-400">
+        <span class="sidebar-progress-label">Tiến độ hoàn thành:</span>
+        <span id="sidebarProgressPct" class="font-bold text-gemini-emerald">0%</span>
+      </div>
+      <div class="sidebar-progress-bar w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+        <div id="sidebarProgressBar" class="bg-gradient-to-r from-gemini-accent to-gemini-emerald h-1.5 rounded-full transition-all duration-500" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="p-3 border-t border-gemini-cardBorder bg-black/20">
+    <div class="sidebar-user-box flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
+      <div class="flex items-center space-x-2.5 min-w-0 pr-2">
+        <img id="userAvatar" src="https://placehold.co/100x100/7c5dfa/fff?text=U" alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-gemini-accent/40 shrink-0">
+        <div class="sidebar-user-info text-left min-w-0">
+          <p id="userName" class="text-xs font-semibold text-white truncate">Đang tải...</p>
+          <p id="userEmail" class="text-[10px] text-gray-400 truncate">user@gmail.com</p>
+        </div>
+      </div>
+      <button onclick="ww.handleLogout()" title="Đăng Xuất" class="logout-btn text-gray-400 hover:text-red-400 p-2 transition shrink-0"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="sidebarBackdrop" onclick="ww.toggleSidebar()"></div>
+<main id="appMain" class="flex-1 flex flex-col min-w-0 overflow-hidden bg-gemini-bg relative hidden">
+<header class="h-16 border-b border-gemini-cardBorder glass-panel flex items-center justify-between gap-2 px-3 sm:px-6 z-10">
+  <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
+    <!-- Nút ☰ hiện trên Mobile/Tablet -->
+    <button onclick="ww.toggleSidebar()" class="lg:hidden text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition shrink-0" title="Mở menu">
+      <i class="fa-solid fa-bars text-lg"></i>
+    </button>
+    <h2 id="currentWeekTitle"class="text-base font-bold text-white flex items-center gap-2">
+        <span id="tabIconHeader"><i class="fa-solid fa-sitemap text-gemini-accent"></i></span>
+        <span id="tabTitleHeader">Chia Nhỏ Nhiệm Vụ</span>
+      </h2>
+      <span class="text-gray-600">|</span>
+      <div class="text-xs text-gray-400 flex items-center gap-1.5">
+        <i class="fa-regular fa-clock text-gemini-cyan"></i>
+        <span id="liveDateTime">Đang tải...</span>
+      </div>
+    </div>
+    <!-- Search bar -->
+    <div class="relative flex-1 max-w-md mx-2">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+      <input type="text" 
+            id="globalSearchInput" 
+            placeholder="Tìm task... (Ctrl+K)" 
+            autocomplete="off"
+            class="w-full bg-gemini-card border border-gemini-cardBorder rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-gemini-accent transition">
+      <button id="clearSearchBtn" 
+              onclick="ww.clearSearch()" 
+              class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">
+        <i class="fa-solid fa-xmark text-xs"></i>
+      </button>
+    </div>
+    <div class="flex items-center space-x-3">
+      <!-- Nút đổi theme -->
+       <button onclick="ww.toggleSound()" id="soundToggleBtn" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" title="Bật/Tắt âm thanh">
+          <i class="fa-solid fa-volume-high text-sm" id="soundIcon"></i>
+        </button>
+      <button onclick="ww.toggleTheme()" id="themeToggleBtn" 
+          class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" 
+          title="Đổi giao diện sáng/tối">
+        <i class="fa-solid fa-sun" id="themeIcon"></i>
+      </button>
+      <div class="flex items-center space-x-1.5 bg-gemini-card px-3 py-1.5 rounded-lg border border-gemini-cardBorder text-xs text-gray-300">
+        <i id="syncIcon" class="fa-solid fa-cloud text-amber-400"></i>
+        <span id="syncBadgeText" class="text-amber-400 font-medium">Đang kết nối...</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex-1 overflow-y-auto p-6 space-y-6 relative">
+    <div class="main-decor-grid absolute inset-0 opacity-40"></div>
+    <div class="absolute -top-32 -right-20 w-72 h-72 rounded-full bg-violet-600/10 blur-3xl pointer-events-none"></div>
+    <div class="relative z-10 space-y-6">
+
+      <section id="breakoutTab" class="tab-content space-y-6">
+        <div class="glass-panel rounded-2xl p-5 border border-gemini-accent/30 relative overflow-hidden">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa-solid fa-robot text-gemini-accent"></i> Thêm Mục Tiêu Lớn & Chia Nhỏ</label>
+            <span class="text-xs text-purple-300 bg-gemini-accent/10 px-2.5 py-0.5 rounded-full border border-gemini-accent/20">Micro-step</span>
+          </div>
+          <div class="flex flex-col md:flex-row gap-3">
+            <input type="text" id="newGoalInput" placeholder="Ví dụ: Thiết kế xong giao diện trang chủ..." class="flex-1 bg-gemini-card border border-gemini-cardBorder rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-gemini-accent transition">
+            <div class="flex gap-2">
+              <input type="number" id="newGoalEst" placeholder="Giờ" min="0.5" step="0.5" class="w-24 bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-gemini-accent transition">
+              <select id="newGoalDay" class="bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-gemini-accent transition">
+                <option value="Mon">Thứ 2</option><option value="Tue">Thứ 3</option><option value="Wed">Thứ 4</option>
+                <option value="Thu">Thứ 5</option><option value="Fri">Thứ 6</option><option value="Sat">Thứ 7</option><option value="Sun">Chủ Nhật</option>
+              </select>
+              <select id="newGoalPriority" class="bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-gemini-accent transition" title="Độ ưu tiên">
+                <option value="high">🔴 Cao</option>
+                <option value="medium" selected>🟡 Trung</option>
+                <option value="low">🟢 Thấp</option>
+              </select>
+              <input type="datetime-local" id="newGoalDeadline" 
+                class="bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-gemini-accent transition"
+                title="Hạn chót (tùy chọn)"
+                placeholder="Deadline">
+              <button onclick="ww.createNewBigGoal()" class="px-5 py-3 bg-gemini-accent hover:bg-gemini-accentHover text-white rounded-xl text-xs font-semibold shadow-lg transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-layer-group"></i><span>Thêm</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="weekly-progress-shell glass-panel rounded-2xl p-5 border border-white/5 relative overflow-hidden">
+          <div class="weekly-progress-glow"></div>
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500/30 to-cyan-400/20 border border-violet-400/20 flex items-center justify-center text-violet-300"><i class="fa-solid fa-chart-simple"></i></span>
+                <div>
+                  <h3 class="text-sm font-bold text-white">Tiến độ từng tuần</h3>
+                  <p class="text-[10px] text-gray-500 mt-0.5">Mỗi tuần có tiến độ riêng.</p>
+                </div>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[10px] font-semibold">Weekly Progress</span>
+          </div>
+          <div id="weeklyProgressBoard" class="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+        </div>
+
+        <div id="selectedWeekDetails" class="glass-panel rounded-2xl p-5 border border-white/5 relative overflow-hidden mt-5"></div>
+    
+          <!-- Filter bar 
+        <div class="glass-panel rounded-2xl p-3 border border-white/5 mb-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] text-gray-400 font-medium mr-2">Lọc:</span>
+            <button onclick="ww.setPriorityFilter('all')" data-filter="all" class="priority-filter-btn active text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-black/20 text-gray-300 hover:bg-white/5 transition">
+              Tất cả <span data-count="all" class="ml-1 opacity-60">0</span>
+            </button>
+            <button onclick="ww.setPriorityFilter('high')" data-filter="high" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
+              🔴 Cao <span data-count="high" class="ml-1 opacity-60">0</span>
+            </button>
+            <button onclick="ww.setPriorityFilter('medium')" data-filter="medium" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition">
+              🟡 Trung bình <span data-count="medium" class="ml-1 opacity-60">0</span>
+            </button>
+            <button onclick="ww.setPriorityFilter('low')" data-filter="low" class="priority-filter-btn text-[10px] px-3 py-1.5 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition">
+              🟢 Thấp <span data-count="low" class="ml-1 opacity-60">0</span>
+            </button>
+            <span id="filterCount" class="text-[10px] text-gray-500 ml-auto"></span>
+          </div>
+        </div> -->
+        <div id="bigGoalsList" class="space-y-4"></div>
+      </section>
+
+      <section id="calendarTab" class="tab-content hidden space-y-6">
+        <div>
+          <h3 class="text-base font-bold text-white">Lịch Làm Việc 7 Ngày</h3>
+          <p class="text-xs text-gray-400">Công việc phân bổ theo từng ngày</p>
+        </div>
+        <div class="weekly-calendar-grid" id="weeklyCalendarGrid"></div>
+      </section>
+
+      <section id="timerTab" class="tab-content hidden space-y-6">
+        <div class="glass-panel rounded-2xl p-6 border border-gemini-cyan/30 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-2 text-center md:text-left">
+            <span class="px-3 py-1 bg-gemini-cyan/10 border border-gemini-cyan/30 text-gemini-cyan rounded-full text-xs font-semibold"><i class="fa-solid fa-stopwatch mr-1"></i> Pomodoro</span>
+            <h3 id="activeTimerTaskTitle" class="text-sm font-bold text-white">Chưa chọn công việc</h3>
+            <p class="text-xs text-gray-400">Chọn nhiệm vụ để bấm đếm ngược.</p>
+          </div>
+          <div class="flex items-center space-x-6">
+            <div class="text-center font-mono">
+              <div id="timerDisplay" class="text-4xl font-extrabold text-gemini-cyan tracking-wider">25:00</div>
+              <span class="text-[10px] text-gray-400 uppercase tracking-widest">Thời Gian</span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button id="startTimerBtn" onclick="ww.toggleTimer()" class="px-5 py-2 bg-gemini-cyan hover:bg-cyan-600 text-black font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-play"></i> <span id="timerBtnText">Bắt Đầu</span>
+              </button>
+              <button onclick="ww.resetTimer()" class="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs transition border border-gray-700">
+                <i class="fa-solid fa-rotate-right"></i> Đặt Lại
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-4 rounded-xl border border-white/5 flex items-center justify-between">
+            <div><p class="text-xs text-gray-400">Tổng Giờ Dự Kiến</p><h4 id="statTotalEst" class="text-xl font-bold text-gemini-blue mt-1">0.0 giờ</h4></div>
+            <div class="w-10 h-10 rounded-lg bg-gemini-blue/10 flex items-center justify-center text-gemini-blue"><i class="fa-solid fa-hourglass-start"></i></div>
+          </div>
+          <div class="glass-card p-4 rounded-xl border border-white/5 flex items-center justify-between">
+            <div><p class="text-xs text-gray-400">Tổng Giờ Thực Tế</p><h4 id="statTotalAct" class="text-xl font-bold text-gemini-pink mt-1">0.0 giờ</h4></div>
+            <div class="w-10 h-10 rounded-lg bg-gemini-pink/10 flex items-center justify-center text-gemini-pink"><i class="fa-solid fa-hourglass-end"></i></div>
+          </div>
+          <div class="glass-card p-4 rounded-xl border border-white/5 flex items-center justify-between">
+            <div><p class="text-xs text-gray-400">Hiệu Quả</p><h4 id="statTimeVariance" class="text-sm font-bold text-emerald-400 mt-1">Đúng tiến độ</h4></div>
+            <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-chart-line"></i></div>
+          </div>
+        </div>
+        <div class="glass-panel rounded-2xl overflow-hidden border border-gemini-cardBorder">
+          <div class="p-4 border-b border-gemini-cardBorder bg-black/30"><h4 class="text-xs font-bold text-white">Báo Cáo Thời Gian</h4></div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-300">
+              <thead class="bg-black/40 text-gray-400 uppercase text-[10px]">
+                <tr><th class="p-3.5">Nhiệm Vụ</th><th class="p-3.5">Ngày</th><th class="p-3.5">Dự Kiến</th><th class="p-3.5">Thực Tế</th><th class="p-3.5">Chênh</th></tr>
+              </thead>
+              <tbody id="timeTrackerTableBody" class="divide-y divide-gemini-cardBorder"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="aiCoachTab" class="tab-content hidden space-y-5">
+        <div class="ai-hero rounded-3xl p-5 md:p-7">
+          <div class="relative z-10 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-5 items-center">
+            <div class="flex justify-center lg:justify-start"><div class="ai-hero-mascot flex items-center justify-center text-7xl">🤖</div></div>
+            <div class="space-y-4">
+              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="w-9 h-9 rounded-xl bg-fuchsia-500/15 text-fuchsia-300 flex items-center justify-center ai-pulse-dot"><i class="fa-solid fa-robot"></i></span>
+                    <span class="text-[11px] font-bold uppercase tracking-[.18em] text-fuchsia-300">AI Productivity Coach</span>
+                  </div>
+                  <h2 class="text-2xl md:text-3xl font-extrabold text-white">Chào bạn! 👋</h2>
+                  <p class="text-xs md:text-sm text-gray-400 mt-2 max-w-2xl">Mình xem những việc chưa xong và giúp bạn biết <b class="text-gray-200">bắt đầu từ đâu</b>.</p>
+                </div>
+                <button onclick="ww.getAIRecommendations()" id="aiRecommendBtn" class="shrink-0 px-4 py-3 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold transition shadow-lg flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-robot"></i><span>AI gợi ý cho tôi</span>
+                </button>
+              </div>
+              <div class="rounded-2xl bg-white/5 border border-white/10 px-4 py-3">
+                <p id="aiHeroMessage" class="text-xs md:text-sm text-gray-300">Đang kiểm tra công việc...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div class="ai-summary-card rounded-2xl p-4 flex items-center justify-between">
+            <div><p class="text-[10px] text-gray-500 uppercase tracking-wider">Cần xử lý</p><p id="aiTodayCount" class="text-lg font-extrabold text-white mt-1">0</p></div>
+            <div class="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-300 flex items-center justify-center"><i class="fa-solid fa-calendar-day"></i></div>
+          </div>
+          <div class="ai-summary-card rounded-2xl p-4 flex items-center justify-between">
+            <div><p class="text-[10px] text-gray-500 uppercase tracking-wider">Ưu tiên</p><p id="aiPriorityText" class="text-sm font-bold text-white mt-1 truncate max-w-[150px]">Chưa có</p></div>
+            <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-300 flex items-center justify-center"><i class="fa-solid fa-star"></i></div>
+          </div>
+          <div class="ai-summary-card rounded-2xl p-4 flex items-center justify-between">
+            <div><p class="text-[10px] text-gray-500 uppercase tracking-wider">Còn lại</p><p id="aiWeekCount" class="text-lg font-extrabold text-white mt-1">0</p></div>
+            <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-300 flex items-center justify-center"><i class="fa-solid fa-list-check"></i></div>
+          </div>
+          <div class="ai-summary-card rounded-2xl p-4 flex items-center justify-between">
+            <div><p class="text-[10px] text-gray-500 uppercase tracking-wider">Nhắc nhở</p><p id="aiReminderSummary" class="text-sm font-bold text-gray-300 mt-1">Chưa bật</p></div>
+            <div class="w-11 h-11 rounded-xl bg-pink-500/10 text-pink-300 flex items-center justify-center"><i class="fa-regular fa-bell"></i></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_.85fr] gap-5">
+          <div class="glass-panel rounded-3xl p-5 border border-white/5">
+            <div class="flex items-center justify-between mb-4">
+              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-square-check text-fuchsia-400"></i> Việc hôm nay</h3></div>
+              <span id="aiTaskBadge" class="text-[10px] px-2.5 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/15">0 việc</span>
+            </div>
+            <div id="aiTodayTaskList" class="space-y-2.5"></div>
+          </div>
+          <div class="glass-panel rounded-3xl p-5 border border-white/5">
+            <div class="flex items-center justify-between mb-4">
+              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-robot text-fuchsia-400"></i> Gợi ý AI</h3></div>
+              <span class="text-[10px] text-gray-500">AI</span>
+            </div>
+            <div id="aiRecommendationCard" class="rounded-2xl bg-black/15 border border-white/5 p-4 min-h-[170px]">
+              <div class="flex items-center gap-3 text-gray-400"><div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center"><i class="fa-solid fa-lightbulb"></i></div><div><p class="text-sm font-semibold text-white">Đang chuẩn bị...</p></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-reminder-panel rounded-3xl p-5 border border-fuchsia-500/20">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="ai-mini-mascot flex items-center justify-center text-3xl">🤖</div>
+              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-regular fa-bell text-amber-300"></i> Nhắc nhở thông minh</h3><p id="nextReminderText" class="text-[11px] text-gray-400 mt-1">Bật để AI nhắc khi còn việc.</p></div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 shrink-0">
+              <span id="notificationStatus" class="px-3 py-2 rounded-xl bg-white/5 text-gray-400 text-[10px] flex items-center justify-center">Chưa bật</span>
+              <button onclick="ww.enableTaskNotifications()" class="px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90 text-white rounded-xl text-xs font-bold transition"><i class="fa-regular fa-bell mr-1"></i> Bật nhắc nhở</button>
+            </div>
+          </div>
+        </div>
+      </section>
+<!-- ═══════ TAB: THỐNG KÊ ═══════ -->
+<section id="statsTab" class="tab-content hidden space-y-5">
+  
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    
+    <div class="stats-card">
+      <div class="stats-icon stats-icon-blue">
+        <i class="fa-solid fa-bullseye"></i>
+      </div>
+      <div>
+        <p class="stats-label">Tổng mục tiêu</p>
+        <p id="statsTotalGoals" class="stats-value">0</p>
+      </div>
+    </div>
+    
+    <div class="stats-card">
+      <div class="stats-icon stats-icon-cyan">
+        <i class="fa-regular fa-clock"></i>
+      </div>
+      <div>
+        <p class="stats-label">Giờ đã làm</p>
+        <p id="statsTotalHours" class="stats-value">0h</p>
+      </div>
+    </div>
+    
+    <div class="stats-card">
+      <div class="stats-icon stats-icon-emerald">
+        <i class="fa-solid fa-check-circle"></i>
+      </div>
+      <div>
+        <p class="stats-label">Hoàn thành</p>
+        <p id="statsCompletionRate" class="stats-value">0%</p>
+      </div>
+    </div>
+    
+    <div class="stats-card stats-card-streak">
+      <div class="stats-icon stats-icon-fire">
+        <i class="fa-solid fa-fire"></i>
+      </div>
+      <div>
+        <p class="stats-label">Chuỗi ngày</p>
+        <p id="statsStreak" class="stats-value">0 <span class="text-xs text-gray-500">ngày</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 1: 2 charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-cyan-400"></i>
+            Tiến độ theo tuần
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">7 tuần gần nhất</p>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chartWeeklyProgress"></canvas>
+      </div>
+    </div>
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-fuchsia-400"></i>
+            Phân bổ độ ưu tiên
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">Tất cả mục tiêu</p>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chartPriority"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Bar chart + Achievements -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-violet-400"></i>
+            Task theo ngày
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">Số task mỗi thứ trong tuần này</p>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chartByDay"></canvas>
+      </div>
+    </div>
+    
+    <div class="glass-panel rounded-2xl p-5 border border-white/5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-trophy text-amber-400"></i>
+            Thành tựu
+          </h3>
+          <p class="text-[10px] text-gray-500 mt-1">Đạt được khi đạt mốc</p>
+        </div>
+      </div>
+      <div id="achievementsList" class="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+  
+</section>
+      <section id="reviewTab" class="tab-content hidden space-y-6">
+        <div class="glass-panel rounded-2xl p-6 border border-gemini-emerald/30 space-y-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gemini-cardBorder pb-4">
+            <div>
+              <span class="px-2.5 py-0.5 bg-gemini-emerald/10 text-gemini-emerald rounded-full text-xs font-semibold">Weekly Reflection</span>
+              <h3 class="text-lg font-bold text-white mt-1">Nhìn Lại Cuối Tuần</h3>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="ww.saveWeeklyReview()" class="px-4 py-2 bg-gemini-emerald hover:bg-emerald-600 text-black font-bold rounded-xl text-xs transition flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu</button>
+              <button onclick="ww.exportAllData()" class="px-4 py-2 bg-gemini-blue/20 hover:bg-gemini-blue/30 text-blue-300 rounded-xl text-xs transition border border-blue-500/30 flex items-center gap-1.5" title="Xuất toàn bộ dữ liệu ra file JSON">
+                <i class="fa-solid fa-download"></i> Xuất dữ liệu
+              </button>
+              <button onclick="ww.importAllData()" class="px-4 py-2 bg-gemini-accent/20 hover:bg-gemini-accent/30 text-purple-300 rounded-xl text-xs transition border border-purple-500/30 flex items-center gap-1.5" title="Nhập dữ liệu từ file JSON">
+                <i class="fa-solid fa-upload"></i> Nhập dữ liệu
+              </button>
+              <button onclick="ww.exportReviewReport()" class="px-4 py-2 bg-gemini-card hover:bg-white/10 text-white rounded-xl text-xs transition border border-gemini-cardBorder flex items-center gap-1.5"><i class="fa-solid fa-file-arrow-down"></i> Tải</button>
+            </div>
+          </div>
+          <form id="reviewForm" class="space-y-5" onsubmit="event.preventDefault(); ww.saveWeeklyReview();">
+            <div>
+              <label class="block text-xs font-semibold text-white mb-2">🏆 Top 3 Thành Tựu</label>
+              <div class="space-y-2">
+                <input type="text" id="reviewAch1" placeholder="1. ..." class="w-full bg-gemini-card border border-gemini-cardBorder rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-gemini-emerald transition">
+                <input type="text" id="reviewAch2" placeholder="2. ..." class="w-full bg-gemini-card border border-gemini-cardBorder rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-gemini-emerald transition">
+                <input type="text" id="reviewAch3" placeholder="3. ..." class="w-full bg-gemini-card border border-gemini-cardBorder rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-gemini-emerald transition">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-white mb-2">⚠️ Khó Khăn</label>
+                <textarea id="reviewObstacles" rows="3" class="w-full bg-gemini-card border border-gemini-cardBorder rounded-xl p-3 text-xs text-white focus:outline-none focus:border-gemini-emerald transition resize-none"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-white mb-2">💡 Bài Học</label>
+                <textarea id="reviewLessons" rows="3" class="w-full bg-gemini-card border border-gemini-cardBorder rounded-xl p-3 text-xs text-white focus:outline-none focus:border-gemini-emerald transition resize-none"></textarea>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-black/20 p-4 rounded-xl border border-white/5">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-2">Điểm tuần (1-10)</label>
+                <div class="flex items-center space-x-2">
+                  <input type="range" id="reviewRating" min="1" max="10" value="8" class="w-full accent-gemini-emerald cursor-pointer" oninput="document.getElementById('ratingVal').innerText = this.value + '/10'">
+                  <span id="ratingVal" class="text-xs font-bold text-gemini-emerald shrink-0">8/10</span>
+                </div>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-gray-300 mb-1">🎯 Mục Tiêu Tuần Tới</label>
+                <input type="text" id="reviewNextFocus" class="w-full bg-gemini-card border border-gemini-cardBorder rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gemini-emerald transition">
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- ═══ CORE JS ═══ -->
+<script src="/src/scripts/core/helpers.js"></script>
+<script src="/src/scripts/core/config.js"></script>
+<script src="/src/scripts/core/state.js"></script>
+<script src="/src/scripts/core/firebase-init.js"></script>
+
+<!-- ═══ DATA ═══ -->
+<script src="/src/data/starter-goals.js"></script>
+
+<!-- ═══ UI ═══ -->
+<script src="/src/scripts/ui/toast.js"></script>
+<script src="/src/scripts/ui/theme.js"></script>
+<script src="/src/scripts/ui/sidebar.js"></script>
+<script src="/src/scripts/ui/search.js"></script>
+<script src="/src/scripts/ui/tab-switch.js"></script>
+<script src="/src/scripts/ui/celebration.js"></script>
+<script src="/src/scripts/ui/particles.js"></script>
+<script src="/src/scripts/ui/auth-stats-counter.js"></script>
+<!-- ═══ FEATURES ═══ -->
+<script src="/src/scripts/features/goals.js"></script>
+<script src="/src/scripts/features/subtasks.js"></script>
+<script src="/src/scripts/features/timer.js"></script>
+<script src="/src/scripts/features/deadline.js"></script>
+<script src="/src/scripts/features/review.js"></script>
+<script src="/src/scripts/features/backup.js"></script>
+<!-- ═══ RENDER ═══ -->
+<script src="/src/scripts/render/weekly-progress.js"></script>
+<script src="/src/scripts/render/breakout-board.js"></script>
+<script src="/src/scripts/render/calendar.js"></script>
+<script src="/src/scripts/render/time-tracker.js"></script>
+<script src="/src/scripts/render/stats.js"></script>
+<script src="/src/scripts/render/ai-dashboard.js"></script>
+<script src="/src/scripts/render/index.js"></script>
+<!-- ═══ AUTH ═══ -->
+<script src="/src/scripts/auth/session.js"></script>
+<script src="/src/scripts/auth/login.js"></script>
+<script src="/src/scripts/auth/google.js"></script>
+<script src="/src/scripts/auth/guest.js"></script>
+<script src="/src/scripts/auth/firebase-modal.js"></script>
+<script src="/src/scripts/auth/logout.js"></script>
+<!-- ═══ AI ═══ -->
+<script src="/src/scripts/ai/gemini-api.js"></script>
+<script src="/src/scripts/ai/reminders.js"></script>
+
+<!-- ═══ PWA ═══ -->
+<script src="/src/scripts/pwa/register-sw.js"></script>
+<script src="/src/scripts/pwa/session-tracker.js"></script>
+
+<!-- ═══ FIREBASE INIT (async, đặt cuối) ═══ -->
+<script src="/src/scripts/core/firebase-init.js"></script>
+
+<!-- ═══ MAIN — Entry point (chạy cuối cùng) ═══ -->
+<script src="/src/scripts/main.js"></script>
+</body>
+</html>
+</body>
+</html>

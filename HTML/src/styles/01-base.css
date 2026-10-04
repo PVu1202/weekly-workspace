@@ -1,0 +1,25 @@
+    html, body {
+  overflow: hidden;
+}
+#appMain {
+  overflow-y: auto !important;
+}
+body { background-color:#0b0b14; color:#f3f4f6; font-family:'Plus Jakarta Sans', sans-serif;
+  background-image: radial-gradient(circle at 15% 15%, rgba(124,93,250,.15) 0%, transparent 35%), radial-gradient(circle at 85% 85%, rgba(59,130,246,.12) 0%, transparent 40%);
+  background-attachment:fixed; overflow-x:hidden; }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:rgba(18,19,32,.6); }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:999px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(124,93,250,.5); }
+
+/* ═══ SMOOTH EASING LIBRARY ═══ */
+:root {
+  /* Easing tự nhiên — không đều, mượt */
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
