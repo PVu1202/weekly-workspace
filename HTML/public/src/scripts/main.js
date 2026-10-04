@@ -50,8 +50,10 @@ window.ww = Object.assign(window.ww || {}, {
   // Week picker
   setCurrentWeek: function() {
     state.currentWeekKey = getCurrentWeekCode();
+    state.selectedProgressWeek = state.currentWeekKey;
     var wp = document.getElementById('weekPicker');
     if (wp) wp.value = state.currentWeekKey;
+    if (typeof updateWeekDisplay === 'function') updateWeekDisplay();
     renderAll();
   },
   selectWeekFromProgress: function(w) {

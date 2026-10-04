@@ -637,12 +637,33 @@
   </button>
 </div>
     <div class="p-4 border-b border-gemini-cardBorder bg-black/20">
-      <label class="sidebar-week-label sidebar-text block text-[11px] text-gray-400 font-medium mb-1.5">Chọn Tuần Làm Việc</label>
-      <div class="sidebar-week-controls flex items-center space-x-2">
-        <input type="week" id="weekPicker" class="bg-gemini-card border border-gemini-cardBorder rounded-lg px-3 py-1.5 text-xs text-white w-full focus:outline-none focus:border-gemini-accent transition">
-        <button onclick="ww.setCurrentWeek()" title="Tuần Hiện Tại" class="px-2.5 py-1.5 bg-gemini-card hover:bg-gemini-accent/20 border border-gemini-cardBorder text-gray-300 rounded-lg text-xs transition"><i class="fa-solid fa-calendar-day"></i></button>
-      </div>
-    </div>
+  <label class="sidebar-week-label sidebar-text block text-[11px] text-gray-400 font-medium mb-1.5">Chọn Tuần Làm Việc</label>
+
+  <!-- Week Navigator -->
+  <div class="sidebar-week-controls">
+    <button onclick="ww.prevWeek()" class="week-nav-btn" title="Tuần trước" type="button">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <button onclick="ww.openWeekInput()" class="week-display-btn" id="weekDisplayBtn" type="button" title="Chọn tuần khác">
+      <span class="week-number" id="weekNumberDisplay">Tuần 40 · 2026</span>
+      <span class="week-range" id="weekRangeDisplay">06/10 → 12/10</span>
+    </button>
+
+    <button onclick="ww.nextWeek()" class="week-nav-btn" title="Tuần sau" type="button">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Today button -->
+  <button onclick="ww.setCurrentWeek()" class="week-today-btn" id="weekTodayBtn" type="button">
+    <i class="fa-solid fa-house"></i>
+    <span>Về tuần hiện tại</span>
+  </button>
+
+  <!-- Native input ẩn (fallback) -->
+  <input type="week" id="weekPicker" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;" tabindex="-1">
+</div>
     <nav class="p-3 space-y-1">
       <button onclick="ww.switchTab('breakoutTab')" id="nav-breakoutTab" data-tooltip="Chia Nhỏ Nhiệm Vụ" class="tab-btn active w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition">
         <div class="flex items-center space-x-3"><i class="fa-solid fa-sitemap text-purple-400 w-4"></i><span class="sidebar-text">Chia Nhỏ Nhiệm Vụ</span></div>
@@ -1140,6 +1161,7 @@
 <script src="/src/scripts/ui/celebration.js"></script>
 <script src="/src/scripts/ui/particles.js"></script>
 <script src="/src/scripts/ui/auth-stats-counter.js"></script>
+<script src="/src/scripts/ui/week-picker.js"></script>
 
 <!-- ═══ FEATURES ═══ -->
 <script src="/src/scripts/features/goals.js"></script>

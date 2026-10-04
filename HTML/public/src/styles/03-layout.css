@@ -334,3 +334,144 @@
   outline: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   WEEK PICKER — Custom Navigation
+   ═══════════════════════════════════════════════════════════════ */
+
+.sidebar-week-controls {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+/* Nút điều hướng ◀ ▶ */
+.week-nav-btn {
+  flex-shrink: 0;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.week-nav-btn:hover {
+  background: rgba(124, 93, 250, 0.15);
+  border-color: rgba(124, 93, 250, 0.4);
+  color: #a78bfa;
+  transform: scale(1.05);
+}
+
+.week-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Nút hiển thị tuần hiện tại */
+.week-display-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(124, 93, 250, 0.08), rgba(34, 211, 238, 0.04));
+  border: 1px solid rgba(124, 93, 250, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.week-display-btn:hover {
+  background: linear-gradient(135deg, rgba(124, 93, 250, 0.15), rgba(34, 211, 238, 0.08));
+  border-color: rgba(124, 93, 250, 0.45);
+  box-shadow: 0 0 20px rgba(124, 93, 250, 0.15);
+}
+
+.week-display-btn .week-number {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.week-display-btn .week-range {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Nút "Về tuần hiện tại" */
+.week-today-btn {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  color: #34d399;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.week-today-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+  transform: translateY(-1px);
+}
+
+.week-today-btn.is-current {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Light mode */
+body.light-mode .week-nav-btn {
+  background: #f9fafb;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #6b7280;
+}
+
+body.light-mode .week-nav-btn:hover {
+  background: rgba(124, 93, 250, 0.08);
+  border-color: rgba(124, 93, 250, 0.3);
+  color: #7c3aed;
+}
+
+body.light-mode .week-display-btn {
+  background: linear-gradient(135deg, #ffffff, #fafafc);
+  border-color: rgba(124, 93, 250, 0.15);
+}
+
+body.light-mode .week-display-btn:hover {
+  background: linear-gradient(135deg, #f0eeff, #fafafc);
+  border-color: rgba(124, 93, 250, 0.35);
+}
+
+body.light-mode .week-display-btn .week-number {
+  color: #111827;
+}
+
+body.light-mode .week-display-btn .week-range {
+  color: #6b7280;
+}
