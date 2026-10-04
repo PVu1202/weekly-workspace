@@ -824,6 +824,12 @@
           title="Đổi giao diện sáng/tối">
         <i class="fa-solid fa-sun" id="themeIcon"></i>
       </button>
+      <!-- ✅ THÊM NÚT NÀY -->
+      <button onclick="ww.openHelpModal()" id="helpBtn" 
+        class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" 
+        title="Hướng dẫn sử dụng">
+        <i class="fa-solid fa-circle-question text-sm"></i>
+      </button>
       <div class="flex items-center space-x-1.5 bg-gemini-card px-3 py-1.5 rounded-lg border border-gemini-cardBorder text-xs text-gray-300">
         <i id="syncIcon" class="fa-solid fa-cloud text-amber-400"></i>
         <span id="syncBadgeText" class="text-amber-400 font-medium">Đang kết nối...</span>
@@ -1238,6 +1244,7 @@
 <script src="/src/scripts/ui/auth-stats-counter.js"></script>
 <script src="/src/scripts/ui/week-picker.js"></script>
 <script src="/src/scripts/ui/user-menu.js"></script>
+<script src="/src/scripts/ui/help.js"></script>
 
 <!-- ═══ FEATURES ═══ -->
  <script src="/src/scripts/features/gamification.js"></script>
