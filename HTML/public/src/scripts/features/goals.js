@@ -8,15 +8,21 @@ function createNewBigGoal() {
   var dayInput = document.getElementById('newGoalDay');
   var priorityInput = document.getElementById('newGoalPriority');
   var deadlineInput = document.getElementById('newGoalDeadline');
+  var weekInput = document.getElementById('newGoalWeek');    
   var title = titleInput.value.trim();
   if (!title) {
     Swal.fire({ icon:'warning', title:'Thông báo', text:'Vui lòng nhập tên mục tiêu!', background:'#1a1b2e', color:'#fff' });
     return;
   }
   var ts = Date.now();
+  var weekOffset = weekInput ? parseInt(weekInput.value, 10) || 0 : 0;
+  var targetWeekKey = state.currentWeekKey;
+  if (weekOffset > 0) {
+    targetWeekKey = shiftWeekKeyByOffset(state.currentWeekKey, weekOffset);
+  }
   state.goals.push({
     id: 'g_' + ts,
-    weekKey: state.currentWeekKey,
+    weekKey: targetWeekKey,
     title: title,
     day: dayInput.value || 'Mon',
     estimatedHours: parseFloat(estInput.value) || 2,
@@ -35,7 +41,20 @@ function createNewBigGoal() {
   titleInput.value = '';
   estInput.value = '';
   if (deadlineInput) deadlineInput.value = '';
-  Swal.fire({ icon:'success', title:'Thành công', text:'Đã tạo mục tiêu!', timer:1200, showConfirmButton:false, background:'#1a1b2e', color:'#fff' });
+  if (weekInput) weekInput.value = '0';
+  // Toast hiển thị tuần đích
+  var toastMsg = weekOffset > 0 
+  ? 'Đã tạo mục tiêu cho ' + formatWeekLabel(targetWeekKey)
+  : 'Đã tạo mục tiêu!';
+  Swal.fire({ 
+  icon: 'success', 
+  title: 'Thành công', 
+  text: toastMsg, 
+  timer: 1200, 
+  showConfirmButton: false, 
+  background: '#1a1b2e', 
+  color: '#fff' 
+  });
 }
 
 function deleteGoal(goalId) {

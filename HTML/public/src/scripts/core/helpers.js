@@ -96,4 +96,39 @@ function getWeekCodeFromDate(d) {
   return d.getFullYear() + '-W' + (weekNum < 10 ? '0' + weekNum : weekNum);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// WEEK SHIFT — Dịch chuyển tuần theo offset
+// ═══════════════════════════════════════════════════════════════
+
+function getISOWeeksInYear(year) {
+  var d = new Date(year, 11, 31);
+  var day = d.getDay() || 7;
+  if (day === 4 || (day === 3 && ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0))) {
+    return 53;
+  }
+  return 52;
+}
+
+function shiftWeekKeyByOffset(weekKey, offset) {
+  var m = String(weekKey || '').match(/(\d{4})-W(\d{1,2})/);
+  if (!m) return weekKey;
+  
+  var year = parseInt(m[1], 10);
+  var week = parseInt(m[2], 10);
+  
+  week += offset;
+  
+  // Xử lý vượt năm
+  while (week < 1) {
+    year--;
+    week += getISOWeeksInYear(year);
+  }
+  while (week > getISOWeeksInYear(year)) {
+    week -= getISOWeeksInYear(year);
+    year++;
+  }
+  
+  return year + '-W' + (week < 10 ? '0' + week : week);
+}
+
 console.log('✅ helpers.js loaded');

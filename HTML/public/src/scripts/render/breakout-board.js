@@ -88,6 +88,9 @@ function renderBreakoutTasks(goals) {
                     '<div class="mb-1 flex flex-wrap items-center gap-1">' +
                       '<span class="priority-badge ' + getPriorityClass(priority) + '">' + getPriorityLabel(priority) + '</span>' +
                       renderDeadlineBadge(goal) +
+                      (goal.weekKey !== state.currentWeekKey 
+                        ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">' + formatWeekLabel(goal.weekKey) + '</span>' 
+                        : '') +
                     '</div>' +
                     '<div class="daily-goal-title">' + escapeHtml(goal.title) + '</div>' +
                     '<div class="daily-goal-meta">⏱ ' + (goal.estimatedHours || 0) + 'h • ' + completed + '/' + subs.length + ' bước' + (pending ? ' • còn ' + pending : ' • hoàn thành') + '</div>' +

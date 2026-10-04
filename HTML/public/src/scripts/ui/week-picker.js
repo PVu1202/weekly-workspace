@@ -144,4 +144,40 @@ window.ww.nextWeek = nextWeek;
 window.ww.openWeekInput = openWeekInput;
 window.ww.updateWeekDisplay = updateWeekDisplay;
 
+// Update week dropdown labels with actual week numbers
+function updateWeekDropdownLabels() {
+  var sel = document.getElementById('newGoalWeek');
+  if (!sel) return;
+  
+  var opts = [
+    { value: '0', label: 'Tuần này' },
+    { value: '1', label: 'Tuần sau' },
+    { value: '2', label: 'Tuần +2' },
+    { value: '3', label: 'Tuần +3' },
+    { value: '4', label: 'Tuần +4' }
+  ];
+  
+  opts.forEach(function(opt, idx) {
+    var targetKey = idx === 0 
+      ? state.currentWeekKey 
+      : shiftWeekKeyByOffset(state.currentWeekKey, idx);
+    
+    var m = String(targetKey).match(/-W(\d{1,2})/);
+    if (m) {
+      var weekNum = parseInt(m[1], 10);
+      sel.options[idx].textContent = opt.label + ' (' + weekNum + ')';
+    }
+  });
+}
+
+// Hook vào updateWeekDisplay
+var _origUpdateWeekDisplay = updateWeekDisplay;
+updateWeekDisplay = function() {
+  _origUpdateWeekDisplay();
+  updateWeekDropdownLabels();
+};
+
+window.ww = window.ww || {};
+window.ww.updateWeekDropdownLabels = updateWeekDropdownLabels;
+
 console.log('✅ ui/week-picker.js loaded');
