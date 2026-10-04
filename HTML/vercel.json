@@ -3,7 +3,10 @@
   "public": "public",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { 
+      "source": "/((?!src/|assets/|fonts/|manifest\\.json|service-worker\\.js).*)", 
+      "destination": "/index.html" 
+    }
   ],
   "headers": [
     {
