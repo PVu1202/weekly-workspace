@@ -1,5 +1,5 @@
 // ═══════════ SERVICE WORKER ═══════════
-const CACHE_VERSION = 'weekly-ws-v1.0.0';
+const CACHE_VERSION = 'weekly-ws-v2.0.0';
 const CACHE_NAME = 'weekly-workspace-' + CACHE_VERSION;
 
 // Assets cần cache
