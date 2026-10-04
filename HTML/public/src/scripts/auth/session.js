@@ -34,6 +34,11 @@ function activateUserSession(user) {
     }
   }
 
+  // ✅ THÊM: Update mini level display
+  setTimeout(function() {
+    if (typeof updateMiniLevel === 'function') updateMiniLevel();
+  }, 300);
+
   subscribeUserData(user.uid);
 }
 

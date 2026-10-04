@@ -13,6 +13,13 @@ function toggleTheme() {
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   } catch (e) {}
   console.log('🎨 Theme:', isLight ? 'light' : 'dark');
+    // ✅ THÊM: Toast thông báo
+  if (typeof showTaskToast === 'function') {
+    showTaskToast(
+      isLight ? '☀️ Giao diện sáng' : '🌙 Giao diện tối', 
+      'Đã chuyển đổi theme'
+      );
+  }
 }
 
 function toggleSound() {

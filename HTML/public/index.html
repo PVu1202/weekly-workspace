@@ -714,18 +714,71 @@
       </div>
     </div>
   </div>
-  <div class="p-3 border-t border-gemini-cardBorder bg-black/20">
-    <div class="sidebar-user-box flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-      <div class="flex items-center space-x-2.5 min-w-0 pr-2">
-        <img id="userAvatar" src="https://placehold.co/100x100/7c5dfa/fff?text=U" alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-gemini-accent/40 shrink-0">
-        <div class="sidebar-user-info text-left min-w-0">
-          <p id="userName" class="text-xs font-semibold text-white truncate">Đang tải...</p>
-          <p id="userEmail" class="text-[10px] text-gray-400 truncate">user@gmail.com</p>
-        </div>
-      </div>
-      <button onclick="ww.handleLogout()" title="Đăng Xuất" class="logout-btn text-gray-400 hover:text-red-400 p-2 transition shrink-0"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
+  <div class="sidebar-user-section">
+  <!-- User Card -->
+  <div class="user-card" id="userCard">
+    <div class="user-card-avatar-wrap">
+      <img id="userAvatar" src="https://placehold.co/100x100/7c5dfa/fff?text=U" alt="User" class="user-card-avatar">
+      <span class="user-card-status" title="Đang hoạt động"></span>
+    </div>
+
+    <div class="user-card-info">
+      <p id="userName" class="user-card-name">Đang tải...</p>
+      <p id="userEmail" class="user-card-email">user@email.com</p>
+    </div>
+
+    <button onclick="ww.toggleUserMenu(event)" class="user-card-menu-btn" title="Menu" type="button">
+      <i class="fa-solid fa-ellipsis"></i>
+    </button>
+  </div>
+
+  <!-- Level Bar (Mini) -->
+  <div class="user-card-level" id="userCardLevel">
+    <div class="user-card-level-row">
+      <span class="user-card-level-label">
+        <i class="fa-solid fa-trophy"></i>
+        <span id="miniLevelText">Lv 1</span>
+      </span>
+      <span class="user-card-level-xp" id="miniXPText">0/100 XP</span>
+    </div>
+    <div class="user-card-level-track">
+      <div class="user-card-level-fill" id="miniXPBar" style="width:0%"></div>
     </div>
   </div>
+
+  <!-- Dropdown Menu -->
+  <div class="user-menu hidden" id="userMenu">
+    <div class="user-menu-header">
+      <div class="user-menu-header-icon"><i class="fa-solid fa-user"></i></div>
+      <div>
+        <div class="user-menu-header-title" id="menuUserName">Khách ẩn danh</div>
+        <div class="user-menu-header-sub" id="menuUserEmail">guest@anonymous.local</div>
+      </div>
+    </div>
+    <div class="user-menu-divider"></div>
+    <button class="user-menu-item" onclick="ww.toggleTheme(); ww.closeUserMenu();">
+      <i class="fa-solid fa-moon"></i>
+      <span>Đổi giao diện sáng/tối</span>
+    </button>
+    <button class="user-menu-item" onclick="ww.toggleSound(); ww.closeUserMenu();">
+      <i class="fa-solid fa-volume-high"></i>
+      <span>Bật/tắt âm thanh</span>
+    </button>
+    <button class="user-menu-item" onclick="ww.showStatsModal(); ww.closeUserMenu();">
+      <i class="fa-solid fa-chart-simple"></i>
+      <span>Thành tích của tôi</span>
+    </button>
+    <button class="user-menu-item" onclick="ww.openFirebaseConfigModal(); ww.closeUserMenu();">
+      <i class="fa-solid fa-gear"></i>
+      <span>Cấu hình Firebase</span>
+    </button>
+    <div class="user-menu-divider"></div>
+    <button class="user-menu-item user-menu-item-danger" onclick="ww.handleLogout(); ww.closeUserMenu();">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Đăng xuất</span>
+    </button>
+  </div>
+</div>
 </aside>
 
 <!-- MAIN -->
@@ -1184,6 +1237,7 @@
 <script src="/src/scripts/ui/particles.js"></script>
 <script src="/src/scripts/ui/auth-stats-counter.js"></script>
 <script src="/src/scripts/ui/week-picker.js"></script>
+<script src="/src/scripts/ui/user-menu.js"></script>
 
 <!-- ═══ FEATURES ═══ -->
  <script src="/src/scripts/features/gamification.js"></script>
