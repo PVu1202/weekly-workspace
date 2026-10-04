@@ -1,0 +1,13 @@
+{
+  "name": "weekly-workspace",
+  "version": "1.0.0",
+  "description": "Ứng dụng quản lý công việc theo tuần với AI Coach, Pomodoro và thống kê",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "start": "python -m http.server 8000"
+  },
+  "keywords": ["task-management", "weekly-planner", "pwa"],
+  "author": "PVu1202",
+  "license": "MIT"
+}

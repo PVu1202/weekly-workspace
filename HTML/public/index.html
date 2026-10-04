@@ -1,33 +1,70 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weekly Workspace - Task Management</title>
-<!-- PWA Meta -->
-<meta name="description" content="Quản lý công việc theo tuần với AI Coach, Pomodoro và thống kê chi tiết.">
-<meta name="theme-color" content="#7c5dfa">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Weekly WS">
-<meta name="mobile-web-app-capable" content="yes">
-<!-- ═══ CSS MODULES ═══ -->
- <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="/src/styles/01-base.css">
-<link rel="stylesheet" href="/src/styles/02-theme.css">
-<link rel="stylesheet" href="/src/styles/03-layout.css">
-<link rel="stylesheet" href="/src/styles/04-components.css">
-<link rel="stylesheet" href="/src/styles/05-task-board.css">
-<link rel="stylesheet" href="/src/styles/06-ai-coach.css">
-<link rel="stylesheet" href="/src/styles/07-stats.css">
-<link rel="stylesheet" href="/src/styles/08-auth-screen.css">
-<link rel="stylesheet" href="/src/styles/09-modals.css">
-<link rel="stylesheet" href="/src/styles/10-animations.css">
-<link rel="stylesheet" href="/src/styles/11-light-mode.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Chart.js -->
-<!-- Google reCAPTCHA v3 -->
-<script src="https://www.google.com/recaptcha/api.js?render=6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Workspace - Task Management</title>
+
+  <!-- PWA Meta -->
+  <meta name="description" content="Quản lý công việc theo tuần với AI Coach, Pomodoro và thống kê chi tiết.">
+  <meta name="theme-color" content="#7c5dfa">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weekly WS">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM3YzVkZmEiLz48c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6IzNiODJmNiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2VjNDg5OSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjAiIGZpbGw9InVybCgjZykiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1MCw1MCkiPjxjaXJjbGUgcj0iMTgiIGZpbGw9IndoaXRlIi8+PHRleHQgeD0iMCIgeT0iNiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzdjNWRmYSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VzwvdGV4dD48L2c+PC9zdmc+">
+
+  <!-- ═══ CDN LIBS (LOAD TRƯỚC CSS) ═══ -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LemONEtAAAAAL2_NqqUPznijBV9MjGM9L4_Ot9d"></script>
+
+  <!-- ═══ TAILWIND CONFIG ═══ -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gemini: {
+              bg: '#0b0b14',
+              sidebar: '#121320',
+              card: '#1a1b2e',
+              cardBorder: 'rgba(255,255,255,0.08)',
+              accent: '#7c5dfa',
+              accentHover: '#6b46c1',
+              blue: '#3b82f6',
+              cyan: '#06b6d4',
+              emerald: '#10b981',
+              pink: '#ec4899'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- ═══ CSS MODULES (LOAD SAU CDN) ═══ -->
+  <link rel="stylesheet" href="/src/styles/01-base.css">
+  <link rel="stylesheet" href="/src/styles/02-theme.css">
+  <link rel="stylesheet" href="/src/styles/03-layout.css">
+  <link rel="stylesheet" href="/src/styles/04-components.css">
+  <link rel="stylesheet" href="/src/styles/05-task-board.css">
+  <link rel="stylesheet" href="/src/styles/06-ai-coach.css">
+  <link rel="stylesheet" href="/src/styles/07-stats.css">
+  <link rel="stylesheet" href="/src/styles/08-auth-screen.css">
+  <link rel="stylesheet" href="/src/styles/09-modals.css">
+  <link rel="stylesheet" href="/src/styles/10-animations.css">
+  <link rel="stylesheet" href="/src/styles/11-light-mode.css">
 </head>
 <body class="h-screen flex overflow-hidden text-gray-200">
 
@@ -1086,11 +1123,10 @@
   </div>
 </main>
 
-<!-- ═══ CORE JS ═══ -->
+<!-- ═══ CORE ═══ -->
 <script src="/src/scripts/core/helpers.js"></script>
 <script src="/src/scripts/core/config.js"></script>
 <script src="/src/scripts/core/state.js"></script>
-<script src="/src/scripts/core/firebase-init.js"></script>
 
 <!-- ═══ DATA ═══ -->
 <script src="/src/data/starter-goals.js"></script>
@@ -1104,6 +1140,7 @@
 <script src="/src/scripts/ui/celebration.js"></script>
 <script src="/src/scripts/ui/particles.js"></script>
 <script src="/src/scripts/ui/auth-stats-counter.js"></script>
+
 <!-- ═══ FEATURES ═══ -->
 <script src="/src/scripts/features/goals.js"></script>
 <script src="/src/scripts/features/subtasks.js"></script>
@@ -1111,6 +1148,7 @@
 <script src="/src/scripts/features/deadline.js"></script>
 <script src="/src/scripts/features/review.js"></script>
 <script src="/src/scripts/features/backup.js"></script>
+
 <!-- ═══ RENDER ═══ -->
 <script src="/src/scripts/render/weekly-progress.js"></script>
 <script src="/src/scripts/render/breakout-board.js"></script>
@@ -1119,6 +1157,7 @@
 <script src="/src/scripts/render/stats.js"></script>
 <script src="/src/scripts/render/ai-dashboard.js"></script>
 <script src="/src/scripts/render/index.js"></script>
+
 <!-- ═══ AUTH ═══ -->
 <script src="/src/scripts/auth/session.js"></script>
 <script src="/src/scripts/auth/login.js"></script>
@@ -1126,6 +1165,7 @@
 <script src="/src/scripts/auth/guest.js"></script>
 <script src="/src/scripts/auth/firebase-modal.js"></script>
 <script src="/src/scripts/auth/logout.js"></script>
+
 <!-- ═══ AI ═══ -->
 <script src="/src/scripts/ai/gemini-api.js"></script>
 <script src="/src/scripts/ai/reminders.js"></script>
@@ -1134,12 +1174,10 @@
 <script src="/src/scripts/pwa/register-sw.js"></script>
 <script src="/src/scripts/pwa/session-tracker.js"></script>
 
-<!-- ═══ FIREBASE INIT (async, đặt cuối) ═══ -->
+<!-- ═══ FIREBASE INIT (async, luôn cuối) ═══ -->
 <script src="/src/scripts/core/firebase-init.js"></script>
 
-<!-- ═══ MAIN — Entry point (chạy cuối cùng) ═══ -->
+<!-- ═══ MAIN (entry point) ═══ -->
 <script src="/src/scripts/main.js"></script>
-</body>
-</html>
 </body>
 </html>
