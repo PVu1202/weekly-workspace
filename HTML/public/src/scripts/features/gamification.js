@@ -149,7 +149,7 @@ function updateGamificationDisplay() {
   var g = state.gamification || { totalXP: 0 };
   var info = getXPProgressInLevel(g.totalXP || 0);
 
-  // Update player card
+  // ═══ Update TOP card (sidebar-player-card) ═══
   var levelEl = document.getElementById('playerLevel');
   var xpEl = document.getElementById('playerXP');
   var xpBarEl = document.getElementById('playerXPBar');
@@ -157,6 +157,15 @@ function updateGamificationDisplay() {
   if (levelEl) levelEl.textContent = 'Lv ' + info.level;
   if (xpEl) xpEl.textContent = info.xpInLevel + ' / ' + info.xpNeeded + ' XP';
   if (xpBarEl) xpBarEl.style.width = info.percent + '%';
+
+  // ═══ Update BOTTOM card (user-card-level) ═══
+  var miniLvlEl = document.getElementById('miniLevelText');
+  var miniXpEl = document.getElementById('miniXPText');
+  var miniBarEl = document.getElementById('miniXPBar');
+
+  if (miniLvlEl) miniLvlEl.textContent = 'Lv ' + info.level;
+  if (miniXpEl) miniXpEl.textContent = info.xpInLevel + '/' + info.xpNeeded + ' XP';
+  if (miniBarEl) miniBarEl.style.width = info.percent + '%';
 }
 
 // ═══ INIT ═══

@@ -11,6 +11,7 @@ function saveStateToFirestore() {
     firestoreSdk.setDoc(ref, {
       goals: state.goals,
       reviews: state.reviews,
+      gamification: state.gamification || {},
       updatedAt: new Date().toISOString()
     }, { merge: true }).catch(function(err) {
       console.warn('Firestore save error:', err);
@@ -31,6 +32,23 @@ function subscribeUserData(uid) {
         var d = snap.data();
         state.goals = Array.isArray(d.goals) ? d.goals : [];
         state.reviews = d.reviews || {};
+
+            // ✅ THÊM: Load gamification
+        if (d.gamification && typeof d.gamification === 'object') {
+          state.gamification = d.gamification;
+        } else {
+          state.gamification = state.gamification || {
+            xp: 0, level: 1, totalXP: 0,
+            unlockedThemes: ['default'],
+            unlockedBadges: []
+          };
+        }
+        
+        // ✅ Update UI sau khi load
+        if (typeof updateGamificationDisplay === 'function') {
+          updateGamificationDisplay();
+        }
+
       } else {
         // User mới → seed starter goals
         state.goals = getStarterGoals();
@@ -181,7 +199,8 @@ function autoBackupLocal() {
         version: '1.0',
         backedUpAt: new Date().toISOString(),
         goals: state.goals,
-        reviews: state.reviews
+        reviews: state.reviews,
+        gamification: state.gamification || {}
       };
       localStorage.setItem('weekly_ws_auto_backup', JSON.stringify(backup));
       localStorage.setItem('weekly_ws_last_backup', String(now));

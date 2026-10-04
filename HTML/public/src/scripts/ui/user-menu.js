@@ -55,20 +55,6 @@ function updateMiniLevel() {
   if (barEl) barEl.style.width = info.percent + '%';
 }
 
-// Hook vào updateGamificationDisplay
-(function hookGamification() {
-  var checkInterval = setInterval(function() {
-    if (window.ww && window.ww.updateGamificationDisplay) {
-      var original = window.ww.updateGamificationDisplay;
-      window.ww.updateGamificationDisplay = function() {
-        original();
-        updateMiniLevel();
-      };
-      updateMiniLevel();
-      clearInterval(checkInterval);
-    }
-  }, 500);
-})();
 
 // Đóng menu khi click ra ngoài
 document.addEventListener('click', function(e) {
