@@ -137,4 +137,11 @@ window.nextWeek = nextWeek;
 window.openWeekInput = openWeekInput;
 window.updateWeekDisplay = updateWeekDisplay;
 
+// ✅ QUAN TRỌNG: Expose vào ww object (cho onclick="ww.prevWeek()")
+window.ww = window.ww || {};
+window.ww.prevWeek = prevWeek;
+window.ww.nextWeek = nextWeek;
+window.ww.openWeekInput = openWeekInput;
+window.ww.updateWeekDisplay = updateWeekDisplay;
+
 console.log('✅ ui/week-picker.js loaded');
