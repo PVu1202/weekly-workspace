@@ -20,7 +20,16 @@ var state = {
   priorityFilter: 'all',
   searchQuery: '',
   goals: [],
-  reviews: {}
+  reviews: {},
+    // ✅ GAMIFICATION STATE
+  gamification: {
+    xp: 0,
+    level: 1,
+    totalXP: 0,
+    unlockedThemes: ['default'],
+    unlockedBadges: [],
+    lastXPGainAt: null
+    }
 };
 
 var timer = {

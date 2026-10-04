@@ -28,6 +28,10 @@ function toggleTimer() {
       } else {
         clearInterval(timer.interval);
         timer.running = false;
+          // ✅ THÊM: Cấp XP
+        if (typeof addXP === 'function') {
+          addXP(XP_REWARDS.POMODORO_DONE, 'Hoàn thành Pomodoro');  // +10
+        }
         Swal.fire({ icon:'info', title:'Hết giờ!', text:'Hoàn thành 25 phút Pomodoro!', background:'#1a1b2e', color:'#fff' });
       }
     }, 1000);

@@ -636,9 +636,24 @@
     <i class="fa-solid fa-bars text-base" id="sidebarToggleIcon"></i>
   </button>
 </div>
-    <div class="p-4 border-b border-gemini-cardBorder bg-black/20">
-  <label class="sidebar-week-label sidebar-text block text-[11px] text-gray-400 font-medium mb-1.5">Chọn Tuần Làm Việc</label>
+    <!-- ═══ PLAYER CARD (Gamification) ═══ -->
+<div class="sidebar-player-card" id="playerCard">
+  <div class="player-header">
+    <div class="player-level-badge">
+      <i class="fa-solid fa-trophy"></i>
+      <span id="playerLevel">Lv 1</span>
+    </div>
+    <div class="player-xp-text" id="playerXP">0 / 100 XP</div>
+  </div>
+  <div class="player-xp-track">
+    <div class="player-xp-fill" id="playerXPBar" style="width:0%"></div>
+  </div>
+</div>
 
+<!-- Week picker (giữ nguyên) -->
+<div class="p-4 border-b border-gemini-cardBorder bg-black/20">
+  <label class="sidebar-week-label sidebar-text block text-[11px] text-gray-400 font-medium mb-1.5">Chọn Tuần Làm Việc</label>
+    
   <!-- Week Navigator -->
   <div class="sidebar-week-controls">
     <button onclick="ww.prevWeek()" class="week-nav-btn" title="Tuần trước" type="button">
@@ -1171,6 +1186,7 @@
 <script src="/src/scripts/ui/week-picker.js"></script>
 
 <!-- ═══ FEATURES ═══ -->
+ <script src="/src/scripts/features/gamification.js"></script>
 <script src="/src/scripts/features/goals.js"></script>
 <script src="/src/scripts/features/subtasks.js"></script>
 <script src="/src/scripts/features/notes.js"></script>

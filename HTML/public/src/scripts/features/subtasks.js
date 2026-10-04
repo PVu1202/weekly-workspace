@@ -85,6 +85,14 @@ function toggleSubtask(goalId, subtaskId) {
     var done = goal.subtasks.filter(function(s) { return s.completed; }).length;
     var total = goal.subtasks.length;
 
+      if (typeof addXP === 'function') {
+    if (done === total) {
+      addXP(XP_REWARDS.GOAL_DONE, 'Hoàn thành task');   // +15
+    } else {
+      addXP(XP_REWARDS.SUBTASK_DONE, 'Hoàn thành bước'); // +3
+    }
+  }
+
     var clickX = window.event ? window.event.clientX : window.innerWidth / 2;
     var clickY = window.event ? window.event.clientY : window.innerHeight / 2;
     createSparkle(clickX, clickY);

@@ -37,6 +37,14 @@ function createNewBigGoal() {
     ],
     createdAt: new Date().toISOString()
   });
+
+  // ✅ THÊM: Cấp XP
+  if (typeof addXP === 'function') {
+    addXP(XP_REWARDS.GOAL_CREATE, 'Tạo task mới');  // +2
+  }
+
+saveStateToFirestore();
+renderAll();
   saveStateToFirestore();
   renderAll();
   titleInput.value = '';
