@@ -430,3 +430,84 @@ body.light-mode .calendar-task-item:hover {
 body.light-mode .calendar-task-title { color: #1f2937; }
 body.light-mode .calendar-day-name { color: #111827; }
 body.light-mode .calendar-empty-state { color: #9ca3af; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   WEEK DELETE — Nút xóa tuần
+   ═══════════════════════════════════════════════════════════════ */
+
+.week-progress-wrapper {
+  position: relative;
+}
+
+/* Nút xóa — ẩn, hiện khi hover */
+.week-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: rgba(19, 19, 29, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #6b7280;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: scale(0.85);
+  z-index: 5;
+  backdrop-filter: blur(8px);
+  padding: 0;
+}
+
+.week-progress-wrapper:hover .week-delete-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.week-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.week-delete-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Đảm bảo nút % không bị đè */
+.week-progress-wrapper .week-progress-card {
+  position: relative;
+}
+
+.week-progress-wrapper:hover .week-progress-card .text-base {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+/* Mobile: luôn hiện */
+@media (max-width: 768px) {
+  .week-delete-btn {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Light mode */
+body.light-mode .week-delete-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #6b7280;
+}
+
+body.light-mode .week-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}

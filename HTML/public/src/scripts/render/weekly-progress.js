@@ -42,7 +42,19 @@ function renderWeeklyProgressBoard() {
     var isSelected = weekKey === state.selectedProgressWeek;
     var isCurrent = weekKey === state.currentWeekKey;
 
-    return '<button type="button" onclick="ww.selectWeekFromProgress(\'' + weekKey + '\')" class="week-progress-card ' + (isSelected ? 'current ring-1 ring-cyan-400/20' : '') + ' text-left rounded-2xl border border-white/10 bg-black/20 p-4 w-full">' +
+    return '<div class="week-progress-wrapper ' + (isSelected ? 'current' : '') + '">' +
+
+    // ═══ NÚT XÓA — góc phải trên ═══
+    (!isCurrent && goals.length > 0
+      ? '<button type="button" ' +
+          'onclick="event.stopPropagation(); ww.deleteWeek(\'' + weekKey + '\');" ' +
+          'class="week-delete-btn" ' +
+          'title="Xóa toàn bộ ' + goals.length + ' mục tiêu của ' + formatWeekLabel(weekKey) + '">' +
+            '<i class="fa-solid fa-trash-can"></i>' +
+        '</button>'
+      : ''
+    ) +
+    '<button type="button" onclick="ww.selectWeekFromProgress(\'' + weekKey + '\')" class="week-progress-card ' + (isSelected ? 'current ring-1 ring-cyan-400/20' : '') + ' text-left rounded-2xl border border-white/10 bg-black/20 p-4 w-full">' +
       '<div class="flex items-center justify-between gap-3">' +
         '<div class="min-w-0">' +
           '<div class="flex items-center gap-2 flex-wrap">' +
