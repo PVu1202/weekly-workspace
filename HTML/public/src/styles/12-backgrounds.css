@@ -1,4 +1,34 @@
 /* ═══════════════════════════════════════════════════════════════
+   AUTH SCREEN + MAIN APP LAYOUT — Chỉ 1 trong 2 hiển thị
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Auth screen full màn hình */
+#authScreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99990 !important;
+}
+
+/* Auth screen ẩn = không chiếm chỗ */
+#authScreen.hidden {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Sidebar + main app chỉ hiện khi auth ẩn */
+#appMain.hidden,
+#appSidebar.hidden {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    BACKGROUND THEMES — 8 preset
    ⚠️ Dùng !important để override 02-theme.css
    ═══════════════════════════════════════════════════════════════ */
@@ -619,4 +649,37 @@ body.bg-custom #appMain > header {
 /* Đảm bảo auth screen không bị ảnh hưởng bởi class bg-custom */
 body.bg-custom #authScreen {
   /* Không cần set gì — auth screen tự có nền riêng của nó */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX — Auth screen phải full width khi chưa login
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Khi appMain bị ẩn, auth screen phải chiếm hết chỗ */
+body:has(#appMain.hidden) #authScreen,
+body:has(#appSidebar.hidden) #authScreen {
+  width: 100vw !important;
+  max-width: 100vw !important;
+}
+
+/* Fallback nếu browser không hỗ trợ :has() */
+#authScreen {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Body không cho scroll ngang */
+body {
+  overflow-x: hidden !important;
+}
+
+/* #appMain khi ẩn phải chiếm 0 chỗ */
+body:has(#appMain.hidden) #appMain {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
 }
