@@ -58,7 +58,7 @@ function getAIRecommendations(options) {
     'Trả lời ngắn gọn, tiếng Việt, tối đa 3 gợi ý, không tạo task mới.';
 
   // ═══ GỌI GEMINI API TRỰC TIẾP ═══
-  var apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY;
+  var apiUrl = '/api/gemini';  // Gọi qua serverless proxy
 
   var systemPrompt = 'Bạn là AI Productivity Coach cho ứng dụng quản lý công việc. Chỉ đưa ra gợi ý thực tế, ngắn gọn, không phán xét. Ưu tiên: task đang trễ, task quan trọng, task có thể hoàn thành nhanh để tạo đà. Trả lời bằng tiếng Việt, tối đa 5 gợi ý.';
 
