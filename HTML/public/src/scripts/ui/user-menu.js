@@ -62,6 +62,9 @@ document.addEventListener('click', function(e) {
   var card = document.getElementById('userCard');
   if (!menu || menu.classList.contains('hidden')) return;
 
+  // Không đóng nếu click vào menu item (đang xử lý action)
+  if (e.target.closest('.user-menu-item')) return;
+
   if (!menu.contains(e.target) && (!card || !card.contains(e.target))) {
     closeUserMenu();
   }

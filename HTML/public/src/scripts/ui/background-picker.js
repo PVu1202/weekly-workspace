@@ -193,6 +193,12 @@ function getCurrentBackground() {
 // ═══════════════════════════════════════════════════════════════
 
 function openBackgroundPicker() {
+   setTimeout(function() {
+    _openBackgroundPickerNow();
+  }, 50);
+}
+
+function _openBackgroundPickerNow() {
   var currentBg = getCurrentBackground();
 
   var presetItemsHtml = BACKGROUNDS.map(function(bg) {
@@ -274,6 +280,7 @@ function openBackgroundPicker() {
             : '') +
         '</div>' +
       '</div>',
+      
     showConfirmButton: false,
     showCloseButton: true,
     background: '#1a1b2e',
@@ -672,80 +679,6 @@ function resetBackgroundInit() {
   _bgInitDone = false;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CUSTOM BG + AUTH SCREEN — Fix background bị che
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Auth screen trong suốt khi body có custom bg */
-body.bg-custom #authScreen {
-  background: transparent !important;
-  background-image: none !important;
-}
-
-/* Ẩn lớp noise của auth screen */
-body.bg-custom #authScreen::before {
-  display: none !important;
-  content: none !important;
-}
-
-/* Giữ ambient glow nhẹ nhưng trong suốt */
-body.bg-custom #authScreen::after {
-  background: radial-gradient(
-    circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(124, 93, 250, 0.06),
-    transparent 60%
-  ) !important;
-}
-
-/* Ẩn cả 2 lớp SVG waves */
-body.bg-custom .auth-waves-bg {
-  display: none !important;
-}
-
-body.bg-custom .cyber-waves-bg {
-  display: none !important;
-}
-
-/* Đảm bảo nội dung auth nằm trên ảnh nền */
-body.bg-custom .auth-left,
-body.bg-custom .auth-right {
-  position: relative;
-  z-index: 10 !important;
-}
-
-/* Auth card vẫn có nền riêng để đọc text */
-body.bg-custom .auth-card {
-  background: linear-gradient(160deg, 
-    rgba(19, 19, 29, 0.92) 0%, 
-    rgba(13, 13, 20, 0.94) 100%) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-
-/* Auth left panel — thêm overlay tối để đọc text trên ảnh nền */
-body.bg-custom .auth-left {
-  position: relative;
-}
-
-body.bg-custom .auth-left::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, 
-    rgba(0, 0, 0, 0.5) 0%, 
-    rgba(0, 0, 0, 0.2) 60%,
-    transparent 100%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Mobile: auth screen stack dọc */
-@media (max-width: 900px) {
-  body.bg-custom #authScreen {
-    background: rgba(0, 0, 0, 0.6) !important;
-    backdrop-filter: blur(8px);
-  }
-}
 
 
 // ═══════════════════════════════════════════════════════════════
