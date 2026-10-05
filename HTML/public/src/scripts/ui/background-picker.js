@@ -1,43 +1,5 @@
-
-// ═══ CUSTOM BACKGROUND STATE ═══
-var _customBgData = null;    // { url: '...', overlay: 0.65, source: 'upload' | 'url' }
-
-// Load custom bg từ localStorage
-function loadCustomBg() {
-  try {
-    var saved = localStorage.getItem('ws_custom_bg');
-    if (saved) {
-      _customBgData = JSON.parse(saved);
-      // ✅ Luôn apply, không phụ thuộc state.preferences
-      if (localStorage.getItem('ws_background') === 'bg-custom') {
-        applyCustomBgToDOM(_customBgData);
-      }
-    }
-  } catch(e) { console.warn('Load custom bg failed:', e); }
-  return _customBgData;
-}
-
-// Save custom bg
-function saveCustomBg(data) {
-  _customBgData = data;
-  try {
-    localStorage.setItem('ws_custom_bg', JSON.stringify(data));
-    
-    // ✅ Lưu riêng để early script đọc được
-    if (data && data.url) {
-      localStorage.setItem('ws_custom_url', data.url);
-      localStorage.setItem('ws_custom_overlay', String(data.overlay || 0.65));
-    }
-  } catch(e) { 
-    console.warn('Save custom bg failed:', e);
-    if (typeof showTaskToast === 'function') {
-      showTaskToast('⚠️ Không lưu được', 'Ảnh quá lớn, chọn ảnh nhỏ hơn');
-    }
-  }
-}
-
 // ═══════════════════════════════════════════════════════════════
-// BACKGROUND PICKER — Đổi nền cho trang
+// BACKGROUND PICKER — Đổi nền + Custom upload/URL
 // ═══════════════════════════════════════════════════════════════
 
 var BACKGROUNDS = [
@@ -83,12 +45,102 @@ var BACKGROUNDS = [
   }
 ];
 
-// Apply background lên body
+var _customBgData = null;
+var _bgInitDone = false;
+
+// ═══════════════════════════════════════════════════════════════
+// CUSTOM BG — DOM APPLY
+// ═══════════════════════════════════════════════════════════════
+
+function applyCustomBgToDOM(data) {
+  if (!data || !data.url) return;
+  
+  document.body.style.setProperty('background-image', 'url("' + data.url + '")', 'important');
+  document.body.style.setProperty('background-size', 'cover', 'important');
+  document.body.style.setProperty('background-position', 'center', 'important');
+  document.body.style.setProperty('background-attachment', 'fixed', 'important');
+  document.body.style.setProperty('background-repeat', 'no-repeat', 'important');
+  document.body.style.setProperty('--custom-overlay', data.overlay || 0.65);
+  
+  document.documentElement.style.setProperty('background-image', 'url("' + data.url + '")', 'important');
+  document.documentElement.style.setProperty('background-size', 'cover', 'important');
+  document.documentElement.style.setProperty('background-position', 'center', 'important');
+  document.documentElement.style.setProperty('background-attachment', 'fixed', 'important');
+  document.documentElement.style.setProperty('background-repeat', 'no-repeat', 'important');
+}
+
+function clearCustomBgFromDOM() {
+  var props = ['background-image', 'background-size', 'background-position', 'background-attachment', 'background-repeat'];
+  props.forEach(function(p) {
+    document.body.style.removeProperty(p);
+    document.documentElement.style.removeProperty(p);
+  });
+  document.body.style.removeProperty('--custom-overlay');
+  
+  var earlyStyle = document.getElementById('early-bg-style');
+  if (earlyStyle) earlyStyle.remove();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CUSTOM BG — STORAGE
+// ═══════════════════════════════════════════════════════════════
+
+function loadCustomBg() {
+  try {
+    var saved = localStorage.getItem('ws_custom_bg');
+    if (saved) {
+      _customBgData = JSON.parse(saved);
+    }
+  } catch(e) { 
+    console.warn('Load custom bg failed:', e); 
+    _customBgData = null;
+  }
+  return _customBgData;
+}
+
+function saveCustomBg(data) {
+  _customBgData = data;
+  try {
+    localStorage.setItem('ws_custom_bg', JSON.stringify(data));
+    if (data && data.url) {
+      localStorage.setItem('ws_custom_url', data.url);
+      localStorage.setItem('ws_custom_overlay', String(data.overlay || 0.65));
+    }
+    return true;
+  } catch(e) { 
+    console.warn('Save custom bg failed:', e);
+    if (typeof showTaskToast === 'function') {
+      showTaskToast('⚠️ Không lưu được', 'Ảnh quá lớn, chọn ảnh nhỏ hơn');
+    }
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APPLY BACKGROUND (PRESET)
+// ═══════════════════════════════════════════════════════════════
+
 function applyBackground(bgId, options) {
   options = options || {};
-  var save = options.save === true;   // ⚠️ Mặc định KHÔNG LƯU
+  var save = options.save === true;
 
-  // ✅ Xóa custom bg nếu đang bật
+  var allBgIds = BACKGROUNDS.map(function(b) { return b.id; });
+  if (!bgId || allBgIds.indexOf(bgId) < 0) bgId = 'bg-default';
+
+  // Nếu không đổi → return sớm
+  var currentBg = localStorage.getItem('ws_background') || 'bg-default';
+  if (currentBg === bgId && !document.body.classList.contains('bg-custom')) {
+    // Vẫn ensure class đúng
+    allBgIds.forEach(function(id) {
+      document.body.classList.remove(id);
+      document.documentElement.classList.remove(id);
+    });
+    document.body.classList.add(bgId);
+    document.documentElement.classList.add(bgId);
+    return bgId;
+  }
+
+  // Xóa custom bg nếu đang bật
   if (document.body.classList.contains('bg-custom')) {
     document.body.classList.remove('bg-custom');
     document.documentElement.classList.remove('bg-custom');
@@ -96,21 +148,7 @@ function applyBackground(bgId, options) {
     try {
       localStorage.removeItem('ws_custom_url');
       localStorage.removeItem('ws_custom_overlay');
-      var earlyStyle = document.getElementById('early-bg-style');
-      if (earlyStyle) earlyStyle.remove();
     } catch(e) {}
-  }
-
-
-  // Chuẩn hóa
-  var allBgIds = BACKGROUNDS.map(function(b) { return b.id; });
-  if (!bgId || allBgIds.indexOf(bgId) < 0) {
-    bgId = 'bg-default';
-  }
-
-  // Nếu background không đổi → return sớm, không làm gì
-  if (state.preferences && state.preferences.background === bgId) {
-    return bgId;
   }
 
   // Xóa tất cả class bg-* cũ
@@ -123,12 +161,16 @@ function applyBackground(bgId, options) {
   document.body.classList.add(bgId);
   document.documentElement.classList.add(bgId);
 
-  // Lưu vào state + localStorage
+  // Lưu state
   if (!state.preferences) state.preferences = {};
   state.preferences.background = bgId;
-  try { localStorage.setItem('ws_background', bgId); } catch(e) {}
+  try { 
+    localStorage.setItem('ws_background', bgId);
+    localStorage.removeItem('ws_custom_bg');
+    localStorage.removeItem('ws_custom_url');
+    localStorage.removeItem('ws_custom_overlay');
+  } catch(e) {}
 
-  // Chỉ sync Firestore khi user CHỦ ĐỘNG đổi (options.save = true)
   if (save && typeof saveStateToFirestore === 'function') {
     saveStateToFirestore();
   }
@@ -136,92 +178,236 @@ function applyBackground(bgId, options) {
   return bgId;
 }
 
-// Lấy background hiện tại
+// ═══════════════════════════════════════════════════════════════
+// GET CURRENT
+// ═══════════════════════════════════════════════════════════════
+
 function getCurrentBackground() {
-  return (state.preferences && state.preferences.background) 
-    || localStorage.getItem('ws_background') 
+  return localStorage.getItem('ws_background') 
+    || (state.preferences && state.preferences.background)
     || 'bg-default';
 }
 
-// ═══ APPLY CUSTOM BG TO DOM ═══
-function applyCustomBg() {
-  if (!_customBgData || !_customBgData.url) {
-    Swal.fire({ icon: 'warning', title: 'Chưa có ảnh', text: 'Vui lòng chọn ảnh hoặc nhập URL trước', background: '#1a1b2e', color: '#fff' });
-    return;
-  }
-  
-  var slider = document.getElementById('bgOverlaySlider');
-  if (slider) _customBgData.overlay = parseFloat(slider.value);
-  
-  saveCustomBg(_customBgData);
-  
-  // ✅ Lưu background chọn + overlay
-  try {
-    localStorage.setItem('ws_background', 'bg-custom');
-    localStorage.setItem('ws_custom_overlay', String(_customBgData.overlay));
-  } catch(e) {}
-  
-  // Xóa class bg-* cũ trên html + body
-  BACKGROUNDS.forEach(function(b) {
-    document.body.classList.remove(b.id);
-    document.documentElement.classList.remove(b.id);
+// ═══════════════════════════════════════════════════════════════
+// OPEN PICKER MODAL
+// ═══════════════════════════════════════════════════════════════
+
+function openBackgroundPicker() {
+  var currentBg = getCurrentBackground();
+
+  var presetItemsHtml = BACKGROUNDS.map(function(bg) {
+    var isActive = bg.id === currentBg;
+    return '<button type="button" ' +
+              'class="bg-picker-item' + (isActive ? ' active' : '') + '" ' +
+              'data-bg-id="' + bg.id + '" ' +
+              'onclick="ww.pickBackground(\'' + bg.id + '\')">' +
+              '<div class="bg-picker-preview" style="background:' + bg.preview + '"></div>' +
+              '<div class="bg-picker-label">' + bg.label + '</div>' +
+            '</button>';
+  }).join('');
+
+  Swal.fire({
+    title: '',
+    html:
+      '<div style="text-align:left">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
+          '<div style="width:36px;height:36px;border-radius:10px;' +
+              'background:linear-gradient(135deg,#7c5dfa,#22d3ee);' +
+              'display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px">' +
+            '<i class="fa-solid fa-image"></i>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.02em">Đổi nền trang</div>' +
+            '<div style="font-size:10px;color:#7d7d8a;margin-top:1px">Chọn nền có sẵn hoặc tự thêm ảnh của bạn</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="bg-picker-tabs">' +
+          '<button type="button" id="bgTabPreset" class="bg-picker-tab active" onclick="ww.switchBgTab(\'preset\')">' +
+            '<i class="fa-solid fa-palette"></i> Có sẵn' +
+          '</button>' +
+          '<button type="button" id="bgTabCustom" class="bg-picker-tab" onclick="ww.switchBgTab(\'custom\')">' +
+            '<i class="fa-solid fa-wand-magic-sparkles"></i> Tùy chỉnh' +
+          '</button>' +
+        '</div>' +
+        '<div id="bgPresetPanel">' +
+          '<div class="bg-picker-grid">' + presetItemsHtml + '</div>' +
+        '</div>' +
+        '<div id="bgCustomPanel" class="bg-custom-panel">' +
+          '<div class="bg-upload-zone" id="bgUploadZone" onclick="document.getElementById(\'bgFileInput\').click()">' +
+            '<i class="fa-solid fa-cloud-arrow-up bg-upload-icon"></i>' +
+            '<div class="bg-upload-text">Click hoặc kéo ảnh vào đây</div>' +
+            '<div class="bg-upload-hint">JPG, PNG, WEBP · Tối đa 10MB</div>' +
+          '</div>' +
+          '<input type="file" id="bgFileInput" accept="image/*" style="display:none">' +
+          '<div class="bg-or-divider">hoặc</div>' +
+          '<input type="url" id="bgUrlInput" class="bg-url-input" ' +
+            'placeholder="Dán URL ảnh (https://...)" ' +
+            'onkeydown="if(event.key===\'Enter\'){event.preventDefault();ww.useBgUrl();}">' +
+          '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.useBgUrl()" style="margin-bottom:12px">' +
+            '<i class="fa-solid fa-link"></i> Dùng URL này' +
+          '</button>' +
+          '<div class="bg-preview-box" id="bgPreviewBox">' +
+            '<img id="bgPreviewImg" src="" alt="Preview">' +
+            '<div class="bg-preview-overlay" id="bgPreviewOverlay"></div>' +
+            '<div class="bg-preview-label">Preview</div>' +
+          '</div>' +
+          '<div class="bg-overlay-control">' +
+            '<div class="bg-overlay-label">' +
+              '<span>Độ tối overlay</span>' +
+              '<span class="bg-overlay-value" id="bgOverlayValue">65%</span>' +
+            '</div>' +
+            '<input type="range" id="bgOverlaySlider" class="bg-overlay-slider" ' +
+              'min="0" max="0.9" step="0.05" value="0.65">' +
+          '</div>' +
+          '<div class="bg-custom-actions">' +
+            '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.resetBgCustom()">' +
+              '<i class="fa-solid fa-rotate-left"></i> Đặt lại' +
+            '</button>' +
+            '<button type="button" class="bg-btn bg-btn-primary" onclick="ww.applyCustomBg()">' +
+              '<i class="fa-solid fa-check"></i> Áp dụng' +
+            '</button>' +
+          '</div>' +
+          (currentBg === 'bg-custom' 
+            ? '<button type="button" class="bg-remove-btn" onclick="ww.removeCustomBg()">' +
+                '<i class="fa-solid fa-trash-can"></i> Xóa nền tùy chỉnh' +
+              '</button>'
+            : '') +
+        '</div>' +
+      '</div>',
+    showConfirmButton: false,
+    showCloseButton: true,
+    background: '#1a1b2e',
+    color: '#fff',
+    width: 500,
+    allowOutsideClick: true,
+    allowEscapeKey: true,
+    didOpen: function() {
+      // File input
+      var fileInput = document.getElementById('bgFileInput');
+      if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+          if (e.target.files && e.target.files[0]) {
+            handleBgFileUpload(e.target.files[0]);
+          }
+        });
+      }
+      
+      // Drag & drop
+      var uploadZone = document.getElementById('bgUploadZone');
+      if (uploadZone) {
+        ['dragenter', 'dragover'].forEach(function(evt) {
+          uploadZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+          });
+        });
+        ['dragleave', 'drop'].forEach(function(evt) {
+          uploadZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+          });
+        });
+        uploadZone.addEventListener('drop', function(e) {
+          var files = e.dataTransfer.files;
+          if (files && files[0]) handleBgFileUpload(files[0]);
+        });
+      }
+      
+      // Slider
+      var slider = document.getElementById('bgOverlaySlider');
+      var sliderVal = document.getElementById('bgOverlayValue');
+      var previewOverlay = document.getElementById('bgPreviewOverlay');
+      if (slider && sliderVal) {
+        slider.addEventListener('input', function() {
+          var val = parseFloat(slider.value);
+          sliderVal.textContent = Math.round(val * 100) + '%';
+          if (previewOverlay) previewOverlay.style.setProperty('--preview-overlay', val);
+        });
+      }
+      
+      // Load custom if exists
+      loadCustomBg();
+      if (_customBgData && _customBgData.url) {
+        var urlInput = document.getElementById('bgUrlInput');
+        var overlaySlider = document.getElementById('bgOverlaySlider');
+        if (urlInput && _customBgData.source === 'url') urlInput.value = _customBgData.url;
+        if (overlaySlider) overlaySlider.value = _customBgData.overlay || 0.65;
+        updateCustomPreview(_customBgData.url);
+      }
+    }
   });
-  document.body.classList.remove('bg-custom');
-  document.documentElement.classList.remove('bg-custom');
-  
-  // Apply custom
-  document.body.classList.add('bg-custom');
-  document.documentElement.classList.add('bg-custom');
-  applyCustomBgToDOM(_customBgData);
-  
-  // Update state
-  if (!state.preferences) state.preferences = {};
-  state.preferences.background = 'bg-custom';
-  state.preferences.customOverlay = _customBgData.overlay;
-  
-  if (typeof saveStateToFirestore === 'function') saveStateToFirestore();
-  if (typeof showTaskToast === 'function') {
-    showTaskToast('🎨 Đã áp dụng nền', 'Nền tùy chỉnh đã kích hoạt');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PICK PRESET BACKGROUND
+// ═══════════════════════════════════════════════════════════════
+
+function pickBackground(bgId) {
+  applyBackground(bgId, { save: true });
+
+  var allItems = document.querySelectorAll('.bg-picker-item');
+  allItems.forEach(function(el) {
+    if (el.getAttribute('data-bg-id') === bgId) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
+
+  var bg = BACKGROUNDS.find(function(b) { return b.id === bgId; });
+  if (typeof showTaskToast === 'function' && bg) {
+    showTaskToast('🎨 Đã đổi nền', bg.label);
   }
 }
 
-// ═══ CLEAR CUSTOM BG FROM DOM ═══
-function clearCustomBgFromDOM() {
-  document.body.style.removeProperty('background-image');
-  document.body.style.removeProperty('background-size');
-  document.body.style.removeProperty('background-position');
-  document.body.style.removeProperty('background-attachment');
-  document.body.style.removeProperty('background-repeat');
-  document.body.style.removeProperty('--custom-overlay');
+// ═══════════════════════════════════════════════════════════════
+// SWITCH TAB
+// ═══════════════════════════════════════════════════════════════
+
+function switchBgTab(tab) {
+  var presetTab = document.getElementById('bgPresetPanel');
+  var customTab = document.getElementById('bgCustomPanel');
+  var presetBtn = document.getElementById('bgTabPreset');
+  var customBtn = document.getElementById('bgTabCustom');
   
-  // ✅ Xóa inline style sớm ở <head>
-  var earlyStyle = document.getElementById('early-bg-style');
-  if (earlyStyle) earlyStyle.remove();
+  if (tab === 'preset') {
+    presetTab.style.display = 'block';
+    customTab.classList.remove('active');
+    presetBtn.classList.add('active');
+    customBtn.classList.remove('active');
+  } else {
+    presetTab.style.display = 'none';
+    customTab.classList.add('active');
+    presetBtn.classList.remove('active');
+    customBtn.classList.add('active');
+    
+    loadCustomBg();
+    if (_customBgData && _customBgData.url) {
+      updateCustomPreview(_customBgData.url);
+      var slider = document.getElementById('bgOverlaySlider');
+      if (slider) slider.value = _customBgData.overlay || 0.65;
+    }
+  }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// COMPRESS IMAGE
+// ═══════════════════════════════════════════════════════════════
 
-// ═══ NÉN ẢNH UPLOAD ═══
 function compressImage(file, maxWidth, quality) {
   return new Promise(function(resolve, reject) {
-    // ═══ TỰ ĐỘNG CHỌN QUALITY DỰA TRÊN KÍCH THƯỚC FILE ═══
-    var targetKB = 800;         // Mục tiêu ~800KB để chắc chắn vừa localStorage
     var fileKB = file.size / 1024;
     
     if (fileKB > 5000) {
-      // Ảnh >5MB → nén mạnh
       maxWidth = maxWidth || 1920;
       quality = quality || 0.55;
     } else if (fileKB > 2000) {
-      // Ảnh 2-5MB → nén vừa
       maxWidth = maxWidth || 1920;
       quality = quality || 0.65;
     } else {
-      // Ảnh <2MB → giữ nét
       maxWidth = maxWidth || 1920;
       quality = quality || 0.75;
     }
-    
-    console.log('📷 Compress:', Math.round(fileKB) + 'KB → maxWidth=' + maxWidth + ', quality=' + quality);
     
     var reader = new FileReader();
     reader.onload = function(e) {
@@ -242,18 +428,13 @@ function compressImage(file, maxWidth, quality) {
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Thử quality cao trước, nếu file vẫn lớn thì giảm
         var dataUrl = canvas.toDataURL('image/jpeg', quality);
         var sizeKB = (dataUrl.length * 0.75) / 1024;
         
-        // Nếu vẫn >1.5MB → nén lại mạnh hơn
         if (sizeKB > 1500 && quality > 0.4) {
-          console.log('📷 Vẫn lớn (' + Math.round(sizeKB) + 'KB), nén lại quality=0.4');
           dataUrl = canvas.toDataURL('image/jpeg', 0.4);
-          sizeKB = (dataUrl.length * 0.75) / 1024;
         }
         
-        console.log('✅ Final size:', Math.round(sizeKB) + 'KB');
         resolve(dataUrl);
       };
       img.onerror = reject;
@@ -264,16 +445,19 @@ function compressImage(file, maxWidth, quality) {
   });
 }
 
-// ═══ HANDLE FILE UPLOAD ═══
+// ═══════════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════════════════════════
+
 function handleBgFileUpload(file) {
   if (!file) return;
   
   if (!file.type.startsWith('image/')) {
-    Swal.fire({ icon: 'error', title: 'File không hợp lệ', text: 'Chỉ nhận file ảnh (JPG, PNG, WEBP...)', background: '#1a1b2e', color: '#fff' });
+    Swal.fire({ icon: 'error', title: 'File không hợp lệ', text: 'Chỉ nhận file ảnh', background: '#1a1b2e', color: '#fff' });
     return;
   }
   
-  if (file.size > 10 * 1024 * 1024) {   // ✅ Vẫn giữ 10MB
+  if (file.size > 10 * 1024 * 1024) {
     Swal.fire({ icon: 'error', title: 'Ảnh quá lớn', text: 'Ảnh phải nhỏ hơn 10MB', background: '#1a1b2e', color: '#fff' });
     return;
   }
@@ -283,7 +467,7 @@ function handleBgFileUpload(file) {
   }
   
   compressImage(file).then(function(dataUrl) {
-    updateCustomPreview(dataUrl, 'upload');
+    updateCustomPreview(dataUrl);
     _customBgData = { url: dataUrl, overlay: 0.65, source: 'upload' };
     if (typeof showTaskToast === 'function') {
       showTaskToast('✅ Đã nạp ảnh', 'Bấm "Áp dụng" để đặt làm nền');
@@ -294,8 +478,11 @@ function handleBgFileUpload(file) {
   });
 }
 
-// ═══ UPDATE PREVIEW ═══
-function updateCustomPreview(url, source) {
+// ═══════════════════════════════════════════════════════════════
+// UPDATE PREVIEW
+// ═══════════════════════════════════════════════════════════════
+
+function updateCustomPreview(url) {
   var previewBox = document.getElementById('bgPreviewBox');
   var previewImg = document.getElementById('bgPreviewImg');
   var previewOverlay = document.getElementById('bgPreviewOverlay');
@@ -319,35 +506,72 @@ function updateCustomPreview(url, source) {
   }
 }
 
-// ═══ APPLY CUSTOM BG ═══
+// ═══════════════════════════════════════════════════════════════
+// USE URL
+// ═══════════════════════════════════════════════════════════════
+
+function useBgUrl() {
+  var input = document.getElementById('bgUrlInput');
+  if (!input) return;
+  var url = input.value.trim();
+  
+  if (!url) {
+    Swal.fire({ icon: 'warning', title: 'Chưa có URL', text: 'Vui lòng nhập URL ảnh', background: '#1a1b2e', color: '#fff' });
+    return;
+  }
+  
+  if (!/^https?:\/\//i.test(url)) {
+    Swal.fire({ icon: 'error', title: 'URL không hợp lệ', text: 'URL phải bắt đầu bằng http:// hoặc https://', background: '#1a1b2e', color: '#fff' });
+    return;
+  }
+  
+  var testImg = new Image();
+  testImg.onload = function() {
+    _customBgData = { url: url, overlay: 0.65, source: 'url' };
+    updateCustomPreview(url);
+    if (typeof showTaskToast === 'function') {
+      showTaskToast('✅ URL hợp lệ', 'Bấm "Áp dụng" để đặt làm nền');
+    }
+  };
+  testImg.onerror = function() {
+    Swal.fire({ icon: 'error', title: 'Không tải được ảnh', text: 'URL có thể bị chặn hoặc ảnh không tồn tại', background: '#1a1b2e', color: '#fff' });
+  };
+  testImg.src = url;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APPLY CUSTOM BG
+// ═══════════════════════════════════════════════════════════════
+
 function applyCustomBg() {
   if (!_customBgData || !_customBgData.url) {
     Swal.fire({ icon: 'warning', title: 'Chưa có ảnh', text: 'Vui lòng chọn ảnh hoặc nhập URL trước', background: '#1a1b2e', color: '#fff' });
     return;
   }
   
-  // Lấy overlay từ slider
   var slider = document.getElementById('bgOverlaySlider');
   if (slider) _customBgData.overlay = parseFloat(slider.value);
   
-  saveCustomBg(_customBgData);
+  if (!saveCustomBg(_customBgData)) return;
   
-  // Xóa tất cả class bg-* cũ
+  try {
+    localStorage.setItem('ws_background', 'bg-custom');
+    localStorage.setItem('ws_custom_overlay', String(_customBgData.overlay));
+  } catch(e) {}
+  
+  // Xóa preset bg
   BACKGROUNDS.forEach(function(b) {
     document.body.classList.remove(b.id);
+    document.documentElement.classList.remove(b.id);
   });
-  document.body.classList.remove('bg-custom');
   
-  // Apply custom
   document.body.classList.add('bg-custom');
+  document.documentElement.classList.add('bg-custom');
   applyCustomBgToDOM(_customBgData);
   
-  // Update state
   if (!state.preferences) state.preferences = {};
   state.preferences.background = 'bg-custom';
   state.preferences.customOverlay = _customBgData.overlay;
-  
-  try { localStorage.setItem('ws_background', 'bg-custom'); } catch(e) {}
   
   if (typeof saveStateToFirestore === 'function') saveStateToFirestore();
   if (typeof showTaskToast === 'function') {
@@ -355,7 +579,10 @@ function applyCustomBg() {
   }
 }
 
-// ═══ REMOVE CUSTOM BG ═══
+// ═══════════════════════════════════════════════════════════════
+// REMOVE CUSTOM BG
+// ═══════════════════════════════════════════════════════════════
+
 function removeCustomBg() {
   Swal.fire({
     icon: 'warning',
@@ -371,22 +598,20 @@ function removeCustomBg() {
   }).then(function(result) {
     if (!result.isConfirmed) return;
     
-    try { localStorage.removeItem('ws_custom_bg'); } catch(e) {}
+    try {
+      localStorage.removeItem('ws_custom_bg');
+      localStorage.removeItem('ws_custom_url');
+      localStorage.removeItem('ws_custom_overlay');
+    } catch(e) {}
+    
     _customBgData = null;
     clearCustomBgFromDOM();
     document.body.classList.remove('bg-custom');
+    document.documentElement.classList.remove('bg-custom');
     
-    // Reset state
-    if (!state.preferences) state.preferences = {};
-    state.preferences.background = 'bg-default';
-    delete state.preferences.customBg;
-    try { localStorage.setItem('ws_background', 'bg-default'); } catch(e) {}
+    applyBackground('bg-default', { save: true });
     
-    if (typeof saveStateToFirestore === 'function') saveStateToFirestore();
-    applyBackground('bg-default');
-    
-    // Refresh modal
-    if (typeof openBackgroundPicker === 'function') openBackgroundPicker();
+    Swal.close();
     
     if (typeof showTaskToast === 'function') {
       showTaskToast('🗑️ Đã xóa nền', 'Về nền mặc định');
@@ -394,239 +619,10 @@ function removeCustomBg() {
   });
 }
 
-// ═══ SWITCH PICKER TAB ═══
-function switchBgTab(tab) {
-  var presetTab = document.getElementById('bgPresetPanel');
-  var customTab = document.getElementById('bgCustomPanel');
-  var presetBtn = document.getElementById('bgTabPreset');
-  var customBtn = document.getElementById('bgTabCustom');
-  
-  if (tab === 'preset') {
-    presetTab.style.display = 'block';
-    customTab.classList.remove('active');
-    presetBtn.classList.add('active');
-    customBtn.classList.remove('active');
-  } else {
-    presetTab.style.display = 'none';
-    customTab.classList.add('active');
-    presetBtn.classList.remove('active');
-    customBtn.classList.add('active');
-    
-    // Load custom bg vào preview nếu có
-    if (_customBgData && _customBgData.url) {
-      updateCustomPreview(_customBgData.url, _customBgData.source);
-      var slider = document.getElementById('bgOverlaySlider');
-      if (slider) slider.value = _customBgData.overlay || 0.65;
-    } else {
-      loadCustomBg();
-      if (_customBgData && _customBgData.url) {
-        updateCustomPreview(_customBgData.url, _customBgData.source);
-      }
-    }
-  }
-}
+// ═══════════════════════════════════════════════════════════════
+// RESET FORM
+// ═══════════════════════════════════════════════════════════════
 
-
-// Mở modal chọn background
-function openBackgroundPicker() {
-  var currentBg = getCurrentBackground();
-
-  var presetItemsHtml = BACKGROUNDS.map(function(bg) {
-    var isActive = bg.id === currentBg;
-    return '<button type="button" ' +
-              'class="bg-picker-item' + (isActive ? ' active' : '') + '" ' +
-              'data-bg-id="' + bg.id + '" ' +
-              'onclick="ww.pickBackground(\'' + bg.id + '\')">' +
-              '<div class="bg-picker-preview" style="background:' + bg.preview + '"></div>' +
-              '<div class="bg-picker-label">' + bg.label + '</div>' +
-            '</button>';
-  }).join('');
-
-  Swal.fire({
-    title: '',
-    html:
-      '<div style="text-align:left">' +
-        // Header
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
-          '<div style="width:36px;height:36px;border-radius:10px;' +
-              'background:linear-gradient(135deg,#7c5dfa,#22d3ee);' +
-              'display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px">' +
-            '<i class="fa-solid fa-image"></i>' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.02em">Đổi nền trang</div>' +
-            '<div style="font-size:10px;color:#7d7d8a;margin-top:1px">Chọn nền có sẵn hoặc tự thêm ảnh của bạn</div>' +
-          '</div>' +
-        '</div>' +
-        
-        // Tabs
-        '<div class="bg-picker-tabs">' +
-          '<button type="button" id="bgTabPreset" class="bg-picker-tab active" onclick="ww.switchBgTab(\'preset\')">' +
-            '<i class="fa-solid fa-palette"></i> Có sẵn' +
-          '</button>' +
-          '<button type="button" id="bgTabCustom" class="bg-picker-tab" onclick="ww.switchBgTab(\'custom\')">' +
-            '<i class="fa-solid fa-wand-magic-sparkles"></i> Tùy chỉnh' +
-          '</button>' +
-        '</div>' +
-        
-        // Panel 1: Presets
-        '<div id="bgPresetPanel">' +
-          '<div class="bg-picker-grid">' + presetItemsHtml + '</div>' +
-        '</div>' +
-        
-        // Panel 2: Custom
-        '<div id="bgCustomPanel" class="bg-custom-panel">' +
-          // Upload zone
-          '<div class="bg-upload-zone" id="bgUploadZone" onclick="document.getElementById(\'bgFileInput\').click()">' +
-            '<i class="fa-solid fa-cloud-arrow-up bg-upload-icon"></i>' +
-            '<div class="bg-upload-text">Click hoặc kéo ảnh vào đây</div>' +
-            '<div class="bg-upload-hint">JPG, PNG, WEBP · Tối đa 10MB</div>' +
-          '</div>' +
-          '<input type="file" id="bgFileInput" accept="image/*" style="display:none">' +
-          
-          // OR divider
-          '<div class="bg-or-divider">hoặc</div>' +
-          
-          // URL input
-          '<input type="url" id="bgUrlInput" class="bg-url-input" ' +
-            'placeholder="Dán URL ảnh (https://...)" ' +
-            'onkeydown="if(event.key===\'Enter\'){event.preventDefault();ww.useBgUrl();}">' +
-          '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.useBgUrl()" style="margin-bottom:12px">' +
-            '<i class="fa-solid fa-link"></i> Dùng URL này' +
-          '</button>' +
-          
-          // Preview
-          '<div class="bg-preview-box" id="bgPreviewBox">' +
-            '<img id="bgPreviewImg" src="" alt="Preview">' +
-            '<div class="bg-preview-overlay" id="bgPreviewOverlay"></div>' +
-            '<div class="bg-preview-label" id="bgPreviewLabel">Preview</div>' +
-          '</div>' +
-          
-          // Overlay slider
-          '<div class="bg-overlay-control">' +
-            '<div class="bg-overlay-label">' +
-              '<span>Độ tối overlay</span>' +
-              '<span class="bg-overlay-value" id="bgOverlayValue">65%</span>' +
-            '</div>' +
-            '<input type="range" id="bgOverlaySlider" class="bg-overlay-slider" ' +
-              'min="0" max="0.9" step="0.05" value="0.65">' +
-          '</div>' +
-          
-          // Actions
-          '<div class="bg-custom-actions">' +
-            '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.resetBgCustom()">' +
-              '<i class="fa-solid fa-rotate-left"></i> Đặt lại' +
-            '</button>' +
-            '<button type="button" class="bg-btn bg-btn-primary" id="bgApplyBtn" onclick="ww.applyCustomBg()">' +
-              '<i class="fa-solid fa-check"></i> Áp dụng' +
-            '</button>' +
-          '</div>' +
-          
-          // Remove button (chỉ hiện khi đã có custom bg)
-          (currentBg === 'bg-custom' 
-            ? '<button type="button" class="bg-remove-btn" onclick="ww.removeCustomBg()">' +
-                '<i class="fa-solid fa-trash-can"></i> Xóa nền tùy chỉnh' +
-              '</button>'
-            : '') +
-        '</div>' +
-      '</div>',
-    showConfirmButton: false,
-    showCloseButton: true,
-    background: '#1a1b2e',
-    color: '#fff',
-    width: 500,
-    allowOutsideClick: true,
-    allowEscapeKey: true,
-    didOpen: function() {
-      // Setup file input
-      var fileInput = document.getElementById('bgFileInput');
-      if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-          if (e.target.files && e.target.files[0]) {
-            handleBgFileUpload(e.target.files[0]);
-          }
-        });
-      }
-      
-      // Setup drag & drop
-      var uploadZone = document.getElementById('bgUploadZone');
-      if (uploadZone) {
-        ['dragenter', 'dragover'].forEach(function(evt) {
-          uploadZone.addEventListener(evt, function(e) {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-          });
-        });
-        ['dragleave', 'drop'].forEach(function(evt) {
-          uploadZone.addEventListener(evt, function(e) {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-          });
-        });
-        uploadZone.addEventListener('drop', function(e) {
-          var files = e.dataTransfer.files;
-          if (files && files[0]) handleBgFileUpload(files[0]);
-        });
-      }
-      
-      // Setup slider
-      var slider = document.getElementById('bgOverlaySlider');
-      var sliderVal = document.getElementById('bgOverlayValue');
-      var previewOverlay = document.getElementById('bgPreviewOverlay');
-      if (slider && sliderVal) {
-        slider.addEventListener('input', function() {
-          var val = parseFloat(slider.value);
-          sliderVal.textContent = Math.round(val * 100) + '%';
-          if (previewOverlay) previewOverlay.style.setProperty('--preview-overlay', val);
-        });
-      }
-      
-      // Load custom bg nếu đang dùng
-      loadCustomBg();
-      if (_customBgData && _customBgData.url) {
-        var urlInput = document.getElementById('bgUrlInput');
-        var overlaySlider = document.getElementById('bgOverlaySlider');
-        if (urlInput && _customBgData.source === 'url') urlInput.value = _customBgData.url;
-        if (overlaySlider) overlaySlider.value = _customBgData.overlay || 0.65;
-        updateCustomPreview(_customBgData.url, _customBgData.source);
-      }
-    }
-  });
-}
-
-// ═══ USE BG URL ═══
-function useBgUrl() {
-  var input = document.getElementById('bgUrlInput');
-  if (!input) return;
-  var url = input.value.trim();
-  
-  if (!url) {
-    Swal.fire({ icon: 'warning', title: 'Chưa có URL', text: 'Vui lòng nhập URL ảnh', background: '#1a1b2e', color: '#fff' });
-    return;
-  }
-  
-  // Basic URL validation
-  if (!/^https?:\/\//i.test(url)) {
-    Swal.fire({ icon: 'error', title: 'URL không hợp lệ', text: 'URL phải bắt đầu bằng http:// hoặc https://', background: '#1a1b2e', color: '#fff' });
-    return;
-  }
-  
-  // Test load image
-  var testImg = new Image();
-  testImg.onload = function() {
-    _customBgData = { url: url, overlay: 0.65, source: 'url' };
-    updateCustomPreview(url, 'url');
-    if (typeof showTaskToast === 'function') {
-      showTaskToast('✅ URL hợp lệ', 'Bấm "Áp dụng" để đặt làm nền');
-    }
-  };
-  testImg.onerror = function() {
-    Swal.fire({ icon: 'error', title: 'Không tải được ảnh', text: 'URL có thể bị chặn hoặc ảnh không tồn tại', background: '#1a1b2e', color: '#fff' });
-  };
-  testImg.src = url;
-}
-
-// ═══ RESET CUSTOM BG FORM ═══
 function resetBgCustom() {
   _customBgData = null;
   var urlInput = document.getElementById('bgUrlInput');
@@ -641,80 +637,56 @@ function resetBgCustom() {
   updateCustomPreview(null);
 }
 
-// User chọn background
-function pickBackground(bgId) {
-  // ✅ User chủ động đổi → save = true
-  applyBackground(bgId, { save: true });
-
-  // Update UI
-  var allItems = document.querySelectorAll('.bg-picker-item');
-  allItems.forEach(function(el) {
-    if (el.getAttribute('data-bg-id') === bgId) {
-      el.classList.add('active');
-    } else {
-      el.classList.remove('active');
-    }
-  });
-
-  // Toast
-  var bg = BACKGROUNDS.find(function(b) { return b.id === bgId; });
-  if (typeof showTaskToast === 'function' && bg) {
-    showTaskToast('🎨 Đã đổi nền', bg.label);
-  }
-}
-
-// Init — Load background khi khởi động
-var _bgInitDone = false;
+// ═══════════════════════════════════════════════════════════════
+// INIT BACKGROUND — Chạy 1 lần khi load
+// ═══════════════════════════════════════════════════════════════
 
 function initBackground() {
-  // ✅ Cho phép chạy lại khi login user khác
   var savedBg = localStorage.getItem('ws_background') || 'bg-default';
   
-  console.log('🎨 initBackground:', savedBg);
-  
   if (savedBg === 'bg-custom') {
-    // Load custom bg từ localStorage
     loadCustomBg();
     
     if (_customBgData && _customBgData.url) {
-      // Apply lên body + html
-      document.body.classList.remove.apply(document.body.classList, BACKGROUNDS.map(function(b) { return b.id; }));
-      document.documentElement.classList.remove.apply(document.documentElement.classList, BACKGROUNDS.map(function(b) { return b.id; }));
-      
+      BACKGROUNDS.forEach(function(b) {
+        document.body.classList.remove(b.id);
+        document.documentElement.classList.remove(b.id);
+      });
       document.body.classList.add('bg-custom');
       document.documentElement.classList.add('bg-custom');
       applyCustomBgToDOM(_customBgData);
+      console.log('🎨 Custom bg loaded');
     } else {
-      // Custom bg data bị mất → fallback default
-      console.warn('⚠️ Custom bg data missing, fallback default');
       savedBg = 'bg-default';
       localStorage.setItem('ws_background', 'bg-default');
       applyBackground('bg-default');
+      console.log('🎨 Custom bg missing → default');
     }
   } else {
-    // Apply preset
-    applyBackground(savedBg, { save: false });  // ✅ Không lưu Firestore
+    applyBackground(savedBg, { save: false });
+    console.log('🎨 Preset bg loaded:', savedBg);
   }
-  
-  _bgInitDone = true;
 }
 
 function resetBackgroundInit() {
   _bgInitDone = false;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// EXPOSE
+// ═══════════════════════════════════════════════════════════════
+
 window.ww = window.ww || {};
-window.ww.resetBackgroundInit = resetBackgroundInit;
 window.ww.openBackgroundPicker = openBackgroundPicker;
 window.ww.pickBackground = pickBackground;
 window.ww.applyBackground = applyBackground;
 window.ww.getCurrentBackground = getCurrentBackground;
 window.ww.initBackground = initBackground;
+window.ww.resetBackgroundInit = resetBackgroundInit;
 window.ww.switchBgTab = switchBgTab;
 window.ww.useBgUrl = useBgUrl;
 window.ww.applyCustomBg = applyCustomBg;
 window.ww.removeCustomBg = removeCustomBg;
 window.ww.resetBgCustom = resetBgCustom;
-
 
 console.log('✅ ui/background-picker.js loaded');
