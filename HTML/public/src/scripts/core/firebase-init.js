@@ -45,6 +45,8 @@
     firebase.auth = auth;
     firebase.db = db;
     firebase.storage = storage;
+    firebase.listAll = storageMod.listAll;
+firebase.deleteObject = storageMod.deleteObject;
     firebase.signInEmail = authMod.signInWithEmailAndPassword;
     firebase.createUser = authMod.createUserWithEmailAndPassword;
     firebase.signInPopup = authMod.signInWithPopup;

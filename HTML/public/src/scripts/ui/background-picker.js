@@ -557,9 +557,27 @@ function uploadBgToStorage(dataUrl) {
 
 // ═══ DỌN ẢNH CŨ (giữ 2 gần nhất) ═══
 function cleanupOldBackgrounds() {
-  // Tạm thời bỏ qua — có thể implement sau với Firebase Storage list API
-  // Cần dùng storageMod.listAll để list files
-  console.log('🧹 Cleanup: bỏ qua (cần list API)');
+  if (!firebase.listAll || !firebase.user) return;
+  
+  var uid = firebase.user.uid;
+  var folderRef = firebase.ref(firebase.storage, 'backgrounds/' + uid);
+  
+  firebase.listAll(folderRef).then(function(res) {
+    // Sắp xếp theo tên (timestamp)
+    var items = res.items.sort(function(a, b) {
+      return a.name.localeCompare(b.name);
+    });
+    
+    // Giữ 2 ảnh mới nhất, xóa phần còn lại
+    var toDelete = items.slice(0, Math.max(0, items.length - 2));
+    return Promise.all(toDelete.map(function(item) {
+      return firebase.deleteObject(item).catch(function(e) {
+        console.warn('Delete failed:', e);
+      });
+    }));
+  }).catch(function(err) {
+    console.warn('Cleanup error:', err);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
