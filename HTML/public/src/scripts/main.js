@@ -113,6 +113,12 @@ console.log('✅ Đã alias handlers ra window');
 initUI();
 renderTimerDisplay();
 
+// ✅ Load background preference
+setTimeout(function() {
+  if (typeof initBackground === 'function') initBackground();
+}, 100);
+
+
 // ═══ 4. Safety net: tự tắt overlay sau 8s ═══
 setTimeout(function() {
   var overlay = document.getElementById('loadingOverlay');

@@ -12,6 +12,7 @@ function saveStateToFirestore() {
       goals: state.goals,
       reviews: state.reviews,
       gamification: state.gamification || {},
+      preferences: state.preferences || {},
       updatedAt: new Date().toISOString()
     }, { merge: true }).catch(function(err) {
       console.warn('Firestore save error:', err);
@@ -36,7 +37,11 @@ function subscribeUserData(uid) {
             // ✅ THÊM: Load gamification
         if (d.gamification && typeof d.gamification === 'object') {
           state.gamification = d.gamification;
-        } else {
+        } 
+        if (d.preferences && typeof d.preferences === 'object') {
+          state.preferences = d.preferences;
+        }
+        else {
           state.gamification = state.gamification || {
             xp: 0, level: 1, totalXP: 0,
             unlockedThemes: ['default'],
@@ -57,6 +62,7 @@ function subscribeUserData(uid) {
         console.log('🌱 Đã seed starter goals cho user mới:', uid);
       }
       setSyncBadge('connected');
+      if (typeof initBackground === 'function') initBackground();
       renderAll();
     }, function(err) {
       console.warn('Firestore listener error:', err);

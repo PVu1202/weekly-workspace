@@ -21,6 +21,11 @@ var state = {
   searchQuery: '',
   goals: [],
   reviews: {},
+
+    preferences: {                       // ✅ THÊM
+    background: 'bg-default'
+  },
+
     // ✅ GAMIFICATION STATE
   gamification: {
     xp: 0,

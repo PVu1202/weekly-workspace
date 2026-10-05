@@ -65,6 +65,7 @@
   <link rel="stylesheet" href="/src/styles/09-modals.css">
   <link rel="stylesheet" href="/src/styles/10-animations.css">
   <link rel="stylesheet" href="/src/styles/11-light-mode.css">
+  <link rel="stylesheet" href="/src/styles/12-backgrounds.css">
 </head>
 <body class="h-screen flex overflow-hidden text-gray-200">
 
@@ -758,6 +759,10 @@
       <i class="fa-solid fa-volume-high"></i>
       <span>Bật/tắt âm thanh</span>
     </button>
+    <button class="user-menu-item" onclick="ww.openBackgroundPicker(); ww.closeUserMenu();">
+      <i class="fa-solid fa-image"></i>
+      <span>Đổi nền trang</span>
+    </button>
     <button class="user-menu-item" onclick="ww.showStatsModal(); ww.closeUserMenu();">
       <i class="fa-solid fa-chart-simple"></i>
       <span>Thành tích của tôi</span>
@@ -1235,9 +1240,10 @@
 <script src="/src/scripts/ui/week-picker.js"></script>
 <script src="/src/scripts/ui/user-menu.js"></script>
 <script src="/src/scripts/ui/help.js"></script>
+<script src="/src/scripts/ui/background-picker.js"></script>
 
 <!-- ═══ FEATURES ═══ -->
- <script src="/src/scripts/features/gamification.js"></script>
+<script src="/src/scripts/features/gamification.js"></script>
 <script src="/src/scripts/features/goals.js"></script>
 <script src="/src/scripts/features/subtasks.js"></script>
 <script src="/src/scripts/features/notes.js"></script>
