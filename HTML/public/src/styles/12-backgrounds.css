@@ -564,39 +564,15 @@ body.bg-custom header {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   CUSTOM BG — Chỉ áp dụng cho MAIN APP, KHÔNG cho Auth Screen
+   CUSTOM BG — CHỈ TRÊN MAIN APP
+   Auth screen LUÔN giữ nền riêng, không bị ảnh hưởng
    ═══════════════════════════════════════════════════════════════ */
 
-/* ⚠️ QUAN TRỌNG: Auth screen LUÔN giữ nền riêng, không bị ảnh hưởng */
-body.bg-custom #authScreen {
-  /* Để auth screen dùng lại nền kem waves gốc */
-  background: #06060a !important;
-  background-image: none !important;
-  /* Không có ảnh custom ở đây */
-}
+/* ⚠️ QUAN TRỌNG: body không có custom bg → auth screen không bị ảnh hưởng */
 
-/* Đảm bảo các layer waves hiện lại trong auth screen */
-body.bg-custom #authScreen .auth-waves-bg {
-  display: block !important;
-}
-
-body.bg-custom #authScreen .cyber-waves-bg {
-  display: block !important;
-}
-
-body.bg-custom #authScreen::before {
-  display: block !important;
-  content: '' !important;
-}
-
-/* ═══ CHỈ MAIN APP CÓ CUSTOM BG ═══ */
-
-/* Main app hiển thị ảnh nền custom */
+/* Main app có custom bg qua inline style (JS set) */
 body.bg-custom #appMain {
-  background: transparent !important;
-  background-image: none !important;
   position: relative;
-  z-index: 1;
 }
 
 /* Tắt các lớp phủ cũ của theme trong main app */
@@ -606,7 +582,7 @@ body.bg-custom #appMain::after {
   content: none !important;
 }
 
-/* Overlay tối trên main app — nhưng KHÔNG che auth screen */
+/* Overlay tối — nằm trên ảnh nền, dưới content */
 body.bg-custom #appMain::before {
   content: '';
   display: block !important;
@@ -617,8 +593,9 @@ body.bg-custom #appMain::before {
   z-index: 0;
 }
 
-/* Content main app nằm trên overlay */
-body.bg-custom #appMain > * {
+/* Header + content của main app nằm trên overlay */
+body.bg-custom #appMain > header,
+body.bg-custom #appMain > div {
   position: relative;
   z-index: 1;
 }
@@ -632,8 +609,14 @@ body.bg-custom #appSidebar {
 }
 
 /* Header trong suốt */
-body.bg-custom header {
+body.bg-custom #appMain > header {
   background: rgba(13, 13, 20, 0.65) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+}
+
+/* ═══ AUTH SCREEN — LUÔN GIỮ NỀN RIÊNG ═══ */
+/* Đảm bảo auth screen không bị ảnh hưởng bởi class bg-custom */
+body.bg-custom #authScreen {
+  /* Không cần set gì — auth screen tự có nền riêng của nó */
 }

@@ -55,22 +55,35 @@ var _bgInitDone = false;
 function applyCustomBgToDOM(data) {
   if (!data || !data.url) return;
   
-  document.body.style.setProperty('background-image', 'url("' + data.url + '")', 'important');
-  document.body.style.setProperty('background-size', 'cover', 'important');
-  document.body.style.setProperty('background-position', 'center', 'important');
-  document.body.style.setProperty('background-attachment', 'fixed', 'important');
-  document.body.style.setProperty('background-repeat', 'no-repeat', 'important');
-  document.body.style.setProperty('--custom-overlay', data.overlay || 0.65);
+  // ✅ CHỈ apply lên #appMain — không lên body/html
+  var appMain = document.getElementById('appMain');
+  if (!appMain) {
+    // Nếu #appMain chưa tồn tại, retry sau 200ms
+    setTimeout(function() { applyCustomBgToDOM(data); }, 200);
+    return;
+  }
   
+  appMain.style.setProperty('background-image', 'url("' + data.url + '")', 'important');
+  appMain.style.setProperty('background-size', 'cover', 'important');
+  appMain.style.setProperty('background-position', 'center', 'important');
+  appMain.style.setProperty('background-attachment', 'fixed', 'important');
+  appMain.style.setProperty('background-repeat', 'no-repeat', 'important');
+  appMain.style.setProperty('background-color', '#08080c', 'important');
+  appMain.style.setProperty('--custom-overlay', data.overlay || 0.65);
+  
+  // Đánh dấu body có custom bg (cho CSS selector)
+  document.body.classList.add('bg-custom');
 }
 
 function clearCustomBgFromDOM() {
-  var props = ['background-image', 'background-size', 'background-position', 'background-attachment', 'background-repeat'];
-  props.forEach(function(p) {
-    document.body.style.removeProperty(p);
-  });
-  document.body.style.removeProperty('--custom-overlay');
+  var appMain = document.getElementById('appMain');
+  if (appMain) {
+    var props = ['background-image', 'background-size', 'background-position', 'background-attachment', 'background-repeat', 'background-color'];
+    props.forEach(function(p) { appMain.style.removeProperty(p); });
+    appMain.style.removeProperty('--custom-overlay');
+  }
   
+  // Xóa style sớm trong <head> nếu có
   var earlyStyle = document.getElementById('early-bg-style');
   if (earlyStyle) earlyStyle.remove();
 }
@@ -649,14 +662,16 @@ function initBackground() {
     loadCustomBg();
     
     if (_customBgData && _customBgData.url) {
+      // Xóa preset bg classes
       BACKGROUNDS.forEach(function(b) {
         document.body.classList.remove(b.id);
         document.documentElement.classList.remove(b.id);
       });
+      
       document.body.classList.add('bg-custom');
       document.documentElement.classList.add('bg-custom');
       applyCustomBgToDOM(_customBgData);
-      console.log('🎨 Custom bg loaded');
+      console.log('🎨 Custom bg loaded on #appMain');
     } else {
       savedBg = 'bg-default';
       localStorage.setItem('ws_background', 'bg-default');

@@ -67,37 +67,42 @@
   <link rel="stylesheet" href="/src/styles/11-light-mode.css">
   <link rel="stylesheet" href="/src/styles/12-backgrounds.css">
 
-  <!-- ═══ EARLY BACKGROUND LOADER — Chạy trước body ═══ -->
+<!-- ═══ EARLY BACKGROUND LOADER ═══ -->
 <script>
 (function() {
   try {
     var bg = localStorage.getItem('ws_background') || 'bg-default';
-    var overlay = localStorage.getItem('ws_custom_overlay') || '0.65';
-    var customUrl = localStorage.getItem('ws_custom_url');
     
-    // Thêm class bg-* vào <html> ngay lập tức
+    // Chỉ set class lên <html> để báo hiệu (không set ảnh nền)
     document.documentElement.classList.add(bg);
     
-    if (bg === 'bg-custom' && customUrl) {
-      var style = document.createElement('style');
-      style.id = 'early-bg-style';
-      style.textContent = 
-        'body.bg-custom {' +
-          'background-image: url("' + customUrl + '") !important;' +
-          'background-size: cover !important;' +
-          'background-position: center !important;' +
-          'background-attachment: fixed !important;' +
-          'background-repeat: no-repeat !important;' +
-          'background-color: #08080c !important;' +
-          '--custom-overlay: ' + overlay + ';' +
-        '}';
-      document.head.appendChild(style);
+    // Với custom bg: tạo style tag nhắm vào #appMain
+    if (bg === 'bg-custom') {
+      var customUrl = localStorage.getItem('ws_custom_url');
+      var overlay = localStorage.getItem('ws_custom_overlay') || '0.65';
+      
+      if (customUrl) {
+        var style = document.createElement('style');
+        style.id = 'early-bg-style';
+        // ⚠️ CHỈ nhắm vào #appMain, KHÔNG set body/html
+        style.textContent = 
+          '#appMain {' +
+            'background-image: url("' + customUrl + '") !important;' +
+            'background-size: cover !important;' +
+            'background-position: center !important;' +
+            'background-attachment: fixed !important;' +
+            'background-repeat: no-repeat !important;' +
+            'background-color: #08080c !important;' +
+            '--custom-overlay: ' + overlay + ';' +
+          '}';
+        document.head.appendChild(style);
+      }
     }
   } catch(e) {
-    // Nếu lỗi → không làm gì, để JS chính xử lý
     console.warn('Early bg load failed:', e);
   }
 })();
+</script>
 </script>
 </head>
 <body class="h-screen flex overflow-hidden text-gray-200">
