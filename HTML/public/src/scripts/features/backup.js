@@ -12,7 +12,10 @@ function saveStateToFirestore() {
       goals: state.goals,
       reviews: state.reviews,
       gamification: state.gamification || {},
-      preferences: state.preferences || {},
+      preferences: {
+      background: localStorage.getItem('ws_background') || state.preferences?.background || 'bg-default',
+      customOverlay: state.preferences?.customOverlay
+    },
       updatedAt: new Date().toISOString()
     }, { merge: true }).catch(function(err) {
       console.warn('Firestore save error:', err);
@@ -38,9 +41,6 @@ function subscribeUserData(uid) {
         if (d.gamification && typeof d.gamification === 'object') {
           state.gamification = d.gamification;
         } 
-        if (d.preferences && typeof d.preferences === 'object') {
-          state.preferences = d.preferences;
-        }
         else {
           state.gamification = state.gamification || {
             xp: 0, level: 1, totalXP: 0,
@@ -48,6 +48,26 @@ function subscribeUserData(uid) {
             unlockedBadges: []
           };
         }
+        // ═══ MERGE PREFERENCES — không override hoàn toàn ═══
+        if (d.preferences && typeof d.preferences === 'object') {
+          // ✅ Ưu tiên localStorage cho background
+          // Chỉ lấy từ Firestore nếu localStorage CHƯA CÓ
+          var localBg = localStorage.getItem('ws_background');
+          if (!localBg || localBg === 'bg-default') {
+            // Máy mới hoặc chưa set → dùng Firestore
+            state.preferences = Object.assign({}, state.preferences, d.preferences);
+          } else {
+            // Máy đã có set → giữ local, không ghi đè background
+            state.preferences = Object.assign({}, d.preferences, {
+              background: localBg,
+              customOverlay: state.preferences.customOverlay || d.preferences.customOverlay
+            });
+          }
+        } else {
+          // Firestore chưa có preferences → giữ local
+          state.preferences = state.preferences || { background: 'bg-default' };
+        }
+        
         
         // ✅ Update UI sau khi load
         if (typeof updateGamificationDisplay === 'function') {
@@ -62,8 +82,14 @@ function subscribeUserData(uid) {
         console.log('🌱 Đã seed starter goals cho user mới:', uid);
       }
       setSyncBadge('connected');
-      if (typeof initBackground === 'function') initBackground();
-      renderAll();
+
+    // ✅ Re-apply background sau khi user login
+    if (typeof initBackground === 'function') {
+      _bgInitDone = false;  // Reset flag để initBackground chạy lại
+      initBackground();
+    }
+
+    renderAll();
     }, function(err) {
       console.warn('Firestore listener error:', err);
       setSyncBadge('error');

@@ -44,7 +44,13 @@ function activateUserSession(user) {
     if (typeof updateMiniLevel === 'function') updateMiniLevel();
   }, 300);
 
-  subscribeUserData(user.uid);
+    subscribeUserData(user.uid);
+  
+  // ✅ Re-init background sau khi user login
+  setTimeout(function() {
+    if (typeof resetBackgroundInit === 'function') resetBackgroundInit();
+    if (typeof initBackground === 'function') initBackground();
+  }, 500);
 }
 
 console.log('✅ auth/session.js loaded');

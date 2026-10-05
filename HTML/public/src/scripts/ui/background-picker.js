@@ -8,8 +8,8 @@ function loadCustomBg() {
     var saved = localStorage.getItem('ws_custom_bg');
     if (saved) {
       _customBgData = JSON.parse(saved);
-      // Apply luôn nếu đang dùng
-      if (state.preferences && state.preferences.background === 'bg-custom') {
+      // ✅ Luôn apply, không phụ thuộc state.preferences
+      if (localStorage.getItem('ws_background') === 'bg-custom') {
         applyCustomBgToDOM(_customBgData);
       }
     }
@@ -203,8 +203,25 @@ function clearCustomBgFromDOM() {
 // ═══ NÉN ẢNH UPLOAD ═══
 function compressImage(file, maxWidth, quality) {
   return new Promise(function(resolve, reject) {
-    maxWidth = maxWidth || 1920;
-    quality = quality || 0.75;
+    // ═══ TỰ ĐỘNG CHỌN QUALITY DỰA TRÊN KÍCH THƯỚC FILE ═══
+    var targetKB = 800;         // Mục tiêu ~800KB để chắc chắn vừa localStorage
+    var fileKB = file.size / 1024;
+    
+    if (fileKB > 5000) {
+      // Ảnh >5MB → nén mạnh
+      maxWidth = maxWidth || 1920;
+      quality = quality || 0.55;
+    } else if (fileKB > 2000) {
+      // Ảnh 2-5MB → nén vừa
+      maxWidth = maxWidth || 1920;
+      quality = quality || 0.65;
+    } else {
+      // Ảnh <2MB → giữ nét
+      maxWidth = maxWidth || 1920;
+      quality = quality || 0.75;
+    }
+    
+    console.log('📷 Compress:', Math.round(fileKB) + 'KB → maxWidth=' + maxWidth + ', quality=' + quality);
     
     var reader = new FileReader();
     reader.onload = function(e) {
@@ -214,7 +231,6 @@ function compressImage(file, maxWidth, quality) {
         var width = img.width;
         var height = img.height;
         
-        // Resize nếu quá lớn
         if (width > maxWidth) {
           height = Math.round((height * maxWidth) / width);
           width = maxWidth;
@@ -226,8 +242,18 @@ function compressImage(file, maxWidth, quality) {
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Convert to JPEG để giảm size (trừ khi ảnh gốc là PNG trong suốt)
+        // Thử quality cao trước, nếu file vẫn lớn thì giảm
         var dataUrl = canvas.toDataURL('image/jpeg', quality);
+        var sizeKB = (dataUrl.length * 0.75) / 1024;
+        
+        // Nếu vẫn >1.5MB → nén lại mạnh hơn
+        if (sizeKB > 1500 && quality > 0.4) {
+          console.log('📷 Vẫn lớn (' + Math.round(sizeKB) + 'KB), nén lại quality=0.4');
+          dataUrl = canvas.toDataURL('image/jpeg', 0.4);
+          sizeKB = (dataUrl.length * 0.75) / 1024;
+        }
+        
+        console.log('✅ Final size:', Math.round(sizeKB) + 'KB');
         resolve(dataUrl);
       };
       img.onerror = reject;
@@ -242,27 +268,23 @@ function compressImage(file, maxWidth, quality) {
 function handleBgFileUpload(file) {
   if (!file) return;
   
-  // Validate
   if (!file.type.startsWith('image/')) {
     Swal.fire({ icon: 'error', title: 'File không hợp lệ', text: 'Chỉ nhận file ảnh (JPG, PNG, WEBP...)', background: '#1a1b2e', color: '#fff' });
     return;
   }
   
-  if (file.size > 10 * 1024 * 1024) {
+  if (file.size > 10 * 1024 * 1024) {   // ✅ Vẫn giữ 10MB
     Swal.fire({ icon: 'error', title: 'Ảnh quá lớn', text: 'Ảnh phải nhỏ hơn 10MB', background: '#1a1b2e', color: '#fff' });
     return;
   }
   
-  // Show loading
   if (typeof showTaskToast === 'function') {
     showTaskToast('📷 Đang xử lý ảnh...', 'Vui lòng đợi');
   }
   
-  compressImage(file, 1920, 0.75).then(function(dataUrl) {
-    // Update preview
+  compressImage(file).then(function(dataUrl) {
     updateCustomPreview(dataUrl, 'upload');
     _customBgData = { url: dataUrl, overlay: 0.65, source: 'upload' };
-    
     if (typeof showTaskToast === 'function') {
       showTaskToast('✅ Đã nạp ảnh', 'Bấm "Áp dụng" để đặt làm nền');
     }
@@ -645,25 +667,36 @@ function pickBackground(bgId) {
 var _bgInitDone = false;
 
 function initBackground() {
-  if (_bgInitDone) return;
+  // ✅ Cho phép chạy lại khi login user khác
+  var savedBg = localStorage.getItem('ws_background') || 'bg-default';
   
-  // Load custom bg trước
-  loadCustomBg();
+  console.log('🎨 initBackground:', savedBg);
   
-  var savedBg = (state.preferences && state.preferences.background)
-    || localStorage.getItem('ws_background')
-    || 'bg-default';
-
-  if (savedBg === 'bg-custom' && _customBgData && _customBgData.url) {
-    // Apply custom
-    document.body.classList.add('bg-custom');
-    applyCustomBgToDOM(_customBgData);
+  if (savedBg === 'bg-custom') {
+    // Load custom bg từ localStorage
+    loadCustomBg();
+    
+    if (_customBgData && _customBgData.url) {
+      // Apply lên body + html
+      document.body.classList.remove.apply(document.body.classList, BACKGROUNDS.map(function(b) { return b.id; }));
+      document.documentElement.classList.remove.apply(document.documentElement.classList, BACKGROUNDS.map(function(b) { return b.id; }));
+      
+      document.body.classList.add('bg-custom');
+      document.documentElement.classList.add('bg-custom');
+      applyCustomBgToDOM(_customBgData);
+    } else {
+      // Custom bg data bị mất → fallback default
+      console.warn('⚠️ Custom bg data missing, fallback default');
+      savedBg = 'bg-default';
+      localStorage.setItem('ws_background', 'bg-default');
+      applyBackground('bg-default');
+    }
   } else {
-    applyBackground(savedBg);
+    // Apply preset
+    applyBackground(savedBg, { save: false });  // ✅ Không lưu Firestore
   }
-
+  
   _bgInitDone = true;
-  console.log('🎨 Background loaded:', savedBg);
 }
 
 function resetBackgroundInit() {
