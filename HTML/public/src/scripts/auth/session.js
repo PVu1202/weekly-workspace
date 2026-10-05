@@ -9,6 +9,11 @@ function showAuthScreen() {
   if (auth) auth.classList.remove('hidden');
   if (sidebar) sidebar.classList.add('hidden');
   if (main) main.classList.add('hidden');
+
+   // ✅ Reset background flag khi logout
+  if (typeof resetBackgroundInit === 'function') {
+    resetBackgroundInit();
+  }
 }
 
 function activateUserSession(user) {

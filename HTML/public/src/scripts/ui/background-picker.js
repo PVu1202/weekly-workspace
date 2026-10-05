@@ -46,28 +46,36 @@ var BACKGROUNDS = [
 ];
 
 // Apply background lên body
-function applyBackground(bgId) {
-  // Xóa tất cả class bg-* cũ
+function applyBackground(bgId, options) {
+  options = options || {};
+  var save = options.save === true;   // ⚠️ Mặc định KHÔNG LƯU
+
+  // Chuẩn hóa
   var allBgIds = BACKGROUNDS.map(function(b) { return b.id; });
+  if (!bgId || allBgIds.indexOf(bgId) < 0) {
+    bgId = 'bg-default';
+  }
+
+  // Nếu background không đổi → return sớm, không làm gì
+  if (state.preferences && state.preferences.background === bgId) {
+    return bgId;
+  }
+
+  // Xóa tất cả class bg-* cũ
   allBgIds.forEach(function(id) {
     document.body.classList.remove(id);
   });
 
   // Thêm class mới
-  if (bgId && allBgIds.indexOf(bgId) >= 0) {
-    document.body.classList.add(bgId);
-  } else {
-    document.body.classList.add('bg-default');
-    bgId = 'bg-default';
-  }
+  document.body.classList.add(bgId);
 
   // Lưu vào state + localStorage
   if (!state.preferences) state.preferences = {};
   state.preferences.background = bgId;
-  localStorage.setItem('ws_background', bgId);
+  try { localStorage.setItem('ws_background', bgId); } catch(e) {}
 
-  // Sync lên Firestore
-  if (typeof saveStateToFirestore === 'function') {
+  // Chỉ sync Firestore khi user CHỦ ĐỘNG đổi (options.save = true)
+  if (save && typeof saveStateToFirestore === 'function') {
     saveStateToFirestore();
   }
 
@@ -130,9 +138,10 @@ function openBackgroundPicker() {
 
 // User chọn background
 function pickBackground(bgId) {
-  applyBackground(bgId);
+  // ✅ User chủ động đổi → save = true
+  applyBackground(bgId, { save: true });
 
-  // Update UI ngay (không cần đóng modal)
+  // Update UI
   var allItems = document.querySelectorAll('.bg-picker-item');
   allItems.forEach(function(el) {
     if (el.getAttribute('data-bg-id') === bgId) {
@@ -142,7 +151,7 @@ function pickBackground(bgId) {
     }
   });
 
-  // Toast xác nhận
+  // Toast
   var bg = BACKGROUNDS.find(function(b) { return b.id === bgId; });
   if (typeof showTaskToast === 'function' && bg) {
     showTaskToast('🎨 Đã đổi nền', bg.label);
@@ -150,15 +159,30 @@ function pickBackground(bgId) {
 }
 
 // Init — Load background khi khởi động
+var _bgInitDone = false;
+
 function initBackground() {
-  // Ưu tiên: state.preferences → localStorage → default
+  // ✅ Chỉ chạy 1 lần duy nhất trong session
+  if (_bgInitDone) return;
+  
   var savedBg = (state.preferences && state.preferences.background)
     || localStorage.getItem('ws_background')
     || 'bg-default';
 
+  // ✅ KHÔNG truyền save → không ghi Firestore
   applyBackground(savedBg);
+
+  _bgInitDone = true;
   console.log('🎨 Background loaded:', savedBg);
 }
+
+// Cho phép reset nếu user logout/login
+function resetBackgroundInit() {
+  _bgInitDone = false;
+}
+
+window.ww = window.ww || {};
+window.ww.resetBackgroundInit = resetBackgroundInit;
 
 // Expose
 window.ww = window.ww || {};
