@@ -87,7 +87,6 @@ window.resetFirebaseConfig = resetFirebaseConfig;
 
 window.switchTab = switchTab;
 window.toggleSidebar = toggleSidebar;
-window.toggleTheme = toggleTheme;
 window.toggleSound = toggleSound;
 window.setPriorityFilter = setPriorityFilter;
 window.cyclePriority = cyclePriority;
