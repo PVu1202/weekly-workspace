@@ -482,20 +482,84 @@ function handleBgFileUpload(file) {
     return;
   }
   
+  if (!firebase.user) {
+    Swal.fire({ icon: 'warning', title: 'Cần đăng nhập', text: 'Đăng nhập để lưu nền của bạn', background: '#1a1b2e', color: '#fff' });
+    return;
+  }
+  
   if (typeof showTaskToast === 'function') {
     showTaskToast('📷 Đang xử lý ảnh...', 'Vui lòng đợi');
   }
   
+  // ═══ 1. NÉN ẢNH ═══
   compressImage(file).then(function(dataUrl) {
-    updateCustomPreview(dataUrl);
-    _customBgData = { url: dataUrl, overlay: 0.65, source: 'upload' };
     if (typeof showTaskToast === 'function') {
-      showTaskToast('✅ Đã nạp ảnh', 'Bấm "Áp dụng" để đặt làm nền');
+      showTaskToast('☁️ Đang tải lên cloud...', 'Đang sync cho mọi máy');
+    }
+    
+    // ═══ 2. UPLOAD LÊN FIREBASE STORAGE ═══
+    return uploadBgToStorage(dataUrl);
+    
+  }).then(function(downloadUrl) {
+    // ═══ 3. LƯU URL + APPLY ═══
+    _customBgData = { 
+      url: downloadUrl, 
+      overlay: 0.65, 
+      source: 'firebase-storage' 
+    };
+    updateCustomPreview(downloadUrl);
+    
+    if (typeof showTaskToast === 'function') {
+      showTaskToast('✅ Đã tải lên', 'Bấm "Áp dụng" để đặt làm nền');
     }
   }).catch(function(err) {
-    console.error('Compress error:', err);
-    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không xử lý được ảnh', background: '#1a1b2e', color: '#fff' });
+    console.error('Upload error:', err);
+    Swal.fire({ 
+      icon: 'error', 
+      title: 'Lỗi upload', 
+      text: err.message || 'Không upload được ảnh', 
+      background: '#1a1b2e', 
+      color: '#fff' 
+    });
   });
+}
+
+// ═══ UPLOAD ẢNH LÊN FIREBASE STORAGE ═══
+function uploadBgToStorage(dataUrl) {
+  return new Promise(function(resolve, reject) {
+    if (!firebase.storage || !firebase.ref || !firebase.uploadBytes || !firebase.getDownloadURL) {
+      reject(new Error('Firebase Storage chưa sẵn sàng'));
+      return;
+    }
+    
+    var uid = firebase.user.uid;
+    var timestamp = Date.now();
+    var filename = 'backgrounds/' + uid + '/bg_' + timestamp + '.jpg';
+    
+    // Convert dataUrl → Blob
+    fetch(dataUrl)
+      .then(function(res) { return res.blob(); })
+      .then(function(blob) {
+        var storageRef = firebase.ref(firebase.storage, filename);
+        return firebase.uploadBytes(storageRef, blob);
+      })
+      .then(function(snapshot) {
+        return firebase.getDownloadURL(snapshot.ref);
+      })
+      .then(function(url) {
+        // Xóa ảnh cũ để tiết kiệm storage (giữ 2 ảnh gần nhất)
+        cleanupOldBackgrounds();
+        resolve(url);
+      })
+      .catch(reject);
+  });
+}
+
+// ═══ DỌN ẢNH CŨ (giữ 2 gần nhất) ═══
+function cleanupOldBackgrounds() {
+  // Tạm thời bỏ qua — có thể implement sau với Firebase Storage list API
+  // Cần dùng storageMod.listAll để list files
+  console.log('🧹 Cleanup: bỏ qua (cần list API)');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -535,13 +599,8 @@ function useBgUrl() {
   if (!input) return;
   var url = input.value.trim();
   
-  if (!url) {
-    Swal.fire({ icon: 'warning', title: 'Chưa có URL', text: 'Vui lòng nhập URL ảnh', background: '#1a1b2e', color: '#fff' });
-    return;
-  }
-  
-  if (!/^https?:\/\//i.test(url)) {
-    Swal.fire({ icon: 'error', title: 'URL không hợp lệ', text: 'URL phải bắt đầu bằng http:// hoặc https://', background: '#1a1b2e', color: '#fff' });
+  if (!url || !/^https?:\/\//i.test(url)) {
+    Swal.fire({ icon: 'error', title: 'URL không hợp lệ', background: '#1a1b2e', color: '#fff' });
     return;
   }
   
@@ -554,7 +613,7 @@ function useBgUrl() {
     }
   };
   testImg.onerror = function() {
-    Swal.fire({ icon: 'error', title: 'Không tải được ảnh', text: 'URL có thể bị chặn hoặc ảnh không tồn tại', background: '#1a1b2e', color: '#fff' });
+    Swal.fire({ icon: 'error', title: 'Không tải được ảnh', text: 'URL có thể bị chặn', background: '#1a1b2e', color: '#fff' });
   };
   testImg.src = url;
 }
@@ -572,30 +631,36 @@ function applyCustomBg() {
   var slider = document.getElementById('bgOverlaySlider');
   if (slider) _customBgData.overlay = parseFloat(slider.value);
   
-  if (!saveCustomBg(_customBgData)) return;
+  // Lưu local
+  saveCustomBg(_customBgData);
   
   try {
     localStorage.setItem('ws_background', 'bg-custom');
     localStorage.setItem('ws_custom_overlay', String(_customBgData.overlay));
   } catch(e) {}
   
-  // Xóa preset bg
+  // ✅ SYNC LÊN FIRESTORE — quan trọng để máy khác load
+  if (!state.preferences) state.preferences = {};
+  state.preferences.background = 'bg-custom';
+  state.preferences.customBgUrl = _customBgData.url;
+  state.preferences.customBgOverlay = _customBgData.overlay;
+  state.preferences.customBgSource = _customBgData.source;
+  
+  if (typeof saveStateToFirestore === 'function') {
+    saveStateToFirestore();
+  }
+  
+  // Apply DOM
   BACKGROUNDS.forEach(function(b) {
     document.body.classList.remove(b.id);
     document.documentElement.classList.remove(b.id);
   });
-  
   document.body.classList.add('bg-custom');
   document.documentElement.classList.add('bg-custom');
   applyCustomBgToDOM(_customBgData);
   
-  if (!state.preferences) state.preferences = {};
-  state.preferences.background = 'bg-custom';
-  state.preferences.customOverlay = _customBgData.overlay;
-  
-  if (typeof saveStateToFirestore === 'function') saveStateToFirestore();
   if (typeof showTaskToast === 'function') {
-    showTaskToast('🎨 Đã áp dụng nền', 'Nền tùy chỉnh đã kích hoạt');
+    showTaskToast('🎨 Đã áp dụng nền', 'Sync mọi máy cùng account');
   }
 }
 

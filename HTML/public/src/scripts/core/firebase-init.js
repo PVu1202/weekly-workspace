@@ -10,6 +10,7 @@
     var authMod = await import("https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js");
     var fsMod   = await import("https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js");
     var aiMod   = await import("https://www.gstatic.com/firebasejs/11.8.0/firebase-ai.js");
+    var storageMod = await import("https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js");
 
     firestoreSdk.doc = fsMod.doc;
     firestoreSdk.setDoc = fsMod.setDoc;
@@ -37,10 +38,13 @@
 
     var auth = authMod.getAuth(app);
     var db = fsMod.getFirestore(app);
+    var storage = storageMod.getStorage(app);
+
 
     firebase.app = app;
     firebase.auth = auth;
     firebase.db = db;
+    firebase.storage = storage;
     firebase.signInEmail = authMod.signInWithEmailAndPassword;
     firebase.createUser = authMod.createUserWithEmailAndPassword;
     firebase.signInPopup = authMod.signInWithPopup;

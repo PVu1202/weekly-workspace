@@ -14,9 +14,9 @@ function saveStateToFirestore() {
     gamification: state.gamification || {},
     preferences: {
       background: localStorage.getItem('ws_background') || 'bg-default',
-      customOverlay: state.preferences?.customOverlay,
-      customBgUrl: state.preferences?.customBgUrl || null,     // ✅ THÊM
-      customBgSource: state.preferences?.customBgSource || null // ✅ THÊM
+    customBgUrl: state.preferences?.customBgUrl || null,        // ✅ THÊM
+    customBgOverlay: state.preferences?.customBgOverlay || null, // ✅ THÊM
+    customBgSource: state.preferences?.customBgSource || null
     },
     updatedAt: new Date().toISOString()
 }, { merge: true }).catch(function(err) {
@@ -52,25 +52,35 @@ function subscribeUserData(uid) {
         }
         // ═══ MERGE PREFERENCES — không override hoàn toàn ═══
         if (d.preferences && typeof d.preferences === 'object') {
-          // Merge preferences
           state.preferences = Object.assign({}, state.preferences, d.preferences);
           
-          // ✅ Nếu user chưa có custom bg local nhưng Firestore có URL → dùng URL từ Firestore
-          var localCustomBg = localStorage.getItem('ws_custom_bg');
-          if (!localCustomBg && d.preferences.customBgUrl && d.preferences.customBgSource === 'url') {
-            var remoteData = {
-              url: d.preferences.customBgUrl,
-              overlay: d.preferences.customOverlay || 0.65,
-              source: 'url'
+          // ✅ SYNC CUSTOM BG TỪ FIRESTORE → LOCAL
+          var localBg = localStorage.getItem('ws_background');
+          var remoteBg = d.preferences.background;
+          var remoteUrl = d.preferences.customBgUrl;
+          var remoteOverlay = d.preferences.customBgOverlay || 0.65;
+          
+          // Nếu đang dùng custom bg VÀ có URL trên Firestore
+          if (remoteBg === 'bg-custom' && remoteUrl) {
+            // Lưu vào localStorage để máy này dùng luôn
+            var customData = {
+              url: remoteUrl,
+              overlay: remoteOverlay,
+              source: d.preferences.customBgSource || 'firebase-storage'
             };
-            localStorage.setItem('ws_custom_bg', JSON.stringify(remoteData));
-            localStorage.setItem('ws_custom_url', remoteData.url);
-            localStorage.setItem('ws_custom_overlay', String(remoteData.overlay));
-            localStorage.setItem('ws_background', 'bg-custom');
-            console.log('📥 Đã đồng bộ custom URL từ Firestore');
+            try {
+              localStorage.setItem('ws_custom_bg', JSON.stringify(customData));
+              localStorage.setItem('ws_custom_url', remoteUrl);
+              localStorage.setItem('ws_custom_overlay', String(remoteOverlay));
+              localStorage.setItem('ws_background', 'bg-custom');
+              
+              _customBgData = customData;  // Nếu biến tồn tại
+              console.log('📥 Đã sync custom bg từ Firestore');
+            } catch(e) {
+              console.warn('Sync custom bg failed:', e);
+            }
           }
         }
-        
         
         // ✅ Update UI sau khi load
         if (typeof updateGamificationDisplay === 'function') {
