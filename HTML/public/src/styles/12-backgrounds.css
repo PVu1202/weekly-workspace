@@ -204,3 +204,353 @@ body,
   inset: 0;
   z-index: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOM BACKGROUND — User tự thêm
+   ═══════════════════════════════════════════════════════════════ */
+
+body.bg-custom {
+  background-color: #08080c !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  position: relative;
+}
+
+/* Overlay tối để text đọc được */
+body.bg-custom::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, var(--custom-overlay, 0.65));
+  pointer-events: none;
+  z-index: 0;
+  transition: background 0.3s ease;
+}
+
+/* Đảm bảo content nằm trên overlay */
+body.bg-custom #appSidebar,
+body.bg-custom #appMain,
+body.bg-custom #authScreen {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar mờ hơn để thấy background */
+body.bg-custom #appSidebar {
+  background: rgba(8, 8, 12, 0.75) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body.bg-custom #appMain {
+  background: transparent !important;
+}
+
+body.bg-custom header {
+  background: rgba(13, 13, 20, 0.7) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ═══ PICKER TABS ═══ */
+.bg-picker-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.bg-picker-tab {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7d7d8a;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.bg-picker-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.bg-picker-tab.active {
+  background: linear-gradient(135deg, #7c5dfa, #6366f1);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(124, 93, 250, 0.3);
+}
+
+/* ═══ CUSTOM PANEL ═══ */
+.bg-custom-panel {
+  display: none;
+}
+
+.bg-custom-panel.active {
+  display: block;
+}
+
+/* Upload zone */
+.bg-upload-zone {
+  border: 2px dashed rgba(124, 93, 250, 0.3);
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: rgba(124, 93, 250, 0.03);
+  margin-bottom: 12px;
+}
+
+.bg-upload-zone:hover,
+.bg-upload-zone.dragover {
+  border-color: rgba(124, 93, 250, 0.7);
+  background: rgba(124, 93, 250, 0.08);
+  transform: translateY(-2px);
+}
+
+.bg-upload-icon {
+  font-size: 28px;
+  color: #a78bfa;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.bg-upload-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.bg-upload-hint {
+  font-size: 10px;
+  color: #7d7d8a;
+}
+
+/* OR divider */
+.bg-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  font-size: 10px;
+  color: #4b5563;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bg-or-divider::before,
+.bg-or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* URL input */
+.bg-url-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.bg-url-input:focus {
+  border-color: #7c5dfa;
+  box-shadow: 0 0 0 3px rgba(124, 93, 250, 0.15);
+}
+
+/* Overlay slider */
+.bg-overlay-control {
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.bg-overlay-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.bg-overlay-value {
+  color: #a78bfa;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-overlay-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.bg-overlay-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c5dfa, #22d3ee);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(124, 93, 250, 0.4);
+  border: 2px solid #fff;
+}
+
+.bg-overlay-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c5dfa, #22d3ee);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(124, 93, 250, 0.4);
+  border: 2px solid #fff;
+}
+
+/* Preview */
+.bg-preview-box {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: none;
+}
+
+.bg-preview-box.active {
+  display: block;
+}
+
+.bg-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bg-preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, var(--preview-overlay, 0.65));
+  pointer-events: none;
+}
+
+.bg-preview-label {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 10px;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+/* Action buttons */
+.bg-custom-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bg-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.bg-btn-primary {
+  background: linear-gradient(135deg, #7c5dfa, #6366f1);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(124, 93, 250, 0.3);
+}
+
+.bg-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124, 93, 250, 0.4);
+}
+
+.bg-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bg-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #b4b4be;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bg-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Remove custom bg button */
+.bg-remove-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.bg-remove-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
