@@ -206,19 +206,27 @@ body,
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CUSTOM BACKGROUND — User tự thêm
+   CUSTOM BACKGROUND
    ═══════════════════════════════════════════════════════════════ */
 
 body.bg-custom {
   background-color: #08080c !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-attachment: fixed !important;
-  background-repeat: no-repeat !important;
   position: relative;
 }
 
-/* Overlay tối để text đọc được */
+/* ✅ Tắt các lớp phủ của theme cũ để thấy ảnh nền */
+body.bg-custom #appMain::before,
+body.bg-custom #appMain::after {
+  display: none !important;
+  content: none !important;
+}
+
+body.bg-custom #appMain {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Overlay tối trên ảnh nền — nằm dưới content */
 body.bg-custom::before {
   content: '';
   position: fixed;
@@ -229,7 +237,7 @@ body.bg-custom::before {
   transition: background 0.3s ease;
 }
 
-/* Đảm bảo content nằm trên overlay */
+/* Content phải nổi lên trên overlay */
 body.bg-custom #appSidebar,
 body.bg-custom #appMain,
 body.bg-custom #authScreen {
@@ -237,22 +245,21 @@ body.bg-custom #authScreen {
   z-index: 1;
 }
 
-/* Sidebar mờ hơn để thấy background */
+/* Sidebar trong suốt để thấy nền */
 body.bg-custom #appSidebar {
-  background: rgba(8, 8, 12, 0.75) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(8, 8, 12, 0.7) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-body.bg-custom #appMain {
-  background: transparent !important;
-}
-
+/* Header trong suốt */
 body.bg-custom header {
-  background: rgba(13, 13, 20, 0.7) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 13, 20, 0.65) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
+
 
 /* ═══ PICKER TABS ═══ */
 .bg-picker-tabs {

@@ -132,16 +132,44 @@ function getCurrentBackground() {
 function applyCustomBgToDOM(data) {
   if (!data || !data.url) return;
   
-  document.body.style.backgroundImage = 'url("' + data.url + '")';
+  // ✅ Dùng priority 'important' để override CSS !important
+  document.body.style.setProperty(
+    'background-image', 
+    'url("' + data.url + '")', 
+    'important'                    // ← CHÌA KHÓA Ở ĐÂY
+  );
+  document.body.style.setProperty(
+    'background-size', 
+    'cover', 
+    'important'
+  );
+  document.body.style.setProperty(
+    'background-position', 
+    'center', 
+    'important'
+  );
+  document.body.style.setProperty(
+    'background-attachment', 
+    'fixed', 
+    'important'
+  );
+  document.body.style.setProperty(
+    'background-repeat', 
+    'no-repeat', 
+    'important'
+  );
   document.body.style.setProperty('--custom-overlay', data.overlay || 0.65);
 }
 
 // ═══ CLEAR CUSTOM BG FROM DOM ═══
 function clearCustomBgFromDOM() {
-  document.body.style.backgroundImage = '';
+  document.body.style.removeProperty('background-image');
+  document.body.style.removeProperty('background-size');
+  document.body.style.removeProperty('background-position');
+  document.body.style.removeProperty('background-attachment');
+  document.body.style.removeProperty('background-repeat');
   document.body.style.removeProperty('--custom-overlay');
 }
-
 // ═══ NÉN ẢNH UPLOAD ═══
 function compressImage(file, maxWidth, quality) {
   return new Promise(function(resolve, reject) {
