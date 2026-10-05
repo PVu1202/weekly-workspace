@@ -9,7 +9,7 @@ var HELP_CONTENT = {
     color: 'violet',
     title: 'Chia Nhỏ Nhiệm Vụ',
     subtitle: 'Biến mục tiêu lớn thành các bước nhỏ dễ làm',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%237c5dfa"/><stop offset="100%" stop-color="%2322d3ee"/></linearGradient></defs><rect x="10" y="20" width="180" height="16" rx="4" fill="url(%23g1)" opacity="0.9"/><circle cx="26" cy="28" r="4" fill="white"/><rect x="40" y="24" width="80" height="3" rx="1.5" fill="white" opacity="0.9"/><rect x="40" y="30" width="50" height="2" rx="1" fill="white" opacity="0.5"/><rect x="10" y="48" width="180" height="16" rx="4" fill="%231a1b2e" stroke="%237c5dfa" stroke-width="1" opacity="0.9"/><circle cx="26" cy="56" r="4" fill="%2310b981"/><path d="M24 56 L25.5 58 L28.5 55" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/><rect x="40" y="52" width="80" height="3" rx="1.5" fill="%23a78bfa" opacity="0.9"/><rect x="10" y="76" width="180" height="16" rx="4" fill="%231a1b2e" stroke="%2322d3ee" stroke-width="1" opacity="0.9"/><circle cx="26" cy="84" r="4" fill="%2322d3ee"/><path d="M24 84 L25.5 86 L28.5 83" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/><rect x="40" y="80" width="80" height="3" rx="1.5" fill="%2367e8f9" opacity="0.9"/></svg>',
+    illustration: '/assets/help/chia-nho.png',
     sections: [
       { title: '📌 Thêm mục tiêu', content: 'Nhập tên mục tiêu lớn (VD: "Làm website"), chọn số giờ dự kiến, thứ trong tuần, độ ưu tiên và deadline (nếu có). Bấm **Thêm** để tạo.' },
       { title: '✅ Tick hoàn thành', content: 'Mỗi mục tiêu có các **bước nhỏ** (subtask). Tick vào ô vuông để đánh dấu hoàn thành. Khi hoàn thành tất cả → **bắn confetti** 🎉' },
@@ -24,7 +24,7 @@ var HELP_CONTENT = {
     color: 'blue',
     title: 'Lịch Tuần 7 Ngày',
     subtitle: 'Xem tổng quan công việc cả tuần',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><rect x="10" y="15" width="180" height="90" rx="8" fill="%231a1b2e" stroke="%233b82f6" stroke-width="1" opacity="0.9"/><rect x="10" y="15" width="180" height="14" rx="8" fill="%233b82f6" opacity="0.3"/><line x1="37" y1="15" x2="37" y2="105" stroke="white" stroke-opacity="0.1"/><line x1="64" y1="15" x2="64" y2="105" stroke="white" stroke-opacity="0.1"/><line x1="91" y1="15" x2="91" y2="105" stroke="white" stroke-opacity="0.1"/><line x1="118" y1="15" x2="118" y2="105" stroke="white" stroke-opacity="0.1"/><line x1="145" y1="15" x2="145" y2="105" stroke="white" stroke-opacity="0.1"/><line x1="172" y1="15" x2="172" y2="105" stroke="white" stroke-opacity="0.1"/><rect x="14" y="35" width="20" height="18" rx="3" fill="%233b82f6" opacity="0.6"/><rect x="41" y="35" width="20" height="18" rx="3" fill="%2322d3ee" opacity="0.6"/><rect x="68" y="55" width="20" height="18" rx="3" fill="%237c5dfa" opacity="0.6"/><rect x="95" y="35" width="20" height="18" rx="3" fill="%233b82f6" opacity="0.6"/><rect x="122" y="55" width="20" height="18" rx="3" fill="%2310b981" opacity="0.6"/><rect x="149" y="35" width="20" height="18" rx="3" fill="%23fbbf24" opacity="0.6"/><rect x="149" y="75" width="20" height="18" rx="3" fill="%23ec4899" opacity="0.6"/></svg>',
+    illustration: '/assets/help/lich-tuan.png',
     sections: [
       { title: '📅 Cột theo thứ', content: '7 cột tương ứng 7 ngày. Mỗi cột hiển thị các task của ngày đó + % hoàn thành.' },
       { title: '🖱️ Click vào task', content: 'Click vào task trong lịch → **tự chuyển** sang tab "Chia Nhỏ" và chọn đúng ngày đó.' },
@@ -37,7 +37,7 @@ var HELP_CONTENT = {
     color: 'cyan',
     title: 'Thời Gian & Pomodoro',
     subtitle: 'Quản lý thời gian làm việc theo kỹ thuật Pomodoro',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2322d3ee"/><stop offset="100%" stop-color="%237c5dfa"/></linearGradient></defs><circle cx="100" cy="60" r="42" fill="%231a1b2e" stroke="url(%23g2)" stroke-width="4"/><circle cx="100" cy="60" r="36" fill="none" stroke="%2322d3ee" stroke-width="2" opacity="0.3"/><path d="M 100 60 L 100 32" stroke="%2322d3ee" stroke-width="3" stroke-linecap="round"/><path d="M 100 60 L 120 72" stroke="%237c5dfa" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="60" r="4" fill="%2322d3ee"/><text x="100" y="110" text-anchor="middle" font-family="monospace" font-size="14" font-weight="bold" fill="%2367e8f9">25:00</text><rect x="72" y="8" width="56" height="6" rx="3" fill="%2322d3ee" opacity="0.5"/></svg>',
+    illustration: '/assets/help/pomodoro.png',
     sections: [
       { title: '▶️ Bắt đầu', content: 'Bấm **Bắt Đầu** → đồng hồ đếm ngược từ **25:00**. Bấm **Tạm Dừng** để dừng tạm thời.' },
       { title: '🔄 Đặt lại', content: 'Bấm **Đặt Lại** để reset về 25:00 và dừng timer.' },
@@ -50,7 +50,7 @@ var HELP_CONTENT = {
     color: 'fuchsia',
     title: 'AI Coach',
     subtitle: 'Trợ lý AI giúp bạn tập trung và productive hơn',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><defs><radialGradient id="g3"><stop offset="0%" stop-color="%23d946ef" stop-opacity="0.4"/><stop offset="100%" stop-color="%23d946ef" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="60" r="55" fill="url(%23g3)"/><rect x="70" y="30" width="60" height="60" rx="12" fill="%231a1b2e" stroke="%23d946ef" stroke-width="2"/><circle cx="88" cy="52" r="5" fill="%23d946ef"/><circle cx="112" cy="52" r="5" fill="%23d946ef"/><rect x="85" y="68" width="30" height="3" rx="1.5" fill="%23d946ef" opacity="0.6"/><line x1="100" y1="30" x2="100" y2="20" stroke="%23d946ef" stroke-width="2" stroke-linecap="round"/><circle cx="100" cy="17" r="3" fill="%23fbbf24"/><rect x="78" y="15" width="8" height="2" rx="1" fill="%23a78bfa" opacity="0.6"/><rect x="114" y="15" width="8" height="2" rx="1" fill="%23a78bfa" opacity="0.6"/></svg>',
+    illustration: '/assets/help/ai-coach.png',
     sections: [
       { title: '🤖 Gợi ý AI', content: 'Bấm **"AI gợi ý cho tôi"** → AI phân tích task chưa xong và đề xuất nên làm gì trước.' },
       { title: '📅 Việc hôm nay', content: 'Danh sách task cần xử lý **hôm nay** và các ngày tới hạn. Task quá hạn có viền đỏ.' },
@@ -62,7 +62,7 @@ var HELP_CONTENT = {
     color: 'amber',
     title: 'Thống Kê',
     subtitle: 'Theo dõi tiến độ và thành tích của bạn',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><rect x="15" y="15" width="80" height="40" rx="6" fill="%231a1b2e" stroke="%23fbbf24" stroke-width="1"/><rect x="22" y="28" width="30" height="4" rx="2" fill="%23fbbf24"/><rect x="22" y="38" width="55" height="8" rx="2" fill="%23fbbf24" opacity="0.4"/><rect x="105" y="15" width="80" height="40" rx="6" fill="%231a1b2e" stroke="%2310b981" stroke-width="1"/><rect x="112" y="28" width="30" height="4" rx="2" fill="%2310b981"/><rect x="112" y="38" width="55" height="8" rx="2" fill="%2310b981" opacity="0.4"/><rect x="15" y="65" width="170" height="45" rx="6" fill="%231a1b2e" stroke="%2322d3ee" stroke-width="1"/><polyline points="25,100 45,85 65,92 85,75 105,80 125,68 145,72 165,60" stroke="%2322d3ee" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="165" cy="60" r="3" fill="%2322d3ee"/><circle cx="45" cy="85" r="2" fill="%2322d3ee"/><circle cx="85" cy="75" r="2" fill="%2322d3ee"/></svg>',
+    illustration: '/assets/help/thong-ke.png',
     sections: [
       { title: '📊 4 chỉ số chính', content: '**Tổng mục tiêu** • **Giờ đã làm** • **Tỷ lệ hoàn thành** • **Chuỗi ngày** (streak).' },
       { title: '📈 Biểu đồ tuần', content: 'Đường cong tiến độ **7 tuần gần nhất** — so sánh tuần này với các tuần trước.' },
@@ -75,7 +75,7 @@ var HELP_CONTENT = {
     color: 'emerald',
     title: 'Nhìn Lại Cuối Tuần',
     subtitle: 'Reflection — Đánh giá bản thân sau mỗi tuần',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><rect x="30" y="15" width="140" height="90" rx="8" fill="%231a1b2e" stroke="%2310b981" stroke-width="1.5"/><rect x="50" y="8" width="20" height="14" rx="3" fill="%2310b981"/><rect x="130" y="8" width="20" height="14" rx="3" fill="%2310b981"/><line x1="50" y1="45" x2="150" y2="45" stroke="%23ffffff" stroke-opacity="0.1"/><circle cx="60" cy="35" r="5" fill="%2310b981" opacity="0.4"/><rect x="72" y="32" width="70" height="3" rx="1.5" fill="%23ffffff" opacity="0.5"/><circle cx="60" cy="58" r="5" fill="%2310b981" opacity="0.4"/><rect x="72" y="55" width="60" height="3" rx="1.5" fill="%23ffffff" opacity="0.5"/><circle cx="60" cy="81" r="5" fill="%23fbbf24" opacity="0.6"/><rect x="72" y="78" width="75" height="3" rx="1.5" fill="%23ffffff" opacity="0.5"/><path d="M 140 92 L 145 96 L 152 88" stroke="%2310b981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    illustration: '/assets/help/nhin-lai.png',
     sections: [
       { title: '🏆 Top 3 thành tựu', content: 'Ghi lại **3 điều bạn làm tốt nhất** tuần này.' },
       { title: '⚠️ Khó khăn', content: 'Điều gì **cản trở** bạn? (VD: trì hoãn, thiếu thời gian...)' },
@@ -90,7 +90,7 @@ var HELP_CONTENT = {
     color: 'purple',
     title: 'Thanh Điều Hướng',
     subtitle: 'Các công cụ bên sidebar',
-    illustration: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><rect x="10" y="10" width="70" height="100" rx="6" fill="%231a1b2e" stroke="%237c5dfa" stroke-width="1.5"/><circle cx="30" cy="25" r="5" fill="%237c5dfa"/><rect x="42" y="22" width="30" height="6" rx="2" fill="%237c5dfa" opacity="0.6"/><rect x="20" y="42" width="50" height="14" rx="4" fill="%23fbbf24" opacity="0.4"/><text x="45" y="52" text-anchor="middle" font-family="sans-serif" font-size="7" font-weight="bold" fill="%23fbbf24">Lv 5</text><rect x="18" y="66" width="54" height="8" rx="3" fill="%237c5dfa" opacity="0.6"/><rect x="18" y="80" width="54" height="8" rx="3" fill="%233b82f6" opacity="0.6"/><rect x="18" y="94" width="54" height="8" rx="3" fill="%2310b981" opacity="0.6"/><rect x="90" y="10" width="100" height="100" rx="6" fill="%231a1b2e" stroke="%237c5dfa" stroke-width="0.5"/><rect x="100" y="25" width="80" height="20" rx="4" fill="%237c5dfa" opacity="0.2"/><rect x="100" y="55" width="80" height="20" rx="4" fill="%237c5dfa" opacity="0.2"/><rect x="100" y="85" width="80" height="15" rx="4" fill="%237c5dfa" opacity="0.2"/></svg>',
+    illustration: '/assets/help/sidebar.png',
     sections: [
       { title: '🕐 Chọn Tuần', content: 'Nút **◀ ▶** chuyển tuần trước/sau. **Ô giữa** hiển thị tuần hiện tại. Bấm **"Về tuần hiện tại"** để quay về tuần này.' },
       { title: '🏆 Player Card', content: 'Hiển thị **Level** và **XP**. Càng làm nhiều task, càng nhận nhiều XP → lên level.' },
@@ -123,15 +123,28 @@ function openHelpModal(sectionKey) {
   }).join('');
 
   // ✅ Hiển thị ảnh minh họa nếu có
-  var illustrationHtml = content.illustration
-    ? '<div style="text-align:center;margin:12px 0">' +
+var illustrationHtml = content.illustration
+  ? '<div style="margin:12px 0;text-align:center">' +
+      '<div style="display:inline-block;position:relative;border-radius:12px;overflow:hidden;' +
+                  'border:1px solid rgba(124,93,250,0.25);' +
+                  'box-shadow:0 8px 30px rgba(0,0,0,0.4);cursor:zoom-in;' +
+                  'transition:transform 0.2s ease" ' +
+           'onclick="ww.zoomHelpImage(\'' + content.illustration + '\', \'' + content.title + '\')" ' +
+           'onmouseover="this.style.transform=\'scale(1.02)\';this.style.borderColor=\'rgba(124,93,250,0.5)\'" ' +
+           'onmouseout="this.style.transform=\'scale(1)\';this.style.borderColor=\'rgba(124,93,250,0.25)\'">' +
         '<img src="' + content.illustration + '" ' +
              'alt="' + content.title + '" ' +
-             'style="width:100%;max-width:380px;height:auto;border-radius:12px;' +
-                    'border:1px solid rgba(124,93,250,0.2);' +
-                    'box-shadow:0 8px 30px rgba(0,0,0,0.3)">' +
-      '</div>'
-    : '';
+             'style="display:block;width:100%;max-width:440px;max-height:200px;' +
+                    'object-fit:cover;object-position:top center">' +
+        '<div style="position:absolute;bottom:6px;right:6px;padding:3px 8px;' +
+                    'background:rgba(19,19,29,0.9);border:1px solid rgba(124,93,250,0.3);' +
+                    'border-radius:6px;font-size:9px;color:#a78bfa;font-weight:600;' +
+                    'backdrop-filter:blur(8px)">' +
+          '<i class="fa-solid fa-expand"></i> Click để xem lớn' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  : '';
 
   Swal.fire({
     title: '',
@@ -410,5 +423,36 @@ window.ww.resetOnboarding = function() {
     color: '#fff'
   });
 };
+
+
+// ═══ ZOOM HELP IMAGE ═══
+function zoomHelpImage(src, title) {
+  Swal.fire({
+    title: '',
+    html:
+      '<div style="text-align:center">' +
+        '<div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">' + title + '</div>' +
+        '<img src="' + src + '" style="max-width:100%;height:auto;border-radius:12px;' +
+             'border:1px solid rgba(124,93,250,0.3);box-shadow:0 12px 40px rgba(0,0,0,0.5)">' +
+      '</div>',
+    showConfirmButton: false,
+    showCloseButton: true,
+    background: '#1a1b2e',
+    color: '#fff',
+    width: 'auto',
+    padding: '1.5em',
+    allowOutsideClick: true,
+    allowEscapeKey: true,
+    customClass: {
+      popup: 'help-zoom-popup'
+    }
+  });
+}
+
+// Expose
+window.ww = window.ww || {};
+window.ww.zoomHelpImage = zoomHelpImage;
+
+
 
 console.log('✅ ui/help.js loaded');
