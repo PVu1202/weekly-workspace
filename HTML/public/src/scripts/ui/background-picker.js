@@ -22,6 +22,12 @@ function saveCustomBg(data) {
   _customBgData = data;
   try {
     localStorage.setItem('ws_custom_bg', JSON.stringify(data));
+    
+    // ✅ Lưu riêng để early script đọc được
+    if (data && data.url) {
+      localStorage.setItem('ws_custom_url', data.url);
+      localStorage.setItem('ws_custom_overlay', String(data.overlay || 0.65));
+    }
   } catch(e) { 
     console.warn('Save custom bg failed:', e);
     if (typeof showTaskToast === 'function') {
@@ -82,10 +88,17 @@ function applyBackground(bgId, options) {
   options = options || {};
   var save = options.save === true;   // ⚠️ Mặc định KHÔNG LƯU
 
-      // ✅ Xóa custom bg nếu đang bật
+  // ✅ Xóa custom bg nếu đang bật
   if (document.body.classList.contains('bg-custom')) {
     document.body.classList.remove('bg-custom');
+    document.documentElement.classList.remove('bg-custom');
     clearCustomBgFromDOM();
+    try {
+      localStorage.removeItem('ws_custom_url');
+      localStorage.removeItem('ws_custom_overlay');
+      var earlyStyle = document.getElementById('early-bg-style');
+      if (earlyStyle) earlyStyle.remove();
+    } catch(e) {}
   }
 
 
@@ -103,10 +116,12 @@ function applyBackground(bgId, options) {
   // Xóa tất cả class bg-* cũ
   allBgIds.forEach(function(id) {
     document.body.classList.remove(id);
+    document.documentElement.classList.remove(id);
   });
 
   // Thêm class mới
   document.body.classList.add(bgId);
+  document.documentElement.classList.add(bgId);
 
   // Lưu vào state + localStorage
   if (!state.preferences) state.preferences = {};
@@ -129,36 +144,45 @@ function getCurrentBackground() {
 }
 
 // ═══ APPLY CUSTOM BG TO DOM ═══
-function applyCustomBgToDOM(data) {
-  if (!data || !data.url) return;
+function applyCustomBg() {
+  if (!_customBgData || !_customBgData.url) {
+    Swal.fire({ icon: 'warning', title: 'Chưa có ảnh', text: 'Vui lòng chọn ảnh hoặc nhập URL trước', background: '#1a1b2e', color: '#fff' });
+    return;
+  }
   
-  // ✅ Dùng priority 'important' để override CSS !important
-  document.body.style.setProperty(
-    'background-image', 
-    'url("' + data.url + '")', 
-    'important'                    // ← CHÌA KHÓA Ở ĐÂY
-  );
-  document.body.style.setProperty(
-    'background-size', 
-    'cover', 
-    'important'
-  );
-  document.body.style.setProperty(
-    'background-position', 
-    'center', 
-    'important'
-  );
-  document.body.style.setProperty(
-    'background-attachment', 
-    'fixed', 
-    'important'
-  );
-  document.body.style.setProperty(
-    'background-repeat', 
-    'no-repeat', 
-    'important'
-  );
-  document.body.style.setProperty('--custom-overlay', data.overlay || 0.65);
+  var slider = document.getElementById('bgOverlaySlider');
+  if (slider) _customBgData.overlay = parseFloat(slider.value);
+  
+  saveCustomBg(_customBgData);
+  
+  // ✅ Lưu background chọn + overlay
+  try {
+    localStorage.setItem('ws_background', 'bg-custom');
+    localStorage.setItem('ws_custom_overlay', String(_customBgData.overlay));
+  } catch(e) {}
+  
+  // Xóa class bg-* cũ trên html + body
+  BACKGROUNDS.forEach(function(b) {
+    document.body.classList.remove(b.id);
+    document.documentElement.classList.remove(b.id);
+  });
+  document.body.classList.remove('bg-custom');
+  document.documentElement.classList.remove('bg-custom');
+  
+  // Apply custom
+  document.body.classList.add('bg-custom');
+  document.documentElement.classList.add('bg-custom');
+  applyCustomBgToDOM(_customBgData);
+  
+  // Update state
+  if (!state.preferences) state.preferences = {};
+  state.preferences.background = 'bg-custom';
+  state.preferences.customOverlay = _customBgData.overlay;
+  
+  if (typeof saveStateToFirestore === 'function') saveStateToFirestore();
+  if (typeof showTaskToast === 'function') {
+    showTaskToast('🎨 Đã áp dụng nền', 'Nền tùy chỉnh đã kích hoạt');
+  }
 }
 
 // ═══ CLEAR CUSTOM BG FROM DOM ═══
@@ -169,7 +193,13 @@ function clearCustomBgFromDOM() {
   document.body.style.removeProperty('background-attachment');
   document.body.style.removeProperty('background-repeat');
   document.body.style.removeProperty('--custom-overlay');
+  
+  // ✅ Xóa inline style sớm ở <head>
+  var earlyStyle = document.getElementById('early-bg-style');
+  if (earlyStyle) earlyStyle.remove();
 }
+
+
 // ═══ NÉN ẢNH UPLOAD ═══
 function compressImage(file, maxWidth, quality) {
   return new Promise(function(resolve, reject) {

@@ -66,6 +66,40 @@
   <link rel="stylesheet" href="/src/styles/10-animations.css">
   <link rel="stylesheet" href="/src/styles/11-light-mode.css">
   <link rel="stylesheet" href="/src/styles/12-backgrounds.css">
+
+  <!-- ═══ EARLY BACKGROUND LOADER — Chạy trước body ═══ -->
+<script>
+(function() {
+  try {
+    var bg = localStorage.getItem('ws_background') || 'bg-default';
+    var overlay = localStorage.getItem('ws_custom_overlay') || '0.65';
+    var customUrl = localStorage.getItem('ws_custom_url');
+    
+    // Thêm class bg-* vào <html> ngay lập tức
+    document.documentElement.classList.add(bg);
+    
+    if (bg === 'bg-custom' && customUrl) {
+      // Apply inline ngay — không cần đợi body
+      var style = document.createElement('style');
+      style.id = 'early-bg-style';
+      style.textContent = 
+        'html.bg-custom, body.bg-custom {' +
+          'background-image: url("' + customUrl + '") !important;' +
+          'background-size: cover !important;' +
+          'background-position: center !important;' +
+          'background-attachment: fixed !important;' +
+          'background-repeat: no-repeat !important;' +
+          'background-color: #08080c !important;' +
+          '--custom-overlay: ' + overlay + ';' +
+        '}';
+      document.head.appendChild(style);
+    }
+  } catch(e) {
+    // Nếu lỗi → không làm gì, để JS chính xử lý
+    console.warn('Early bg load failed:', e);
+  }
+})();
+</script>
 </head>
 <body class="h-screen flex overflow-hidden text-gray-200">
 
