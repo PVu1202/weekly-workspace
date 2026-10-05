@@ -113,12 +113,18 @@ function saveCustomBg(data) {
       localStorage.setItem('ws_custom_url', data.url);
       localStorage.setItem('ws_custom_overlay', String(data.overlay || 0.65));
     }
-    return true;
-  } catch(e) { 
-    console.warn('Save custom bg failed:', e);
-    if (typeof showTaskToast === 'function') {
-      showTaskToast('⚠️ Không lưu được', 'Ảnh quá lớn, chọn ảnh nhỏ hơn');
+    
+    // ✅ THÊM: Sync URL lên Firestore (chỉ nếu source = 'url')
+    if (data && data.source === 'url' && typeof saveStateToFirestore === 'function') {
+      if (!state.preferences) state.preferences = {};
+      state.preferences.customBgUrl = data.url;
+      state.preferences.customBgSource = 'url';
+      state.preferences.customOverlay = data.overlay;
+      saveStateToFirestore();
     }
+    return true;
+  } catch(e) {
+    console.warn('Save custom bg failed:', e);
     return false;
   }
 }

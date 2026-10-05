@@ -8,16 +8,18 @@ function saveStateToFirestore() {
   autoBackupLocal();
   try {
     var ref = firestoreSdk.doc(firebase.db, 'artifacts', appId, 'users', uid, 'userData', 'plannerState');
-    firestoreSdk.setDoc(ref, {
-      goals: state.goals,
-      reviews: state.reviews,
-      gamification: state.gamification || {},
-      preferences: {
-      background: localStorage.getItem('ws_background') || state.preferences?.background || 'bg-default',
-      customOverlay: state.preferences?.customOverlay
+  firestoreSdk.setDoc(ref, {
+    goals: state.goals,
+    reviews: state.reviews,
+    gamification: state.gamification || {},
+    preferences: {
+      background: localStorage.getItem('ws_background') || 'bg-default',
+      customOverlay: state.preferences?.customOverlay,
+      customBgUrl: state.preferences?.customBgUrl || null,     // ✅ THÊM
+      customBgSource: state.preferences?.customBgSource || null // ✅ THÊM
     },
-      updatedAt: new Date().toISOString()
-    }, { merge: true }).catch(function(err) {
+    updatedAt: new Date().toISOString()
+}, { merge: true }).catch(function(err) {
       console.warn('Firestore save error:', err);
       setSyncBadge('error');
     });
@@ -50,22 +52,23 @@ function subscribeUserData(uid) {
         }
         // ═══ MERGE PREFERENCES — không override hoàn toàn ═══
         if (d.preferences && typeof d.preferences === 'object') {
-          // ✅ Ưu tiên localStorage cho background
-          // Chỉ lấy từ Firestore nếu localStorage CHƯA CÓ
-          var localBg = localStorage.getItem('ws_background');
-          if (!localBg || localBg === 'bg-default') {
-            // Máy mới hoặc chưa set → dùng Firestore
-            state.preferences = Object.assign({}, state.preferences, d.preferences);
-          } else {
-            // Máy đã có set → giữ local, không ghi đè background
-            state.preferences = Object.assign({}, d.preferences, {
-              background: localBg,
-              customOverlay: state.preferences.customOverlay || d.preferences.customOverlay
-            });
+          // Merge preferences
+          state.preferences = Object.assign({}, state.preferences, d.preferences);
+          
+          // ✅ Nếu user chưa có custom bg local nhưng Firestore có URL → dùng URL từ Firestore
+          var localCustomBg = localStorage.getItem('ws_custom_bg');
+          if (!localCustomBg && d.preferences.customBgUrl && d.preferences.customBgSource === 'url') {
+            var remoteData = {
+              url: d.preferences.customBgUrl,
+              overlay: d.preferences.customOverlay || 0.65,
+              source: 'url'
+            };
+            localStorage.setItem('ws_custom_bg', JSON.stringify(remoteData));
+            localStorage.setItem('ws_custom_url', remoteData.url);
+            localStorage.setItem('ws_custom_overlay', String(remoteData.overlay));
+            localStorage.setItem('ws_background', 'bg-custom');
+            console.log('📥 Đã đồng bộ custom URL từ Firestore');
           }
-        } else {
-          // Firestore chưa có preferences → giữ local
-          state.preferences = state.preferences || { background: 'bg-default' };
         }
         
         
