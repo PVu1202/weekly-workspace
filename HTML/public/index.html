@@ -79,11 +79,10 @@
     document.documentElement.classList.add(bg);
     
     if (bg === 'bg-custom' && customUrl) {
-      // Apply inline ngay — không cần đợi body
       var style = document.createElement('style');
       style.id = 'early-bg-style';
       style.textContent = 
-        'html.bg-custom, body.bg-custom {' +
+        'body.bg-custom {' +
           'background-image: url("' + customUrl + '") !important;' +
           'background-size: cover !important;' +
           'background-position: center !important;' +

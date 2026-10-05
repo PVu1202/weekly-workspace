@@ -62,18 +62,12 @@ function applyCustomBgToDOM(data) {
   document.body.style.setProperty('background-repeat', 'no-repeat', 'important');
   document.body.style.setProperty('--custom-overlay', data.overlay || 0.65);
   
-  document.documentElement.style.setProperty('background-image', 'url("' + data.url + '")', 'important');
-  document.documentElement.style.setProperty('background-size', 'cover', 'important');
-  document.documentElement.style.setProperty('background-position', 'center', 'important');
-  document.documentElement.style.setProperty('background-attachment', 'fixed', 'important');
-  document.documentElement.style.setProperty('background-repeat', 'no-repeat', 'important');
 }
 
 function clearCustomBgFromDOM() {
   var props = ['background-image', 'background-size', 'background-position', 'background-attachment', 'background-repeat'];
   props.forEach(function(p) {
     document.body.style.removeProperty(p);
-    document.documentElement.style.removeProperty(p);
   });
   document.body.style.removeProperty('--custom-overlay');
   

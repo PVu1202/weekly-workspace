@@ -564,76 +564,76 @@ body.bg-custom header {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   CUSTOM BG + AUTH SCREEN — Fix background bị che
+   CUSTOM BG — Chỉ áp dụng cho MAIN APP, KHÔNG cho Auth Screen
    ═══════════════════════════════════════════════════════════════ */
 
-/* Auth screen trong suốt khi body có custom bg */
+/* ⚠️ QUAN TRỌNG: Auth screen LUÔN giữ nền riêng, không bị ảnh hưởng */
 body.bg-custom #authScreen {
-  background: transparent !important;
+  /* Để auth screen dùng lại nền kem waves gốc */
+  background: #06060a !important;
   background-image: none !important;
+  /* Không có ảnh custom ở đây */
 }
 
-/* Ẩn lớp noise của auth screen */
+/* Đảm bảo các layer waves hiện lại trong auth screen */
+body.bg-custom #authScreen .auth-waves-bg {
+  display: block !important;
+}
+
+body.bg-custom #authScreen .cyber-waves-bg {
+  display: block !important;
+}
+
 body.bg-custom #authScreen::before {
+  display: block !important;
+  content: '' !important;
+}
+
+/* ═══ CHỈ MAIN APP CÓ CUSTOM BG ═══ */
+
+/* Main app hiển thị ảnh nền custom */
+body.bg-custom #appMain {
+  background: transparent !important;
+  background-image: none !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Tắt các lớp phủ cũ của theme trong main app */
+body.bg-custom #appMain::before,
+body.bg-custom #appMain::after {
   display: none !important;
   content: none !important;
 }
 
-/* Giữ ambient glow nhẹ nhưng trong suốt */
-body.bg-custom #authScreen::after {
-  background: radial-gradient(
-    circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(124, 93, 250, 0.06),
-    transparent 60%
-  ) !important;
-}
-
-/* Ẩn cả 2 lớp SVG waves */
-body.bg-custom .auth-waves-bg {
-  display: none !important;
-}
-
-body.bg-custom .cyber-waves-bg {
-  display: none !important;
-}
-
-/* Đảm bảo nội dung auth nằm trên ảnh nền */
-body.bg-custom .auth-left,
-body.bg-custom .auth-right {
-  position: relative;
-  z-index: 10 !important;
-}
-
-/* Auth card vẫn có nền riêng để đọc text */
-body.bg-custom .auth-card {
-  background: linear-gradient(160deg, 
-    rgba(19, 19, 29, 0.92) 0%, 
-    rgba(13, 13, 20, 0.94) 100%) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-
-/* Auth left panel — thêm overlay tối để đọc text trên ảnh nền */
-body.bg-custom .auth-left {
-  position: relative;
-}
-
-body.bg-custom .auth-left::before {
+/* Overlay tối trên main app — nhưng KHÔNG che auth screen */
+body.bg-custom #appMain::before {
   content: '';
+  display: block !important;
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, 
-    rgba(0, 0, 0, 0.5) 0%, 
-    rgba(0, 0, 0, 0.2) 60%,
-    transparent 100%);
+  background: rgba(0, 0, 0, var(--custom-overlay, 0.65));
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
-/* Mobile: auth screen stack dọc */
-@media (max-width: 900px) {
-  body.bg-custom #authScreen {
-    background: rgba(0, 0, 0, 0.6) !important;
-    backdrop-filter: blur(8px);
-  }
+/* Content main app nằm trên overlay */
+body.bg-custom #appMain > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar trong suốt để thấy nền */
+body.bg-custom #appSidebar {
+  background: rgba(8, 8, 12, 0.7) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Header trong suốt */
+body.bg-custom header {
+  background: rgba(13, 13, 20, 0.65) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
