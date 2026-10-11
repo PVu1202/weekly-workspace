@@ -1049,7 +1049,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_.85fr] gap-5">
+        <div class="grid grid-cols-1 gap-5">
           <div class="glass-panel rounded-3xl p-5 border border-white/5">
             <div class="flex items-center justify-between mb-4">
               <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-square-check text-fuchsia-400"></i> Việc hôm nay</h3></div>
@@ -1057,29 +1057,112 @@
             </div>
             <div id="aiTodayTaskList" class="space-y-2.5"></div>
           </div>
-          <div class="glass-panel rounded-3xl p-5 border border-white/5">
-            <div class="flex items-center justify-between mb-4">
-              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-robot text-fuchsia-400"></i> Gợi ý AI</h3></div>
-              <span class="text-[10px] text-gray-500">AI</span>
-            </div>
-            <div id="aiRecommendationCard" class="rounded-2xl bg-black/15 border border-white/5 p-4 min-h-[170px]">
-              <div class="flex items-center gap-3 text-gray-400"><div class="w-9 h-9 rounded-xl bg-fuchsia-500/10 text-fuchsia-300 flex items-center justify-center"><i class="fa-solid fa-lightbulb"></i></div><div><p class="text-sm font-semibold text-white">Đang chuẩn bị...</p></div></div>
-            </div>
-          </div>
         </div>
 
         <div class="ai-reminder-panel rounded-3xl p-5 border border-fuchsia-500/20">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="ai-mini-mascot flex items-center justify-center text-3xl">🤖</div>
-              <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-regular fa-bell text-amber-300"></i> Nhắc nhở thông minh</h3><p id="nextReminderText" class="text-[11px] text-gray-400 mt-1">Bật để AI nhắc khi còn việc.</p></div>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-2 shrink-0">
-              <span id="notificationStatus" class="px-3 py-2 rounded-xl bg-white/5 text-gray-400 text-[10px] flex items-center justify-center">Chưa bật</span>
-              <button onclick="ww.enableTaskNotifications()" class="px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90 text-white rounded-xl text-xs font-bold transition"><i class="fa-regular fa-bell mr-1"></i> Bật nhắc nhở</button>
+  
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+          <div class="flex items-center gap-3">
+            <div class="ai-mini-mascot flex items-center justify-center text-3xl">🤖</div>
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-regular fa-bell text-amber-300"></i> Tùy chỉnh thông báo
+              </h3>
+              <p id="nextReminderText" class="text-[11px] text-gray-400 mt-1">Bật để nhận nhắc nhở công việc.</p>
             </div>
           </div>
+          <div class="flex flex-col sm:flex-row gap-2 shrink-0">
+            <span id="notificationStatus" class="px-3 py-2 rounded-xl bg-white/5 text-gray-400 text-[10px] flex items-center justify-center">Chưa bật</span>
+            <button onclick="ww.enableTaskNotifications()" id="notifToggleBtn" class="px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90 text-white rounded-xl text-xs font-bold transition">
+              <i class="fa-regular fa-bell mr-1"></i> Bật nhắc nhở
+            </button>
+          </div>
         </div>
+
+        <!-- Settings -->
+        <div id="notificationSettings" class="space-y-4">
+
+          <!-- Nhắc trước hạn bao lâu -->
+          <div class="notif-row">
+            <div class="notif-label">
+              <i class="fa-solid fa-clock text-cyan-400"></i>
+              <span>Nhắc trước hạn bao lâu</span>
+            </div>
+            <select id="notifBeforeDeadline" class="notif-select" onchange="ww.saveNotificationSettings()">
+              <option value="0">Đúng giờ</option>
+              <option value="15">Trước 15 phút</option>
+              <option value="30" selected>Trước 30 phút</option>
+              <option value="60">Trước 1 giờ</option>
+              <option value="120">Trước 2 giờ</option>
+              <option value="1440">Trước 1 ngày</option>
+            </select>
+          </div>
+
+          <!-- Nhắc task quá hạn -->
+          <div class="notif-row">
+            <div class="notif-label">
+              <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
+              <span>Nhắc khi task quá hạn</span>
+            </div>
+            <label class="notif-switch">
+              <input type="checkbox" id="notifOverdue" checked onchange="ww.saveNotificationSettings()">
+              <span class="notif-slider"></span>
+            </label>
+          </div>
+
+          <!-- Nhắc tổng kết mỗi ngày -->
+          <div class="notif-row">
+            <div class="notif-label">
+              <i class="fa-solid fa-sun text-amber-400"></i>
+              <span>Nhắc tổng kết mỗi ngày</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="time" id="notifDailyTime" value="20:00" class="notif-time" onchange="ww.saveNotificationSettings()">
+              <label class="notif-switch">
+                <input type="checkbox" id="notifDailyEnabled" checked onchange="ww.saveNotificationSettings()">
+                <span class="notif-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Âm thanh thông báo -->
+          <div class="notif-row">
+            <div class="notif-label">
+              <i class="fa-solid fa-volume-high text-emerald-400"></i>
+              <span>Âm thanh thông báo</span>
+            </div>
+            <label class="notif-switch">
+              <input type="checkbox" id="notifSound" checked onchange="ww.saveNotificationSettings()">
+              <span class="notif-slider"></span>
+            </label>
+          </div>
+
+          <!-- Tần suất nhắc AI -->
+          <div class="notif-row">
+            <div class="notif-label">
+              <i class="fa-solid fa-robot text-fuchsia-400"></i>
+              <span>Tần suất nhắc của AI</span>
+            </div>
+            <select id="notifFrequency" class="notif-select" onchange="ww.saveNotificationSettings()">
+              <option value="15">Mỗi 15 phút</option>
+              <option value="30" selected>Mỗi 30 phút</option>
+              <option value="60">Mỗi 1 giờ</option>
+              <option value="120">Mỗi 2 giờ</option>
+              <option value="0">Không tự động</option>
+            </select>
+          </div>
+
+          <!-- Test button -->
+          <div class="flex justify-end pt-2 border-t border-white/5">
+            <button onclick="ww.testNotification()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg text-xs font-semibold transition border border-white/10 flex items-center gap-2">
+              <i class="fa-solid fa-flask"></i>
+              Thử thông báo
+            </button>
+          </div>
+
+        </div>
+      </div>
       </section>
 <!-- ═══════ TAB: THỐNG KÊ ═══════ -->
 <section id="statsTab" class="tab-content hidden space-y-5">
@@ -1280,6 +1363,7 @@
 <script src="/src/scripts/features/deadline.js"></script>
 <script src="/src/scripts/features/review.js"></script>
 <script src="/src/scripts/features/backup.js"></script>
+<script src="/src/scripts/features/notification-settings.js"></script>
 
 <!-- ═══ RENDER ═══ -->
 <script src="/src/scripts/render/weekly-progress.js"></script>
