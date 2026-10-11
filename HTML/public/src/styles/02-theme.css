@@ -908,17 +908,7 @@ textarea::placeholder {
     0 0 0 1px rgba(139, 92, 246, 0.1),
     0 0 60px rgba(139, 92, 246, 0.08) !important;
   backdrop-filter: blur(24px) !important;
-  animation: swalPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
-           swalShake 0.5s ease-out 0.6s;
-           
-           
-           @keyframes swalShake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-}
+  /* ✅ CHỈ giữ 1 animation — XÓA swalShake */
 }
 
 .swal2-title {
