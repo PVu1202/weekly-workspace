@@ -58,14 +58,9 @@ function switchTab(tabId) {
     if (headerTitle) headerTitle.innerText = 'Thời Gian & Pomodoro';
     if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-stopwatch text-gemini-cyan"></i>';
   } else if (tabId === 'aiCoachTab') {
-    if (headerTitle) headerTitle.innerText = 'AI Coach & Nhắc Nhở';
-    if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-fuchsia-400"></i>';
-    if (typeof renderAIDashboardPreview === 'function') renderAIDashboardPreview();
-    setTimeout(function() {
-      if (typeof getAIRecommendations === 'function') {
-        getAIRecommendations({ silent: true });
-      }
-    }, 250);
+  if (headerTitle) headerTitle.innerText = 'Công Việc & Nhắc Nhở';
+  if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-bell text-amber-400"></i>';
+  if (typeof renderAIDashboardPreview === 'function') renderAIDashboardPreview();
   } else if (tabId === 'reviewTab') {
     if (headerTitle) headerTitle.innerText = 'Nhìn Lại Cuối Tuần';
     if (headerIcon) headerIcon.innerHTML = '<i class="fa-solid fa-clipboard-check text-gemini-emerald"></i>';
