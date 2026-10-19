@@ -252,40 +252,46 @@ function _openBackgroundPickerNow() {
           '<div class="bg-picker-grid">' + presetItemsHtml + '</div>' +
         '</div>' +
         '<div id="bgCustomPanel" class="bg-custom-panel">' +
-  
-          // ✅ GỘP UPLOAD VÀ PREVIEW VÀO 1 Ô
           '<div class="bg-upload-zone" id="bgUploadZone" onclick="document.getElementById(\'bgFileInput\').click()">' +
-            
-            // Nội dung mặc định (icon + text)
-            '<div class="bg-upload-content">' +
-              '<i class="fa-solid fa-cloud-arrow-up bg-upload-icon"></i>' +
-              '<div class="bg-upload-text">Click hoặc kéo ảnh vào đây</div>' +
-              '<div class="bg-upload-hint">JPG, PNG, WEBP · Tối đa 10MB</div>' +
-            '</div>' +
-            
-            // Overlay hiện khi đã có ảnh (hover để đổi)
-            '<div class="bg-upload-hover-overlay">' +
-              '<i class="fa-solid fa-arrows-rotate"></i>' +
-              '<span>Thay đổi ảnh</span>' +
-            '</div>' +
-            
+            '<i class="fa-solid fa-cloud-arrow-up bg-upload-icon"></i>' +
+            '<div class="bg-upload-text">Click hoặc kéo ảnh vào đây</div>' +
+            '<div class="bg-upload-hint">JPG, PNG, WEBP · Tối đa 10MB</div>' +
           '</div>' +
-          
           '<input type="file" id="bgFileInput" accept="image/*" style="display:none">' +
-          
           '<div class="bg-or-divider">hoặc</div>' +
-          
-          // URL Input
           '<input type="url" id="bgUrlInput" class="bg-url-input" ' +
             'placeholder="Dán URL ảnh (https://...)" ' +
             'onkeydown="if(event.key===\'Enter\'){event.preventDefault();ww.useBgUrl();}">' +
-          '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.useBgUrl()" style="margin-bottom:16px">' +
+          '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.useBgUrl()" style="margin-bottom:12px">' +
             '<i class="fa-solid fa-link"></i> Dùng URL này' +
           '</button>' +
-          
-          // Overlay slider (giữ nguyên)
+          '<div class="bg-preview-box" id="bgPreviewBox">' +
+            '<img id="bgPreviewImg" src="" alt="Preview">' +
+            '<div class="bg-preview-overlay" id="bgPreviewOverlay"></div>' +
+            '<div class="bg-preview-label">Preview</div>' +
+          '</div>' +
           '<div class="bg-overlay-control">' +
-          // ... (giữ nguyên phần slider)
+            '<div class="bg-overlay-label">' +
+              '<span>Độ tối overlay</span>' +
+              '<span class="bg-overlay-value" id="bgOverlayValue">65%</span>' +
+            '</div>' +
+            '<input type="range" id="bgOverlaySlider" class="bg-overlay-slider" ' +
+              'min="0" max="0.9" step="0.05" value="0.65">' +
+          '</div>' +
+          '<div class="bg-custom-actions">' +
+            '<button type="button" class="bg-btn bg-btn-secondary" onclick="ww.resetBgCustom()">' +
+              '<i class="fa-solid fa-rotate-left"></i> Đặt lại' +
+            '</button>' +
+            '<button type="button" class="bg-btn bg-btn-primary" onclick="ww.applyCustomBg()">' +
+              '<i class="fa-solid fa-check"></i> Áp dụng' +
+            '</button>' +
+          '</div>' +
+          (currentBg === 'bg-custom' 
+            ? '<button type="button" class="bg-remove-btn" onclick="ww.removeCustomBg()">' +
+                '<i class="fa-solid fa-trash-can"></i> Xóa nền tùy chỉnh' +
+              '</button>'
+            : '') +
+        '</div>' +
       '</div>',
       
     showConfirmButton: false,
@@ -312,7 +318,7 @@ function _openBackgroundPickerNow() {
         ['dragenter', 'dragover'].forEach(function(evt) {
           uploadZone.addEventListener(evt, function(e) {
             e.preventDefault();
-            uploadZone.classList.add('dragover'); // CSS mới sẽ xử lý hiệu ứng
+            uploadZone.classList.add('dragover');
           });
         });
         ['dragleave', 'drop'].forEach(function(evt) {
@@ -579,25 +585,26 @@ function cleanupOldBackgrounds() {
 // ═══════════════════════════════════════════════════════════════
 
 function updateCustomPreview(url) {
-  var uploadZone = document.getElementById('bgUploadZone');
+  var previewBox = document.getElementById('bgPreviewBox');
+  var previewImg = document.getElementById('bgPreviewImg');
+  var previewOverlay = document.getElementById('bgPreviewOverlay');
   var overlayValue = document.getElementById('bgOverlayValue');
   var slider = document.getElementById('bgOverlaySlider');
   
-  if (!uploadZone) return;
+  if (!previewBox || !previewImg) return;
   
   if (url) {
-    // Có ảnh -> set làm background, thêm class
-    uploadZone.style.backgroundImage = 'url("' + url + '")';
-    uploadZone.classList.add('has-image');
+    previewImg.src = url;
+    previewBox.classList.add('active');
     
-    // Update slider text
     var overlay = (_customBgData && _customBgData.overlay) || 
                   (slider ? parseFloat(slider.value) : 0.65);
+    
+    if (previewOverlay) previewOverlay.style.setProperty('--preview-overlay', overlay);
     if (overlayValue) overlayValue.textContent = Math.round(overlay * 100) + '%';
   } else {
-    // Không có ảnh -> xóa background
-    uploadZone.style.backgroundImage = '';
-    uploadZone.classList.remove('has-image');
+    previewBox.classList.remove('active');
+    previewImg.src = '';
   }
 }
 
